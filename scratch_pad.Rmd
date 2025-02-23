@@ -1,0 +1,45 @@
+---
+title: "Scratch Pad"
+author: "Bryan Johns"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Scratch Pad for Cyclistic Data Analysis
+
+Exploratory Data Analysis, unencumbered by the need to be presentable
+
+```{r}
+# Load the data, combine into a df
+q1_2019 = read.csv("./resources/data/q1_2019_cleaned.csv")
+q2_2019 = read.csv("./resources/data/q2_2019_cleaned.csv")
+q3_2019 = read.csv("./resources/data/q3_2019_cleaned.csv")
+q4_2019 = read.csv("./resources/data/q4_2019_cleaned.csv")
+q1_2020 = read.csv("./resources/data/q1_2020_cleaned.csv")
+
+# 2020 data contains chars in ride_id and rideable_type
+convert_columns_to_character <- function(df) {
+  df <- mutate(df, 
+               ride_id = as.character(ride_id),
+               rideable_type = as.character(rideable_type))
+  return(df)
+}
+
+# Apply the function to each quarter's data frame
+q1_2019 <- convert_columns_to_character(q1_2019)
+q2_2019 <- convert_columns_to_character(q2_2019)
+q3_2019 <- convert_columns_to_character(q3_2019)
+q4_2019 <- convert_columns_to_character(q4_2019)
+
+df <- bind_rows(q1_2019, q2_2019, q3_2019, q4_2019, q1_2020)
+```
+
