@@ -151,6 +151,46 @@ is.numeric(all_trips$ride_length)
 # https://www.datasciencemadesimple.com/delete-or-drop-rows-in-r-with-conditions-2/
 all_trips_v2 <- all_trips[!(all_trips$start_station_name == "HQ QR" | all_trips$ride_length<0),]
 
+
+
+
+# Repeat, for individual Quarters, in case I want to analyze data by season (using Q1, 2, 3, and 4 as proxies for seasons)
+clean_data <- function(df) {
+  # Define the columns to drop
+  columns_to_drop <- c("start_lat", "start_lng", "end_lat", "end_lng", "birthyear", "gender", "tripduration")
+  
+  # Drop columns if they exist in the dataframe (to account for differences between 2019 and 2020)
+  df <- df %>% select(-one_of(intersect(columns_to_drop, colnames(df))))
+  
+  # Consolidate the member_casual column
+  df <- df %>% mutate(member_casual = recode(member_casual, "Subscriber" = "member", "Customer" = "casual"))
+  
+  # Add date-related columns
+  df$date <- as.Date(df$started_at)
+  df$month <- format(as.Date(df$date), "%m")
+  df$day <- format(as.Date(df$date), "%d")
+  df$year <- format(as.Date(df$date), "%Y")
+  df$day_of_week <- format(as.Date(df$date), "%A")
+  
+  # Add ride_length column
+  df$ride_length <- difftime(df$ended_at, df$started_at)
+  
+  # Convert ride_length to numeric
+  df$ride_length <- as.numeric(as.character(df$ride_length))
+  
+  # Remove rows with start_station_name "HQ QR" or negative ride_length
+  df <- df[!(df$start_station_name == "HQ QR" | df$ride_length < 0),]
+  
+  return(df)
+}
+
+# Apply the function to create cleaned data frames
+q1_2019_cleaned <- clean_data(q1_2019)
+q2_2019_cleaned <- clean_data(q2_2019)
+q3_2019_cleaned <- clean_data(q3_2019)
+q4_2019_cleaned <- clean_data(q4_2019)
+q1_2020_cleaned <- clean_data(q1_2020)
+
 #=====================================
 # STEP 4: CONDUCT DESCRIPTIVE ANALYSIS
 #=====================================
@@ -217,6 +257,12 @@ ggsave("./resources/images/average_duration.png", plot = p)
 # N.B.: This file location is for a Mac. If you are working on a PC, change the file location accordingly (most likely "C:\Users\YOUR_USERNAME\Desktop\...") to export the data. You can read more here: https://datatofish.com/export-dataframe-to-csv-in-r/
 counts <- aggregate(all_trips_v2$ride_length ~ all_trips_v2$member_casual + all_trips_v2$day_of_week, FUN = mean)
 write.csv(counts, file = './resources/data/avg_ride_length.csv')
+write.csv(q1_2019_cleaned, file = './resources/data/q1_2019_cleaned.csv')
+write.csv(q2_2019_cleaned, file = './resources/data/q2_2019_cleaned.csv')
+write.csv(q3_2019_cleaned, file = './resources/data/q3_2019_cleaned.csv')
+write.csv(q4_2019_cleaned, file = './resources/data/q4_2019_cleaned.csv')
+write.csv(q1_2020_cleaned, file = './resources/data/q1_2020_cleaned.csv')
+
 
 
 
