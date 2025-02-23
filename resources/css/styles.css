@@ -1,0 +1,12 @@
+/* styles.css */
+body {
+    font-size: 12pt;
+}
+
+blockquote {
+    font-size: 10pt;
+    color: #555;
+    border-left: 4px solid #ccc;
+    padding-left: 10px;
+    margin-left: 0;
+}

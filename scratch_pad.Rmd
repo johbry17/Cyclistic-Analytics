@@ -43,3 +43,29 @@ q4_2019 <- convert_columns_to_character(q4_2019)
 df <- bind_rows(q1_2019, q2_2019, q3_2019, q4_2019, q1_2020)
 ```
 
+```{r}
+table(df$member_casual)
+```
+!!NOTE!! - This is where I realized that ride_length was in minutes for 2019, seconds for 2020, and had to adjust data cleaning. It has been rectified.
+```{r}
+summary(df$ride_length)
+```
+There are some ridiculously long rides.
+
+```{r}
+max(df$ride_length)/60/24
+```
+123 days!
+```{r}
+print(df[which.max(df$ride_length), ])
+```
+
+```{r}
+ggplot(df, aes(y = ride_length)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Ride Lengths",
+       y = "Ride Length (minutes)",
+       x = "") +
+  theme_minimal()
+```
+

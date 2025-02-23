@@ -172,8 +172,11 @@ clean_data <- function(df) {
   df$year <- format(as.Date(df$date), "%Y")
   df$day_of_week <- format(as.Date(df$date), "%A")
   
-  # Add ride_length column
-  df$ride_length <- difftime(df$ended_at, df$started_at)
+  # Add ride_length column, converting data to minutes
+  # 2019 was in mins, 2020 in secs - combining to all_trips above must've forced calculations to seconds
+  # df$started_at <- as.POSIXct(df$started_at, format="%Y-%m-%d %H:%M:%S")
+  # df$ended_at <- as.POSIXct(df$ended_at, format="%Y-%m-%d %H:%M:%S")
+  df$ride_length <- difftime(df$ended_at, df$started_at, units = "mins")
   
   # Convert ride_length to numeric
   df$ride_length <- as.numeric(as.character(df$ride_length))

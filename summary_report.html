@@ -11,7 +11,6 @@
 
 <meta name="author" content="Bryan Johns" />
 
-<meta name="date" content="2025-02-23" />
 
 <title>Cyclistic</title>
 
@@ -1322,6 +1321,7 @@ if (window.hljs) {
 
 
 
+<style type="text/css">body {font-size: 12pt;}blockquote {font-size: 10pt;color: #555;border-left: 4px solid #ccc;padding-left: 10px;margin-left: 0;}</style>
 
 
 
@@ -1483,7 +1483,7 @@ border-radius: 0px;
 <h3 class="subtitle">Analysis of difference in ridership patterns
 between casual and member customers</h3>
 <h4 class="author">Bryan Johns</h4>
-<h4 class="date">2025-02-23</h4>
+<h4 class="date">2025-02</h4>
 
 </div>
 
@@ -1526,11 +1526,7 @@ these insights, your team will design a new marketing strategy to
 convert casual riders into annual members. But first, Cyclistic
 executives must approve your recommendations, so they must be backed up
 with compelling data insights and professional data visualizations.</p>
-</blockquote>
-<blockquote>
 <p>Characters and teams</p>
-</blockquote>
-<blockquote>
 <p>● Cyclistic: A bike-share program that features more than 5,800
 bicycles and 600 docking stations. Cyclistic sets itself apart by also
 offering reclining bikes, hand tricycles, and cargo bikes, making
@@ -1539,37 +1535,25 @@ can’t use a standard two-wheeled bike. The majority of riders opt for
 traditional bikes; about 8% of riders use the assistive options.
 Cyclistic users are more likely to ride for leisure, but about 30% use
 the bikes to commute to work each day.</p>
-</blockquote>
-<blockquote>
 <p>● Lily Moreno: The director of marketing and your manager. Moreno is
 responsible for the development of campaigns and initiatives to promote
 the bike-share program. These may include email, social media, and other
 channels.</p>
-</blockquote>
-<blockquote>
 <p>● Cyclistic marketing analytics team: A team of data analysts who are
 responsible for collecting, analyzing, and reporting data that helps
 guide Cyclistic marketing strategy. You joined this team six months ago
 and have been busy learning about Cyclistic’s mission and business
 goals—as well as how you, as a junior data analyst, can help Cyclistic
 achieve them.</p>
-</blockquote>
-<blockquote>
 <p>● Cyclistic executive team: The notoriously detail-oriented executive
 team will decide whether to approve the recommended marketing
 program.</p>
-</blockquote>
-<blockquote>
 <p>About the company</p>
-</blockquote>
-<blockquote>
 <p>In 2016, Cyclistic launched a successful bike-share offering. Since
 then, the program has grown to a fleet of 5,824 bicycles that are
 geotracked and locked into a network of 692 stations across Chicago. The
 bikes can be unlocked from one station and returned to any other station
 in the system anytime.</p>
-</blockquote>
-<blockquote>
 <p>Until now, Cyclistic’s marketing strategy relied on building general
 awareness and appealing to broad consumer segments. One approach that
 helped make these things possible was the flexibility of its pricing
@@ -1577,8 +1561,6 @@ plans: single-ride passes, full-day passes, and annual memberships.
 Customers who purchase single-ride or full-day passes are referred to as
 casual riders. Customers who purchase annual memberships are Cyclistic
 members.</p>
-</blockquote>
-<blockquote>
 <p>Cyclistic’s finance analysts have concluded that annual members are
 much more profitable than casual riders. Although the pricing
 flexibility helps Cyclistic attract more customers, Moreno believes that
@@ -1588,8 +1570,6 @@ customers, Moreno believes there is a solid opportunity to convert
 casual riders into members. She notes that casual riders are already
 aware of the Cyclistic program and have chosen Cyclistic for their
 mobility needs.</p>
-</blockquote>
-<blockquote>
 <p>Moreno has set a clear goal: Design marketing strategies aimed at
 converting casual riders into annual members. In order to do that,
 however, the team needs to better understand how annual members and
@@ -1597,29 +1577,21 @@ casual riders differ, why casual riders would buy a membership, and how
 digital media could affect their marketing tactics. Moreno and her team
 are interested in analyzing the Cyclistic historical bike trip data to
 identify trends.</p>
-</blockquote>
-<blockquote>
 <p>Note that data-privacy issues prohibit you from using riders’
 personally identifiable information. This means that you won’t be able
 to connect pass purchases to credit card numbers to determine if casual
 riders live in the Cyclistic service area or if they have purchased
 multiple single passes.</p>
-</blockquote>
-<blockquote>
 <p>Three questions will guide the future marketing program:</p>
-</blockquote>
-<blockquote>
 <ol style="list-style-type: decimal">
 <li>How do annual members and casual riders use Cyclistic bikes
 differently?</li>
 <li>Why would casual riders buy Cyclistic annual memberships?</li>
 <li>How can Cyclistic use digital media to influence casual riders to
-become members?</li>
+become members? <br><br></li>
 </ol>
-</blockquote>
-<blockquote>
-<p>Moreno has assigned you the first question to answer: How do annual
-members and casual riders use Cyclistic bikes differently?</p>
+Moreno has assigned you the first question to answer: How do annual
+members and casual riders use Cyclistic bikes differently?
 </blockquote>
 </div>
 <div id="ask" class="section level2">
@@ -1649,14 +1621,13 @@ straight to analysis). See
 <code>data_cleaning_v1_2019q1_2020q1.R</code>.</p>
 <p>I slightly modified the script to clean individual quarters of
 Cyclistic data. Google’s template covered only Q1 2019 and Q1 2020. I
-wanted to have 2019’s Q2, Q3, and Q4 available.</p>
+wanted to have 2019’s Q2, Q3, and Q4 available. This briefly
+catastrophically halted data analysis, as ride length was calculated in
+minutes for 2019, and seconds in 2020.</p>
 <p>Data cleaning consisted of:</p>
 <p>● Removing some columns to match the 2019 and 2020 datasets (Trip
 duration, gender, and birth year from 2019, station latitude and
-longitude from 2020). Note: gender and birth year might be fruitful
-avenues of exploration for data analysis, and I could probably
-reconstruct and then map out every station from 2020’s lat/long
-data.</p>
+longitude from 2020).</p>
 <p>● Consolidating the “member_casual” column from four labels to two
 (“member” and “casual”), instead of the original two names for members
 (“member” and “Subscriber”) and two names for casual riders (“Customer”
