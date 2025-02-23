@@ -1,0 +1,9 @@
+# Ignore large files
+Divvy_Trips_2019_Q2.csv
+Divvy_Trips_2019_Q3.csv
+Divvy_Trips_2019_Q4.csv
+q2_2019_cleaned.csv
+q3_2019_cleaned.csv
+q4_2019_cleaned.csv
+
+.RDataTmp
