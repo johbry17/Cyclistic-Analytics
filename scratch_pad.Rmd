@@ -16,7 +16,7 @@ library(tidyverse)
 
 ## Scratch Pad for Cyclistic Data Analysis
 
-Exploratory Data Analysis, unencumbered by the need to be presentable
+Exploratory Data Analysis, unencumbered by the need to be **too** presentable. 
 
 ```{r}
 # Load the data, combine into a df
@@ -24,29 +24,41 @@ q1_2019 = read.csv("./resources/data/q1_2019_cleaned.csv")
 q2_2019 = read.csv("./resources/data/q2_2019_cleaned.csv")
 q3_2019 = read.csv("./resources/data/q3_2019_cleaned.csv")
 q4_2019 = read.csv("./resources/data/q4_2019_cleaned.csv")
-q1_2020 = read.csv("./resources/data/q1_2020_cleaned.csv")
+# q1_2020 = read.csv("./resources/data/q1_2020_cleaned.csv")
 
 # 2020 data contains chars in ride_id and rideable_type
-convert_columns_to_character <- function(df) {
-  df <- mutate(df, 
-               ride_id = as.character(ride_id),
-               rideable_type = as.character(rideable_type))
-  return(df)
-}
+# convert_columns_to_character <- function(df) {
+#   df <- mutate(df, 
+#                ride_id = as.character(ride_id),
+#                rideable_type = as.character(rideable_type))
+#   return(df)
+# }
 
 # Apply the function to each quarter's data frame
-q1_2019 <- convert_columns_to_character(q1_2019)
-q2_2019 <- convert_columns_to_character(q2_2019)
-q3_2019 <- convert_columns_to_character(q3_2019)
-q4_2019 <- convert_columns_to_character(q4_2019)
+# q1_2019 <- convert_columns_to_character(q1_2019)
+# q2_2019 <- convert_columns_to_character(q2_2019)
+# q3_2019 <- convert_columns_to_character(q3_2019)
+# q4_2019 <- convert_columns_to_character(q4_2019)
 
-df <- bind_rows(q1_2019, q2_2019, q3_2019, q4_2019, q1_2020)
+# df <- bind_rows(q1_2019, q2_2019, q3_2019, q4_2019, q1_2020)
+df <- bind_rows(q1_2019, q2_2019, q3_2019, q4_2019)
 ```
+
+Number of member vs casual rides
 
 ```{r}
 table(df$member_casual)
 ```
-!!NOTE!! - This is where I realized that ride_length was in minutes for 2019, seconds for 2020, and had to adjust data cleaning. It has been rectified.
+3 million member rides vs 1 million casual rides. Unfortunately, there is no way to tell how many are repeat users. Presumably, many member riders repeat far more often than casual riders.
+
+In the scenario, and in real life, the data is shared without any sort of identifying information that would help track that, probably why after 2019 they removed gender and birthyear.
+
+
+--------------
+
+
+!!NOTE!! - Below is where I realized that ride_length was in minutes for 2019, seconds for 2020, and had to adjust data cleaning. It has been rectified.
+
 ```{r}
 summary(df$ride_length)
 ```
@@ -55,7 +67,8 @@ There are some ridiculously long rides.
 ```{r}
 max(df$ride_length)/60/24
 ```
-123 days!
+123 days! Hell of an outlier.
+
 ```{r}
 print(df[which.max(df$ride_length), ])
 ```
@@ -68,4 +81,188 @@ ggplot(df, aes(y = ride_length)) +
        x = "") +
   theme_minimal()
 ```
+Kinda pointless to plot that.
+
+## Rides by Member type (total rides, duration)
+
+```{r}
+# sum total ride length by membership type
+total_minutes_ridden <- df %>%
+  group_by(member_casual) %>%
+  summarise(total_minutes = sum(ride_length, na.rm = TRUE))
+
+# bar chart of total minutes ridden
+ggplot(total_minutes_ridden, aes(x = member_casual, y = total_minutes, fill = member_casual)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = round(total_minutes)), vjust = -0.5) +
+  theme_minimal() +
+  labs(title = "Total Minutes Ridden by Membership Type", y = "Total Minutes Ridden", x = "Rider Type")
+
+```
+
+```{r}
+# sum average ride length by membership type
+average_ride_length <- df %>%
+  group_by(member_casual) %>%
+  summarise(average_minutes = mean(ride_length, na.rm = TRUE))
+
+# bar chart of average ride length
+ggplot(average_ride_length, aes(x = member_casual, y = average_minutes, fill = member_casual)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = round(average_minutes, 1)), vjust = -0.5) +
+  theme_minimal() +
+  labs(title = "Average Ride Length by Membership Type", y = "Average Ride Length (minutes)", x = "Rider Type")
+```
+
+```{r}
+# bar chart 0f ride frequency per user
+ggplot(df, aes(x = member_casual, fill = member_casual)) +
+  geom_bar() +
+  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5) +
+  labs(title = "Total Rides by Membership Type",
+       x = "Rider Type",
+       y = "Total Rides") +
+  theme_minimal()
+
+```
+
+```{r}
+# histograms of ride length per user type
+ggplot(df, aes(x = ride_length, fill = member_casual)) +
+  geom_histogram(binwidth = 5, alpha = 0.7) +
+  facet_wrap(~ member_casual, scales = "free_y") +
+  labs(title = "Histogram of Ride Lengths by Membership Type",
+       x = "Ride Length (minutes)",
+       y = "Frequency") +
+  theme_minimal() +
+  # scale_fill_manual(values = c("member" = "blue", "casual" = "red")) +
+  xlim(0,100)
+```
+
+Members ride more frequently for shorter duration (probably commuting).
+
+Casuals ride longer, enough to beat members for total minutes on a bicycle.
+
+## Time and Ridership
+
+```{r}
+# line chart of rides per month
+df %>%
+  group_by(month, member_casual) %>%
+  summarise(rides = n()) %>%
+  ggplot(aes(x = month, y = rides, color = member_casual, group = member_casual)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Rides per Month, by Customer Type", x = "Month", y = "Number of Rides")
+```
+
+Peak in August, unsurprisingly.
+
+```{r}
+# bar chart of rides per month
+df %>%
+  group_by(month, member_casual) %>%
+  summarise(rides = n()) %>%
+  ggplot(aes(x = month, y = rides, fill = member_casual)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_minimal() +
+  labs(title = "Total Rides per Month by Customer Type", x = "Month", y = "Number of Rides")
+```
+
+```{r}
+# rides per season
+df %>%
+  mutate(season = factor(season, levels = c("Winter", "Spring", "Summer", "Fall"))) %>%
+  group_by(season, member_casual) %>%
+  summarise(rides = n()) %>%
+  ggplot(aes(x = season, y = rides, fill = member_casual)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = rides), vjust = -0.5, position = position_dodge(0.9)) +
+  theme_minimal() +
+  labs(title = "Total Rides per Season by Customer Type", x = "Season", y = "Number of Rides") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
+```
+
+```{r}
+# line chart of rides per hour
+df %>%
+  group_by(hour, member_casual) %>%
+  summarise(rides = n()) %>%
+  ggplot(aes(x = hour, y = rides, color = member_casual, group = member_casual)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Rides per Hour, by Customer Type", x = "Hour", y = "Number of Rides")
+```
+
+```{r}
+# bar chart of rides per hour
+df %>%
+  group_by(hour, member_casual) %>%
+  summarise(rides = n()) %>%
+  ggplot(aes(x = hour, y = rides, fill = member_casual)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_minimal() +
+  labs(title = "Rides per Hour of Day by Customer Type", x = "Hour of Day", y = "Number of Rides")
+```
+
+```{r}
+# bar chart of rides per hour by day of week, free y-axis
+df %>%
+  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  group_by(hour, member_casual, day_of_week) %>%
+  summarise(rides = n()) %>%
+  ggplot(aes(x = hour, y = rides, fill = member_casual)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ day_of_week, scales = "free_y") +
+  theme_minimal() +
+  labs(title = "Rides per Hour of Day by Customer Type and Day of Week", subtitle = "Free y-axis", x = "Hour of Day", y = "Number of Rides")
+```
+
+```{r}
+# bar chart of rides per hour by day of week, locked y-axis
+df %>%
+  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  group_by(hour, member_casual, day_of_week) %>%
+  summarise(rides = n()) %>%
+  ggplot(aes(x = hour, y = rides, fill = member_casual)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ day_of_week) +
+  theme_minimal() +
+  labs(title = "Rides per Hour of Day by Customer Type and Day of Week", subtitle = "Locked y-axis", x = "Hour of Day", y = "Number of Rides")
+```
+
+```{r}
+# bar chart of rides / member_casual / day of week
+df %>%
+  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  group_by(member_casual, day_of_week) %>%
+  summarise(rides = n()) %>%
+  ggplot(aes(x = member_casual, y = rides, fill = member_casual)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = rides), vjust = -0.5, position = position_dodge(0.9)) +
+  facet_wrap(~ day_of_week) +
+  theme_minimal() +
+  labs(title = "Rides per Member Type by Day of Week", x = "Member Type", y = "Number of Rides") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
+```
+
+```{r}
+# bar chart avg ride time / member_casual / day of week
+df %>%
+  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  group_by(member_casual, day_of_week) %>%
+  summarise(avg_ride_length = mean(ride_length, na.rm = TRUE)) %>%
+  ggplot(aes(x = member_casual, y = avg_ride_length, fill = member_casual)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = round(avg_ride_length, 1)), vjust = -0.5, position = position_dodge(0.9)) +
+  facet_wrap(~ day_of_week) +
+  theme_minimal() +
+  labs(title = "Average Ride Length per Member Type by Day of Week", x = "Member Type", y = "Average Ride Length (minutes)") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
+```
+
+
+
 
