@@ -284,7 +284,8 @@ clean_data <- function(df) {
   df$day <- format(as.Date(df$date), "%d")
   df$year <- format(as.Date(df$date), "%Y")
   df$day_of_week <- format(as.Date(df$date), "%A")
-  df$season <- sapply(df$month, get_season)
+  df$season <- factor(sapply(df$month, get_season), levels = c("Winter", "Spring", "Summer", "Fall")) # sort seasons
+  df$hour <- format(as.POSIXct(df$started_at, format="%Y-%m-%d %H:%M:%S"), "%H")
   
   # Add ride_length column, converting data to minutes
   # 2019 was in mins, 2020 in secs - combining to all_trips above must've forced calculations to seconds
