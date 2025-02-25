@@ -119,9 +119,9 @@ Base the analysis on Cyclistic historical bike trip data.
 
 Deliverable: A description of all data sources used
 
-Google provided the data, meaning Lyft and Divvy provided them with data from Chicago.
+Google provided the [data](https://divvy-tripdata.s3.amazonaws.com/index.html), meaning Lyft and Divvy provided them with data from Chicago.
 
-> The data has been made available by Motivate International Inc. under this [license](https://divvybikes.com/data-license-agreement).
+> The [data](https://divvy-tripdata.s3.amazonaws.com/index.html) has been made available by Motivate International Inc. under this [license](https://divvybikes.com/data-license-agreement).
 
 I used data for 2019, because it has info on gender and birthyear. Pretend that was last year and the data is current and useful.
 
