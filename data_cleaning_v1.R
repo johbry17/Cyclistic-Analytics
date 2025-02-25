@@ -2,6 +2,9 @@ library(tidyverse)  #helps wrangle data
 # Use the conflicted package to manage conflicts
 library(conflicted)
 
+# -------------------------------------------------------------------------
+
+
 # Set dplyr::filter and dplyr::lag as the default choices
 conflict_prefer("filter", "dplyr")
 conflict_prefer("lag", "dplyr")
@@ -11,9 +14,6 @@ conflict_prefer("lag", "dplyr")
 #=====================
 # # Upload Divvy datasets (csv files) here
 q1_2019 <- read_csv("./resources/data/Divvy_Trips_2019_Q1.csv")
-q2_2019 <- read_csv("./resources/data/Divvy_Trips_2019_Q2.csv")
-q3_2019 <- read_csv("./resources/data/Divvy_Trips_2019_Q3.csv")
-q4_2019 <- read_csv("./resources/data/Divvy_Trips_2019_Q4.csv")
 q1_2020 <- read_csv("./resources/data/Divvy_Trips_2020_Q1.csv")
 
 
@@ -22,66 +22,33 @@ q1_2020 <- read_csv("./resources/data/Divvy_Trips_2020_Q1.csv")
 #====================================================
 # Compare column names each of the files
 # While the names don't have to be in the same order, they DO need to match perfectly before we can use a command to join them into one file
-colnames(q1_2019) # same with all of 2019...
-colnames(q1_2020) # ...which is different from 2020
+colnames(q1_2019)
+colnames(q1_2020)
 
 # Rename columns  to make them consistent with q1_2020 (as this will be the supposed going-forward table design for Divvy)
-# Q2 is wildly different from the rest of the Q's
-q2_2019 <- rename(q2_2019,
-               ride_id = "01 - Rental Details Rental ID",
-               rideable_type = "01 - Rental Details Bike ID",
-               started_at = "01 - Rental Details Local Start Time",
-               ended_at = "01 - Rental Details Local End Time",
-               tripduration = "01 - Rental Details Duration In Seconds Uncapped",
-               start_station_name = "03 - Rental Start Station Name",
-               start_station_id = "03 - Rental Start Station ID",
-               end_station_name = "02 - Rental End Station Name",
-               end_station_id = "02 - Rental End Station ID",
-               member_casual = "User Type",
-               gender = "Member Gender",
-               birthyear = "05 - Member Details Member Birthday Year"
-            )
 
-rename_columns <- function(df) {
-  df <- rename(df,
-               ride_id = trip_id,
-               rideable_type = bikeid,
-               started_at = start_time,
-               ended_at = end_time,
-               start_station_name = from_station_name,
-               start_station_id = from_station_id,
-               end_station_name = to_station_name,
-               end_station_id = to_station_id,
-               member_casual = usertype)
-  return(df)
-}
-
-q1_2019 <- rename_columns(q1_2019)
-q3_2019 <- rename_columns(q3_2019)
-q4_2019 <- rename_columns(q4_2019)
+(q1_2019 <- rename(q1_2019
+                   ,ride_id = trip_id
+                   ,rideable_type = bikeid
+                   ,started_at = start_time
+                   ,ended_at = end_time
+                   ,start_station_name = from_station_name
+                   ,start_station_id = from_station_id
+                   ,end_station_name = to_station_name
+                   ,end_station_id = to_station_id
+                   ,member_casual = usertype
+))
 
 # Inspect the dataframes and look for incongruencies
 str(q1_2019)
 str(q1_2020)
 
 # Convert ride_id and rideable_type to character so that they can stack correctly
-# q1_2019 <-  mutate(q1_2019, ride_id = as.character(ride_id)
-#                    ,rideable_type = as.character(rideable_type)) 
-convert_columns_to_character <- function(df) {
-  df <- mutate(df, 
-               ride_id = as.character(ride_id),
-               rideable_type = as.character(rideable_type))
-  return(df)
-}
-
-# Apply the function to each quarter's data frame
-q1_2019 <- convert_columns_to_character(q1_2019)
-q2_2019 <- convert_columns_to_character(q2_2019)
-q3_2019 <- convert_columns_to_character(q3_2019)
-q4_2019 <- convert_columns_to_character(q4_2019)
+q1_2019 <-  mutate(q1_2019, ride_id = as.character(ride_id)
+                   ,rideable_type = as.character(rideable_type)) 
 
 # Stack individual quarter's data frames into one big data frame
-all_trips <- bind_rows(q1_2019, q2_2019, q3_2019, q4_2019, q1_2020)
+all_trips <- bind_rows(q1_2019, q1_2020)#, q3_2019)#, q4_2019, q1_2020)
 
 # Remove lat, long, birthyear, and gender fields as this data was dropped beginning in 2020
 all_trips <- all_trips %>%  
@@ -151,49 +118,6 @@ is.numeric(all_trips$ride_length)
 # https://www.datasciencemadesimple.com/delete-or-drop-rows-in-r-with-conditions-2/
 all_trips_v2 <- all_trips[!(all_trips$start_station_name == "HQ QR" | all_trips$ride_length<0),]
 
-
-
-
-# Repeat, for individual Quarters, in case I want to analyze data by season (using Q1, 2, 3, and 4 as proxies for seasons)
-clean_data <- function(df) {
-  # Define the columns to drop
-  columns_to_drop <- c("start_lat", "start_lng", "end_lat", "end_lng", "birthyear", "gender", "tripduration")
-  
-  # Drop columns if they exist in the dataframe (to account for differences between 2019 and 2020)
-  df <- df %>% select(-one_of(intersect(columns_to_drop, colnames(df))))
-  
-  # Consolidate the member_casual column
-  df <- df %>% mutate(member_casual = recode(member_casual, "Subscriber" = "member", "Customer" = "casual"))
-  
-  # Add date-related columns
-  df$date <- as.Date(df$started_at)
-  df$month <- format(as.Date(df$date), "%m")
-  df$day <- format(as.Date(df$date), "%d")
-  df$year <- format(as.Date(df$date), "%Y")
-  df$day_of_week <- format(as.Date(df$date), "%A")
-  
-  # Add ride_length column, converting data to minutes
-  # 2019 was in mins, 2020 in secs - combining to all_trips above must've forced calculations to seconds
-  # df$started_at <- as.POSIXct(df$started_at, format="%Y-%m-%d %H:%M:%S")
-  # df$ended_at <- as.POSIXct(df$ended_at, format="%Y-%m-%d %H:%M:%S")
-  df$ride_length <- difftime(df$ended_at, df$started_at, units = "mins")
-  
-  # Convert ride_length to numeric
-  df$ride_length <- as.numeric(as.character(df$ride_length))
-  
-  # Remove rows with start_station_name "HQ QR" or negative ride_length
-  df <- df[!(df$start_station_name == "HQ QR" | df$ride_length < 0),]
-  
-  return(df)
-}
-
-# Apply the function to create cleaned data frames
-q1_2019_cleaned <- clean_data(q1_2019)
-q2_2019_cleaned <- clean_data(q2_2019)
-q3_2019_cleaned <- clean_data(q3_2019)
-q4_2019_cleaned <- clean_data(q4_2019)
-q1_2020_cleaned <- clean_data(q1_2020)
-
 #=====================================
 # STEP 4: CONDUCT DESCRIPTIVE ANALYSIS
 #=====================================
@@ -230,28 +154,24 @@ all_trips_v2 %>%
   arrange(member_casual, weekday)								# sorts
 
 # Let's visualize the number of rides by rider type
-p <- all_trips_v2 %>% 
+all_trips_v2 %>% 
   mutate(weekday = wday(started_at, label = TRUE)) %>% 
   group_by(member_casual, weekday) %>% 
   summarise(number_of_rides = n()
             ,average_duration = mean(ride_length)) %>% 
   arrange(member_casual, weekday)  %>% 
   ggplot(aes(x = weekday, y = number_of_rides, fill = member_casual)) +
-  geom_col(position = "dodge") +
-  theme(legend.position = "bottom", axis.text.x = element_text(angle = 90, hjust = 1))
-ggsave("./resources/images/rides_per_day.png", plot = p)
+  geom_col(position = "dodge")
 
 # Let's create a visualization for average duration
-p <- all_trips_v2 %>% 
+all_trips_v2 %>% 
   mutate(weekday = wday(started_at, label = TRUE)) %>% 
   group_by(member_casual, weekday) %>% 
   summarise(number_of_rides = n()
             ,average_duration = mean(ride_length)) %>% 
   arrange(member_casual, weekday)  %>% 
   ggplot(aes(x = weekday, y = average_duration, fill = member_casual)) +
-  geom_col(position = "dodge") +
-  theme(legend.position = "bottom", axis.text.x = element_text(angle = 90, hjust = 1))
-ggsave("./resources/images/average_duration.png", plot = p)
+  geom_col(position = "dodge")
 
 #=================================================
 # STEP 5: EXPORT SUMMARY FILE FOR FURTHER ANALYSIS
@@ -260,12 +180,6 @@ ggsave("./resources/images/average_duration.png", plot = p)
 # N.B.: This file location is for a Mac. If you are working on a PC, change the file location accordingly (most likely "C:\Users\YOUR_USERNAME\Desktop\...") to export the data. You can read more here: https://datatofish.com/export-dataframe-to-csv-in-r/
 counts <- aggregate(all_trips_v2$ride_length ~ all_trips_v2$member_casual + all_trips_v2$day_of_week, FUN = mean)
 write.csv(counts, file = './resources/data/avg_ride_length.csv')
-write.csv(q1_2019_cleaned, file = './resources/data/q1_2019_cleaned.csv')
-write.csv(q2_2019_cleaned, file = './resources/data/q2_2019_cleaned.csv')
-write.csv(q3_2019_cleaned, file = './resources/data/q3_2019_cleaned.csv')
-write.csv(q4_2019_cleaned, file = './resources/data/q4_2019_cleaned.csv')
-write.csv(q1_2020_cleaned, file = './resources/data/q1_2020_cleaned.csv')
-
 
 
 
