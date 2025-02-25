@@ -123,26 +123,30 @@ Google provided the data, meaning Lyft and Divvy provided them with data from Ch
 
 > The data has been made available by Motivate International Inc. under this [license](https://divvybikes.com/data-license-agreement).
 
+I used data for 2019, because it has info on gender and birthyear. Pretend that was last year and the data is current and useful.
+
 ## Process
 
 Deliverable: Documentation of any cleaning or manipulation of data
 
 Google provided a starter template to clean the data. See `data_cleaning_v1.R`.
 
-I slightly modified the script to clean individual quarters of Cyclistic data. Google's template covered only Q1 2019 and Q1 2020. I wanted to have 2019's Q2, Q3, and Q4 available. This briefly catastrophically halted data analysis, as ride length was calculated in minutes for 2019, and seconds in 2020.
+Google's template covered only Q1 2019 and Q1 2020. I wanted to have all of 2019 available, so I modified the script to clean individual quarters of Cyclistic data. To join Q1 2019 and Q1 2020, Google's template removed trip duration, gender, and birth year from 2019, station latitude and longitude from 2020. I wanted to keep that info, so I dropped 2020 (lacking gender and birthyear), and added 2020's lat/lng to 2019.
 
 Data cleaning consisted of:
 
-● Removing some columns to match the 2019 and 2020 datasets (Trip duration, gender, and birth year from 2019, station latitude and longitude from 2020).
+● Extracting station latitude and longitude from 2020 and adding it to start and end stations in 2019 (labeling all but 366 of almost 4 million rows).
+
+● Removing "tripduration" from 2019.
 
 ● Consolidating the "member_casual" column from four labels to two ("member" and "casual"), instead of the original two names for members ("member" and "Subscriber") and two names for casual riders ("Customer" and "casual").
 
-● Extracting day, month, year, and day of the week from the date and creating columns for each, to provide additional opportunities to aggregate the data.
+● Extracting day, month, year, season, and day of the week from the start date and creating columns for each, to provide additional opportunities to aggregate the data.
 
 ● Adding a calculated field ("ride_length") for length of ride since the 2020Q1 data did not have
-the "tripduration" column.
+the "tripduration" column. This briefly catastrophically halted data analysis, as ride length was calculated in minutes for 2019, and seconds in 2020.
 
-● Remvoing rides where tripduration shows up as negative, including several hundred rides where the company took bikes out of circulation for Quality Control reasons.
+● Remvoing rides where ride_length shows up as negative, including several hundred rides where the company took bikes out of circulation for Quality Control reasons.
 
 ## Analyze
 

@@ -298,14 +298,14 @@ clean_data <- function(df) {
   # Remove rows with start_station_name "HQ QR" or negative ride_length
   df <- df[!(df$start_station_name == "HQ QR" | df$ride_length < 0),]
   
-  # add start station latitude and longitude
+  # add start station latitude and longitude - conditional for 2020
   if (!("start_lat" %in% colnames(df) & "start_lng" %in% colnames(df))) {
     df <- df %>%
       left_join(stations_2020, by = c("start_station_id" = "start_station_id")) %>%
       rename(start_lat = latitude, start_lng = longitude)
   }
   
-  # add end station latitude and longitude
+  # add end station latitude and longitude - conditional for 2020
   if (!("end_lat" %in% colnames(df) & "end_lng" %in% colnames(df))) {
     df <- df %>%
       left_join(stations_2020, by = c("end_station_id" = "start_station_id")) %>%

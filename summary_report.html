@@ -1610,6 +1610,8 @@ data from Chicago.</p>
 <p>The data has been made available by Motivate International Inc. under
 this <a href="https://divvybikes.com/data-license-agreement">license</a>.</p>
 </blockquote>
+<p>I used data for 2019, because it has info on gender and birthyear.
+Pretend that was last year and the data is current and useful.</p>
 </div>
 <div id="process" class="section level2">
 <h2>Process</h2>
@@ -1617,25 +1619,30 @@ this <a href="https://divvybikes.com/data-license-agreement">license</a>.</p>
 data</p>
 <p>Google provided a starter template to clean the data. See
 <code>data_cleaning_v1.R</code>.</p>
-<p>I slightly modified the script to clean individual quarters of
-Cyclistic data. Google’s template covered only Q1 2019 and Q1 2020. I
-wanted to have 2019’s Q2, Q3, and Q4 available. This briefly
-catastrophically halted data analysis, as ride length was calculated in
-minutes for 2019, and seconds in 2020.</p>
+<p>Google’s template covered only Q1 2019 and Q1 2020. I wanted to have
+all of 2019 available, so I modified the script to clean individual
+quarters of Cyclistic data. To join Q1 2019 and Q1 2020, Google’s
+template removed trip duration, gender, and birth year from 2019,
+station latitude and longitude from 2020. I wanted to keep that info, so
+I dropped 2020 (lacking gender and birthyear), and added 2020’s lat/lng
+to 2019.</p>
 <p>Data cleaning consisted of:</p>
-<p>● Removing some columns to match the 2019 and 2020 datasets (Trip
-duration, gender, and birth year from 2019, station latitude and
-longitude from 2020).</p>
+<p>● Extracting station latitude and longitude from 2020 and adding it
+to start and end stations in 2019 (labeling all but 366 of almost 4
+million rows).</p>
+<p>● Removing “tripduration” from 2019.</p>
 <p>● Consolidating the “member_casual” column from four labels to two
 (“member” and “casual”), instead of the original two names for members
 (“member” and “Subscriber”) and two names for casual riders (“Customer”
 and “casual”).</p>
-<p>● Extracting day, month, year, and day of the week from the date and
-creating columns for each, to provide additional opportunities to
-aggregate the data.</p>
+<p>● Extracting day, month, year, season, and day of the week from the
+start date and creating columns for each, to provide additional
+opportunities to aggregate the data.</p>
 <p>● Adding a calculated field (“ride_length”) for length of ride since
-the 2020Q1 data did not have the “tripduration” column.</p>
-<p>● Remvoing rides where tripduration shows up as negative, including
+the 2020Q1 data did not have the “tripduration” column. This briefly
+catastrophically halted data analysis, as ride length was calculated in
+minutes for 2019, and seconds in 2020.</p>
+<p>● Remvoing rides where ride_length shows up as negative, including
 several hundred rides where the company took bikes out of circulation
 for Quality Control reasons.</p>
 </div>
