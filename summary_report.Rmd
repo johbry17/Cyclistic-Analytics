@@ -154,6 +154,21 @@ Deliverable: A summary of the data analysis
 
 See `./resources/scratch_pad.Rmd`. Appropriately named, the Scratch Pad is where I played with the data.
 
+Casual riders go longer than members (one hour vs 15 mins).
+
+More member rides than casual rides (3 million vs 1 million).
+
+Ridership peaks in August and nadirs in February, porportionally for both groups. Winter is dead. Crickets for activity.
+
+Casual riders ride late morning, peaking late afternoon, especially Saturday, quite a bit Sunday. Weekend Warriors. Members have two peaks - weekdays at 8am and 5pm. Commuters. They also ride roughly the same on weekends, a gentle curve from late morning to late afternoon.
+
+Top 10 stations! Members riders go to the "Loop". Casual riders seem to hit tourist / leisure destinations (I assume? Must research Chicago landmarks. "Milleniumn Park", "Shedd Aquarium", "Theater on the Lake", "Dusable Harbor", and "Adler Planetarium" sound like destinations for the occasional bike rider).
+
+Members are slightly older, peaking in 30-35. Casual in 25-30.
+
+More men ride than women. Maybe an opportunity there.
+
+
 ## Share
 
 Deliverable: Supporting visualizations and key findings
