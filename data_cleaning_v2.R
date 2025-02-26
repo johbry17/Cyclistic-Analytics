@@ -396,6 +396,7 @@ write.csv(q2_2019_cleaned, file = './resources/data/q2_2019_cleaned.csv')
 write.csv(q3_2019_cleaned, file = './resources/data/q3_2019_cleaned.csv')
 write.csv(q4_2019_cleaned, file = './resources/data/q4_2019_cleaned.csv')
 write.csv(q1_2020_cleaned, file = './resources/data/q1_2020_cleaned.csv')
+write.csv(stations_2020, file = './resources/data/stations.csv')
 
 
 
