@@ -24,6 +24,7 @@ q1_2019 = read.csv("./resources/data/q1_2019_cleaned.csv")
 q2_2019 = read.csv("./resources/data/q2_2019_cleaned.csv")
 q3_2019 = read.csv("./resources/data/q3_2019_cleaned.csv")
 q4_2019 = read.csv("./resources/data/q4_2019_cleaned.csv")
+stations = read.csv("./resources/data/stations.csv")
 # q1_2020 = read.csv("./resources/data/q1_2020_cleaned.csv")
 
 # 2020 data contains chars in ride_id and rideable_type
@@ -74,12 +75,12 @@ print(df[which.max(df$ride_length), ])
 ```
 
 ```{r}
-ggplot(df, aes(y = ride_length)) +
-  geom_boxplot() +
-  labs(title = "Boxplot of Ride Lengths",
-       y = "Ride Length (minutes)",
-       x = "") +
-  theme_minimal()
+# ggplot(df, aes(y = ride_length)) +
+#   geom_boxplot() +
+#   labs(title = "Boxplot of Ride Lengths",
+#        y = "Ride Length (minutes)",
+#        x = "") +
+#   theme_minimal()
 ```
 Kinda pointless to plot that.
 
@@ -263,6 +264,201 @@ df %>%
   scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
 ```
 
+```{r}
+# aggregate casual rider counts by hour and day of the week
+casual_peak_times <- df %>%
+  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%  filter(member_casual == "casual") %>%
+  group_by(day_of_week, hour) %>%
+  summarise(rides = n(), .groups = "drop")
 
+# heatmap of peak times for casual riders
+ggplot(casual_peak_times, aes(x = hour, y = day_of_week, fill = rides)) +
+  geom_tile() +
+  scale_fill_viridis_c() +
+  theme_minimal() +
+  labs(title = "Peak Usage Times for Casual Riders", x = "Hour of Day", y = "Day of Week")
+```
 
+Peak time is Saturday afternoon, followed by Sunday afternoon. Unsurprising.
+
+## Stations
+
+```{r}
+library(sf)
+library(ggspatial)
+
+# convert the stations_2020 data frame to an sf object
+stations_sf <- stations %>% drop_na() %>% st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
+
+# plot the map with the station locations
+ggplot() +
+  annotation_map_tile(type = "osm", zoom = 12) +
+  geom_sf(data = stations_sf, color = "red", size = 2) +
+  labs(title = "Scatter Plot of all Station Locations",
+       x = "Longitude",
+       y = "Latitude") +
+  theme_minimal()
+```
+
+```{r}
+# bar chart: top start stations
+df %>%
+  count(start_station_name, member_casual, sort = TRUE) %>%
+  group_by(member_casual) %>%
+  top_n(20, n) %>%
+  ggplot(aes(x = reorder(start_station_name, n), y = n, fill = member_casual)) +
+  geom_col() +
+  coord_flip() +
+  theme_minimal() +
+  labs(title = "Top Start Stations by Rider Type", x = "Station Name", y = "Number of Rides")
+```
+Those two bars are weird and don't seem right. I am guessing that if I knew the geography of Chicago, the casual / member stations would be more illuminating. "Milleniumn Park", "Shedd Aquarium", "Theater on the Lake", "Dusable Harbor", and "Adler Planetarium" sound like destinations for the occasional bike rider.
+
+```{r}
+# bar chart: top end stations
+df %>%
+  count(end_station_name, member_casual, sort = TRUE) %>%
+  group_by(member_casual) %>%
+  top_n(20, n) %>%
+  ggplot(aes(x = reorder(end_station_name, n), y = n, fill = member_casual)) +
+  geom_col() +
+  coord_flip() +
+  theme_minimal() +
+  labs(title = "Top End Stations by Rider Type", x = "Station Name", y = "Number of Rides")
+```
+
+```{r}
+# most popular start stations
+top_stations <- df %>%
+  count(start_station_name, member_casual, sort = TRUE) %>%
+  group_by(member_casual) %>%
+  top_n(20, n)
+
+print(top_stations)
+```
+
+```{r}
+# most popular end stations
+top_stations <- df %>%
+  count(end_station_name, member_casual, sort = TRUE) %>%
+  group_by(member_casual) %>%
+  top_n(20, n)
+
+print(top_stations)
+```
+
+```{r}
+# Leaflet: popular start stations with cleaned data
+library(leaflet)
+
+# remove rows with missing latitude or longitude values
+cleaned_data <- df %>%
+  filter(!is.na(start_lng) & !is.na(start_lat))
+
+# get a sample - too many rows, it crashes my computer to plot all 4 million
+set.seed(123)  # for reproducibility of sample
+cleaned_data <- cleaned_data %>% sample_n(1000)
+
+# plot sampled stations
+leaflet(data = cleaned_data) %>%
+  addTiles() %>%
+  addMarkers(lng = ~start_lng, lat = ~start_lat, clusterOptions = markerClusterOptions())
+```
+
+```{r}
+# Leaflet: popular end stations with cleaned data
+library(leaflet)
+
+# remove rows with missing latitude or longitude values
+cleaned_data <- df %>%
+  filter(!is.na(end_lng) & !is.na(end_lat))
+
+# get a sample - too many rows, it crashes my computer to plot all 4 million
+set.seed(123)  # for reproducibility of sample
+cleaned_data <- cleaned_data %>% sample_n(1000)
+
+# plot sampled stations
+leaflet(data = cleaned_data) %>%
+  addTiles() %>%
+  addMarkers(lng = ~end_lng, lat = ~end_lat, clusterOptions = markerClusterOptions())
+```
+
+```{r}
+library(sf)
+library(ggspatial)
+
+# sample data
+set.seed(123)  # for reproducibility
+cleaned_data <- df %>% sample_n(1000)
+
+# create linestring geometries for routes
+routes <- cleaned_data %>%
+  drop_na(start_lng, start_lat, end_lng, end_lat) %>%
+  rowwise() %>%
+  mutate(geometry = st_sfc(st_linestring(matrix(c(start_lng, start_lat, end_lng, end_lat), ncol = 2, byrow = TRUE)), crs = 4326)) %>%
+  st_as_sf()
+
+# plot routes
+ggplot() +
+  annotation_map_tile(type = "osm", zoom = 12) +
+  geom_sf(data = routes, aes(geometry = geometry), color = "blue", size = 0.5, alpha = 0.5) +
+  labs(title = "Sample Routes",
+       x = "Longitude",
+       y = "Latitude") +
+  theme_minimal()
+
+```
+
+```{r}
+# aggregate casual rider counts by station
+casual_peak_stations <- df %>%
+  filter(member_casual == "casual") %>%
+  count(start_station_name, sort = TRUE) %>%
+  top_n(10, n)
+
+# bar chart of top stations for casual riders
+ggplot(casual_peak_stations, aes(x = reorder(start_station_name, n), y = n, fill = start_station_name)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  theme_minimal() +
+  labs(title = "Top Start Stations for Casual Riders", x = "Station Name", y = "Number of Rides")
+```
+
+```{r}
+# aggregate casual rider counts by station
+casual_peak_stations <- df %>%
+  filter(member_casual == "casual") %>%
+  count(end_station_name, sort = TRUE) %>%
+  top_n(10, n)
+
+# bar chart of top stations for casual riders
+ggplot(casual_peak_stations, aes(x = reorder(end_station_name, n), y = n, fill = end_station_name)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  theme_minimal() +
+  labs(title = "Top End Stations for Casual Riders", x = "Station Name", y = "Number of Rides")
+```
+
+## Demographics
+
+Remember, this is member rides and casual rides, so member's presumably will be over respresented.
+
+```{r}
+# age distribution
+ggplot(df, aes(x = 2020 - birthyear, fill = member_casual)) +
+  geom_histogram(binwidth = 5, alpha = 0.7, position = "dodge") +
+  # stat_bin(binwidth = 5, geom = "text", aes(label = ..count..), vjust = -0.5, position = position_dodge(5)) +
+  theme_minimal() +
+  labs(title = "Age Distribution by Rider Type", x = "Age", y = "Count") +
+  xlim(0, 100)
+```
+
+```{r}
+# gender split
+ggplot(df, aes(x = gender, fill = member_casual)) +
+  geom_bar(position = "dodge") +
+  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5, position = position_dodge(0.9)) +
+  theme_minimal() +
+  labs(title = "Gender Breakdown by Rider Type", x = "Gender", y = "Count")
+```
 
