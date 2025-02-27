@@ -14,11 +14,42 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(sf)
+library(ggspatial)
 ```
 
-## Google Data Analytics Capstone
+# Google Data Analytics Capstone
 
 A hypothetical data analysis project, answering a business question for a fictional bikeshare company, analyzing customer behavior and concluding with recommendations to assist in converting casual customers into annual members.
+
+```{r, echo=FALSE}
+# load data, combine into a df
+q1_2019 = read.csv("./resources/data/q1_2019_cleaned.csv")
+q2_2019 = read.csv("./resources/data/q2_2019_cleaned.csv")
+q3_2019 = read.csv("./resources/data/q3_2019_cleaned.csv")
+q4_2019 = read.csv("./resources/data/q4_2019_cleaned.csv")
+# stations = read.csv("./resources/data/stations.csv")
+
+df <- bind_rows(q1_2019, q2_2019, q3_2019, q4_2019)
+```
+
+## Executive Summary
+
+Goal: Analyze historical data on Cyclistic users and provide insights for a digital marketing campaign aimed at converting casual users into annual subscription-based members. The top three recommendations are provided.
+
+Result: Recommend focusing on converting casual weekend users into workday commuters, running an ad campaign emphasizing the benefits of commuting by bicycle, with ads targeted to popular leisure destinations and times, with accompanying promotions.
+
+Analysis: This analysis focused on differences in the riding behavior of casual users versus annual members.
+
+- Members are primarily commuters and secondarily leisure users. Casual tend to be 'weekend warriors' using bicycles for trips to pleasurable outings. Casual rides are longer, averaging an hour to member's 15-minute average. Member rides are unsurprisingly more numerous, 4 times more frequent.
+
+- Member rides peak during commuters hours, weekdays at 8am and 5pm. Secondarily they use it for leisure, especially on weekends. Casual riders mostly use bicycles for weekend leisure, peaking on Saturday afternoon, with Sunday afternoon not far behind.
+
+- Members tend to be slightly older, peaking in their early-30's, versus casual riders, peaking in their early-20's.
+
+# Methodology
+
+## Google's Data Analysis Framework
 
 Google's [Data Analytics certificate](https://www.coursera.org/professional-certificates/google-data-analytics) provides an introductory training, covering spreadsheets, SQL, Tableau, and R. The capstone is optional. I used R for my analysis, to further practice that programming language, supplementing my background primarily in Python.
 
@@ -152,27 +183,224 @@ the "tripduration" column. This briefly catastrophically halted data analysis, a
 
 Deliverable: A summary of the data analysis
 
-See `./resources/scratch_pad.Rmd`. Appropriately named, the Scratch Pad is where I played with the data.
+See `./resources/scratch_pad.Rmd` for further insights.
 
-Casual riders go longer than members (one hour vs 15 mins).
+Casual rides are longer but less frequent than member rides.
 
-More member rides than casual rides (3 million vs 1 million).
+Casual rides last longer than member rides (one hour vs 15 mins).
+
+```{r, echo=FALSE}
+# sum average ride length by membership type
+average_ride_length <- df %>%
+  group_by(member_casual) %>%
+  summarise(average_minutes = mean(ride_length, na.rm = TRUE))
+
+# print(average_ride_length)
+
+# bar chart of average ride length
+ggplot(average_ride_length, aes(x = member_casual, y = average_minutes, fill = member_casual)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = round(average_minutes, 1)), vjust = -0.5) +
+  theme_minimal() +
+  labs(title = "Average Ride Length by Membership Type", y = "Average Ride Length (minutes)", x = "Rider Type")
+```
+
+There are three times more member rides than casual rides (3 million vs 1 million).
+
+```{r, echo=FALSE}
+# bar chart 0f ride frequency per user
+ggplot(df, aes(x = member_casual, fill = member_casual)) +
+  geom_bar() +
+  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5) +
+  labs(title = "Total Rides by Membership Type",
+       x = "Rider Type",
+       y = "Total Rides") +
+  theme_minimal()
+```
 
 Ridership peaks in August and nadirs in February, porportionally for both groups. Winter is dead. Crickets for activity.
 
+```{r, echo=FALSE}
+# line chart of rides per month
+df %>%
+  group_by(month, member_casual) %>%
+  summarise(rides = n()) %>%
+  ggplot(aes(x = month, y = rides, color = member_casual, group = member_casual)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Rides per Month, by Customer Type", x = "Month", y = "Number of Rides")
+```
+
 Casual riders ride late morning, peaking late afternoon, especially Saturday, quite a bit Sunday. Weekend Warriors. Members have two peaks - weekdays at 8am and 5pm. Commuters. They also ride roughly the same on weekends, a gentle curve from late morning to late afternoon.
 
-Top 10 stations! Members riders go to the "Loop". Casual riders seem to hit tourist / leisure destinations (I assume? Must research Chicago landmarks. "Milleniumn Park", "Shedd Aquarium", "Theater on the Lake", "Dusable Harbor", and "Adler Planetarium" sound like destinations for the occasional bike rider).
+```{r, echo=FALSE}
+# line chart of rides per hour
+df %>%
+  group_by(hour, member_casual) %>%
+  summarise(rides = n()) %>%
+  ggplot(aes(x = hour, y = rides, color = member_casual, group = member_casual)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Rides per Hour of the Day, by Customer Type", x = "Hour", y = "Number of Rides")
+```
+```{r, echo=FALSE}
+# bar chart of rides per hour by day of week, free y-axis
+df %>%
+  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  group_by(hour, member_casual, day_of_week) %>%
+  summarise(rides = n()) %>%
+  ggplot(aes(x = hour, y = rides, fill = member_casual)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ day_of_week, scales = "free_y") +
+  theme_minimal() +
+  labs(title = "Rides per Hour of Day by Customer Type and Day of Week", subtitle = "Free y-axis", x = "Hour of Day", y = "Number of Rides")
+```
+
+```{r, echo=FALSE}
+# bar chart of rides / member_casual / day of week
+df %>%
+  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  group_by(member_casual, day_of_week) %>%
+  summarise(rides = n()) %>%
+  ggplot(aes(x = member_casual, y = rides, fill = member_casual)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = rides), vjust = -0.5, position = position_dodge(0.9)) +
+  facet_wrap(~ day_of_week) +
+  theme_minimal() +
+  labs(title = "Rides per Member Type by Day of Week", x = "Member Type", y = "Number of Rides") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
+```
+
+Top 10 stations! Members riders go to the "Loop". They use Cyclistic for commuting to places of employment.
+
+```{r, echo=FALSE}
+# aggregate member rider counts by station
+member_peak_stations <- df %>%
+  filter(member_casual == "member") %>%
+  count(start_station_name, sort = TRUE) %>%
+  top_n(10, n)
+
+print(member_peak_stations)
+
+# bar chart of top stations for member riders
+# ggplot(member_peak_stations, aes(x = reorder(start_station_name, n), y = n, fill = start_station_name)) +
+#   geom_col(show.legend = FALSE) +
+#   coord_flip() +
+#   theme_minimal() +
+#   labs(title = "Top Stations for Member Riders", x = "Station Name", y = "Number of Rides")
+```
+
+```{r, echo=FALSE}
+# convert top member start stations to sf object
+member_start_sf <- member_peak_stations %>%
+  left_join(df, by = c("start_station_name")) %>% 
+  distinct(start_station_name, start_lat, start_lng) %>% 
+  drop_na(start_lat, start_lng) %>% 
+  st_as_sf(coords = c("start_lng", "start_lat"), crs = 4326)
+
+# plot map
+ggplot() +
+  annotation_map_tile(type = "osm", zoom = 12) +
+  geom_sf(data = member_start_sf, color = "red", size = 3, alpha = 0.7) +
+  labs(title = "Top Stations for Member Riders (Map)",
+       x = "Longitude", y = "Latitude") +
+  theme_minimal()
+```
+
+Casual riders seem to hit tourist / leisure destinations (I assume? Must research Chicago landmarks. "Milleniumn Park", "Shedd Aquarium", "Theater on the Lake", "Dusable Harbor", and "Adler Planetarium" sound like destinations for the occasional bike rider).
+
+```{r,echo=FALSE}
+# aggregate casual rider counts by station
+casual_peak_stations <- df %>%
+  filter(member_casual == "casual") %>%
+  count(start_station_name, sort = TRUE) %>%
+  top_n(10, n)
+
+print(casual_peak_stations)
+
+# bar chart of top stations for casual riders
+# ggplot(casual_peak_stations, aes(x = reorder(start_station_name, n), y = n, fill = start_station_name)) +
+#   geom_col(show.legend = FALSE) +
+#   coord_flip() +
+#   theme_minimal() +
+#   labs(title = "Top Start Stations for Casual Riders", x = "Station Name", y = "Number of Rides")
+```
+
+```{r, echo=FALSE}
+# map of top start stations for casual riders
+
+# convert top casual start stations to sf object
+casual_start_sf <- casual_peak_stations %>%
+  left_join(df, by = c("start_station_name")) %>% # Join to get lat/lng
+  distinct(start_station_name, start_lat, start_lng) %>% # Remove duplicates
+  drop_na(start_lat, start_lng) %>% 
+  st_as_sf(coords = c("start_lng", "start_lat"), crs = 4326)
+
+# plot the map
+ggplot() +
+  annotation_map_tile(type = "osm", zoom = 12) +
+  geom_sf(data = casual_start_sf, color = "blue", size = 3, alpha = 0.7) +
+  labs(title = "Top Stations for Casual Riders (Map)",
+       x = "Longitude", y = "Latitude") +
+  theme_minimal()
+```
 
 Members are slightly older, peaking in 30-35. Casual in 25-30.
 
+```{r, echo=FALSE}
+# age distribution
+ggplot(df, aes(x = 2020 - birthyear, fill = member_casual)) +
+  geom_histogram(binwidth = 5, alpha = 0.7, position = "dodge") +
+  # stat_bin(binwidth = 5, geom = "text", aes(label = ..count..), vjust = -0.5, position = position_dodge(5)) +
+  theme_minimal() +
+  labs(title = "Age Distribution by Rider Type", x = "Age", y = "Count") +
+  xlim(0, 100)
+```
+
 More men ride than women. Maybe an opportunity there.
+
+```{r, echo=FALSE}
+# gender split
+ggplot(df, aes(x = gender, fill = member_casual)) +
+  geom_bar(position = "dodge") +
+  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5, position = position_dodge(0.9)) +
+  theme_minimal() +
+  labs(title = "Gender Breakdown by Rider Type", x = "Gender", y = "Count")
+```
 
 
 ## Share
 
 Deliverable: Supporting visualizations and key findings
 
+This document, especially the [Executive Summary](#executive-summary).
+
 ## Act
 
 Deliverable: Top three recommendations based on analysis
+
+1. Purpose of advertising
+
+- Ad campaign relating to using a bike for work.
+
+- Emphasize usefulness of bikes for commuting. Maybe advertise on industry / work events, trade orgs, etc. In neighborhoods that Chicagoans commute to.
+
+- Mention helath benefits of commuting by bike. Members are slightly older, and maybe more health conscious.
+
+- Include member testimonials on the power of commuting by bicycle.
+
+2. Locations / times to advertise:
+
+- Advertise on popular websites (restaurants, newpapers, vacation boards, arts & leisure mags, 'Things To Do in Chicago') related to the top destinations of casual users (Shedd Aquarium, Theater on the Lake, et al).
+
+- Advertise on weekends when they are riding.
+
+3. Promotions
+
+- End of summer sale, capitalizing on August peak ridership, when Cyclistic is top of popularity.
+
+- Member bonuses for referring a friend to become a member.
+
+- Free guest trial passes to people who commute at the same time as a member during peak commuting times 7-9am, 4-6pm (enlist significant others / house mates in commuting).
