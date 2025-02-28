@@ -659,3 +659,4 @@ ggplot(df, aes(x = gender, fill = member_casual)) +
   labs(title = "Gender Breakdown by Rider Type", x = "Gender", y = "Count")
 ```
 
+I went through a lot of effort to extract the age and gender data, and it might not have been worth the value-added to see that member riders are slightly older and tend to be male-dominated. Not sure this helps me launch an ad campaign.

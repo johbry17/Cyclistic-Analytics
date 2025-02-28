@@ -37,15 +37,33 @@ df <- bind_rows(q1_2019, q2_2019, q3_2019, q4_2019)
 
 Goal: Analyze historical data on Cyclistic users and provide insights for a digital marketing campaign aimed at converting casual users into annual subscription-based members. The top three recommendations are provided.
 
-Result: Recommend focusing on converting casual weekend users into workday commuters, running an ad campaign emphasizing the benefits of commuting by bicycle, with ads targeted to popular leisure destinations and times, with accompanying promotions.
+Key conclusion: Recommend an ad campaign on enhancing the leisure experience as a benefit of membership, to align with the pattern of usage by casual riders, currently focused on longer weekend rides to popular leisure destinations. Current members tend to be commuters first, and leisure riders secondarily. Cyclistic should launch a marketing campaign emphasizing how membership enhances the existing riding habits of casual users, helping them see the benefits of membership.
+
+Analysis and expanded conclusions follow.
 
 Analysis: This analysis focused on differences in the riding behavior of casual users versus annual members.
 
-- Members are primarily commuters and secondarily leisure users. Casual tend to be 'weekend warriors' using bicycles for trips to pleasurable outings. Casual rides are longer, averaging an hour to member's 15-minute average. Member rides are unsurprisingly more numerous, 4 times more frequent.
+- Members are primarily commuters and secondarily leisure users. Casual users tend to be leisure-oriented, using bicycles for trips to pleasurable outings. Casual rides are longer, averaging an hour, to member rider's 15-minute average. Member rides are unsurprisingly more numerous, 4 times more frequent.
 
 - Member rides peak during commuters hours, weekdays at 8am and 5pm. Secondarily they use it for leisure, especially on weekends. Casual riders mostly use bicycles for weekend leisure, peaking on Saturday afternoon, with Sunday afternoon not far behind.
 
 - Members tend to be slightly older, peaking in their early-30's, versus casual riders, peaking in their early-20's.
+
+- Member destinations tend to be centralized in the Loop, downtown Chicago's central business district. Casual riders go to popular leisure destinations.
+
+Visuals:
+
+- Average Ride Length bar chart
+
+- Rides per Month by Customer Type line chart
+
+- Rides per hour per day of week bar chart
+
+- Top Station destinations (one chart, color-coded for casual vs member)
+
+Recommendations:
+
+
 
 # Methodology
 
@@ -381,26 +399,54 @@ This document, especially the [Executive Summary](#executive-summary).
 
 Deliverable: Top three recommendations based on analysis
 
-1. Purpose of advertising
+Purpose of advertising
 
-- Ad campaign relating to using a bike for work.
+- Ad campaign relating to using a bike for leisure.
 
-- Emphasize usefulness of bikes for commuting. Maybe advertise on industry / work events, trade orgs, etc. In neighborhoods that Chicagoans commute to.
+- Include member testimonials on the joy of using bicycles for fun.
 
-- Mention helath benefits of commuting by bike. Members are slightly older, and maybe more health conscious.
+Advertising:
 
-- Include member testimonials on the power of commuting by bicycle.
+- Advertise in popular digital spaces (restaurants, newpapers, vacation boards, arts & leisure mags, 'Things To Do in Chicago', social media, travel blogs, event pages) related to the top destinations of casual users (Shedd Aquarium, Theater on the Lake, et al).
 
-2. Locations / times to advertise:
+- Advertise around major events, and partner with them. St Patty's Day, Blues festival, Air & Water Show, Pride. ("Skip the traffic with a special Lollapalooza festival pass!")
 
-- Advertise on popular websites (restaurants, newpapers, vacation boards, arts & leisure mags, 'Things To Do in Chicago') related to the top destinations of casual users (Shedd Aquarium, Theater on the Lake, et al).
+- Geotargeted ads near high-traffic casual rider stations ("Unlock unlimited rides this weekend with a membership trial!").
+
+- Feature imagery of scenic rides.
 
 - Advertise on weekends when they are riding.
 
-3. Promotions
+- Follow-up email marketing ("You rode three times this month. A membership would've saved you $X!").
 
-- End of summer sale, capitalizing on August peak ridership, when Cyclistic is top of popularity.
+- Influencer partnerships. Get travel vloggers, fitness influencers, and urban explorers to showcase real-life experiences. Guided bike tours, like a "Museum Ride", or a "Scenic Chicago Ride".
 
-- Member bonuses for referring a friend to become a member.
+- Gamification, with leaderboards (of miles biked) for friend groups, like Strava.
 
-- Free guest trial passes to people who commute at the same time as a member during peak commuting times 7-9am, 4-6pm (enlist significant others / house mates in commuting).
+- Visuals in ads or emails of cost-savings ("Ride six times this month? You're already paying for a membership - unlock unlimited rides today!").
+
+Promotions:
+
+- Offer a weekend membership plan ("Leisure package"). Offer extended ride times on weekends, or a membership explicitly for weekends only.
+
+- Summer pass deals, a limited-time discount.
+
+- Have a summer sale, capitalizing on peak ridership, when Cyclistic is at the top of popularity and fresh in consumer's minds.
+
+- Member bonuses for referring a friend to become a member. Casual riders frequently bike in groups.
+
+- Discounted trial rides ("First month free!").
+
+- Partnerships with leisure destinations. $5 off of the aquarium, 20% off at a restaurant.
+
+- Offer extra passes to foster usage ("Ride four times this month, earn a free day pass" - to hopefully convert to membership).
+
+Commuter crossover marketing.
+
+- Show convenience of commuting by bicycle. Use real-world examples of saving time and money ("Beat rush hour traffic!").
+
+- Free guest trial passes to people who commute during peak commuting times 7-9am, 4-6pm (enlist significant others / house mates in commuting). (Admittedly dubious on this one).
+
+- Corporate or student partnerships, offering discounted memberships to students and young professionals.
+
+- CTA (Chicago Transit Authority) partnership, offering bike and bus/train bundles.
