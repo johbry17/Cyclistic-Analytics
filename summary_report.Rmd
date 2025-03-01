@@ -35,33 +35,103 @@ df <- bind_rows(q1_2019, q2_2019, q3_2019, q4_2019)
 
 ## Executive Summary
 
-Goal: Analyze historical data on Cyclistic users and provide insights for a digital marketing campaign aimed at converting casual users into annual subscription-based members. The top three recommendations are provided.
+This report analyzes historical data on Cyclistic users to provide data-driven insights for a digital marketing campaign aimed at converting casual riders into annual members. The top three recommendations focus on leveraging existing rider behaviors to encourage membership sign-ups.
 
-Key conclusion: Recommend an ad campaign on enhancing the leisure experience as a benefit of membership, to align with the pattern of usage by casual riders, currently focused on longer weekend rides to popular leisure destinations. Current members tend to be commuters first, and leisure riders secondarily. Cyclistic should launch a marketing campaign emphasizing how membership enhances the existing riding habits of casual users, helping them see the benefits of membership.
+## Key Findings
 
-Analysis and expanded conclusions follow.
+- **Casual riders primarily use Cyclistic for leisure:** They take longer trips (averaging an hour) and ride mostly on weekends, particularly Saturday afternoons.
 
-Analysis: This analysis focused on differences in the riding behavior of casual users versus annual members.
+- **Annual members are predominantly commuters:** Their rides are shorter (averaging 15 minutes) and occur mainly during weekday commuting hours (8 AM and 5 PM).
 
-- Members are primarily commuters and secondarily leisure users. Casual users tend to be leisure-oriented, using bicycles for trips to pleasurable outings. Casual rides are longer, averaging an hour, to member rider's 15-minute average. Member rides are unsurprisingly more numerous, 4 times more frequent.
+- **Demographic differences:** Members tend to be slightly older, peaking in their early 30s, while casual riders peak in their early 20s.
 
-- Member rides peak during commuters hours, weekdays at 8am and 5pm. Secondarily they use it for leisure, especially on weekends. Casual riders mostly use bicycles for weekend leisure, peaking on Saturday afternoon, with Sunday afternoon not far behind.
+- **Location trends:** Members’ trips are concentrated in downtown Chicago’s central business district (The Loop), while casual riders frequent popular leisure destinations.
 
-- Members tend to be slightly older, peaking in their early-30's, versus casual riders, peaking in their early-20's.
-
-- Member destinations tend to be centralized in the Loop, downtown Chicago's central business district. Casual riders go to popular leisure destinations.
-
-Visuals:
+## Key Visuals:
 
 - Average Ride Length bar chart
+```{r, echo=FALSE}
+# sum average ride length by membership type
+average_ride_length <- df %>%
+  group_by(member_casual) %>%
+  summarise(average_minutes = mean(ride_length, na.rm = TRUE))
 
-- Rides per Month by Customer Type line chart
+# print(average_ride_length)
+
+# bar chart of average ride length
+ggplot(average_ride_length, aes(x = member_casual, y = average_minutes, fill = member_casual)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = round(average_minutes, 1)), vjust = -0.5) +
+  theme_minimal() +
+  labs(title = "Average Ride Length by Membership Type", y = "Average Ride Length (minutes)", x = "Rider Type")
+```
 
 - Rides per hour per day of week bar chart
+```{r, echo=FALSE}
+# bar chart of rides per hour by day of week, free y-axis
+df %>%
+  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  group_by(hour, member_casual, day_of_week) %>%
+  summarise(rides = n()) %>%
+  ggplot(aes(x = hour, y = rides, fill = member_casual)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ day_of_week, scales = "free_y") +
+  theme_minimal() +
+  labs(title = "Rides per Hour of Day by Customer Type and Day of Week", x = "Hour of Day", y = "Number of Rides")
+```
 
 - Top Station destinations (one chart, color-coded for casual vs member)
+```{r, echo=FALSE}
+# aggregate member rider counts by station
+member_peak_stations <- df %>%
+  filter(member_casual == "member") %>%
+  count(start_station_name, sort = TRUE) %>%
+  top_n(10, n)
 
-Recommendations:
+# aggregate casual rider counts by station
+casual_peak_stations <- df %>%
+  filter(member_casual == "casual") %>%
+  count(start_station_name, sort = TRUE) %>%
+  top_n(10, n)
+
+# convert top member start stations to sf object
+member_start_sf <- member_peak_stations %>%
+  left_join(df, by = c("start_station_name")) %>%
+  distinct(start_station_name, start_lat, start_lng) %>%
+  drop_na(start_lat, start_lng) %>%
+  st_as_sf(coords = c("start_lng", "start_lat"), crs = 4326) %>%
+  mutate(type = "Member")
+
+# convert top casual start stations to sf object
+casual_start_sf <- casual_peak_stations %>%
+  left_join(df, by = c("start_station_name")) %>%
+  distinct(start_station_name, start_lat, start_lng) %>%
+  drop_na(start_lat, start_lng) %>%
+  st_as_sf(coords = c("start_lng", "start_lat"), crs = 4326) %>%
+  mutate(type = "Casual")
+
+# combine the two sf objects
+combined_sf <- bind_rows(member_start_sf, casual_start_sf)
+
+# plot the map with both member and casual stations
+ggplot() +
+  annotation_map_tile(type = "osm", zoom = 12) +
+  geom_sf(data = combined_sf, aes(color = type), size = 3, alpha = 0.7) +
+  labs(title = "Top Stations for Member and Casual Riders",
+       x = "Longitude", y = "Latitude", color = "Rider Type") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  scale_color_manual(values = c("Member" = "red", "Casual" = "blue"))
+```
+
+
+## Recommendation Summary
+
+**Leisure-Focused Marketing:** Position membership as a way to enhance casual riders' existing leisure habits by emphasizing benefits such as unlimited rides and extended ride times.
+
+**Targeted Digital Advertising:** Deploy ads on platforms frequented by casual riders, particularly those related to entertainment, travel, and dining, and use geo-targeted ads near high-traffic leisure stations.
+
+**Promotional Incentives:** Offer weekend-focused memberships, seasonal discounts, referral bonuses, and strategic partnerships with major Chicago events and leisure attractions.
 
 
 
@@ -69,16 +139,18 @@ Recommendations:
 
 ## Google's Data Analysis Framework
 
-Google's [Data Analytics certificate](https://www.coursera.org/professional-certificates/google-data-analytics) provides an introductory training, covering spreadsheets, SQL, Tableau, and R. The capstone is optional. I used R for my analysis, to further practice that programming language, supplementing my background primarily in Python.
+```{r, echo=FALSE}
+knitr::include_graphics("./resources/images/six_phases_of_data_analytics.png")
+```
 
-This report follows the certificate's framework for data analysis: Ask, Prepare, Process, Analyze, Share, Act. It corresponds to the following deliverables:
+This analysis follows the framework outlined in Google's [Data Analytics certificate](https://www.coursera.org/professional-certificates/google-data-analytics), structured as follows:
 
-1. A clear statement of the business task (Ask)
-2. A description of all data sources used (Prepare)
-3. Documentation of any cleaning or manipulation of data (Process)
-4. A summary of the data analysis (Analyze)
-5. Supporting visualizations and key findings (Share)
-6. Top three recommendations based on analysis (Act)
+1. **Ask:** A clear statement of the business task – converting casual riders into annual members.
+2. **Prepare:** Used cleaned historical data from 2019 detailing trip durations, ride frequencies, and popular station destinations.
+3. **Process:** Perform and document data cleaning, manipulation, and exploratory analysis.
+4. **Analyze:** A summary of the data analysis, identifying behavioral trends and differences between customer segments.
+5. **Share:** Supporting visualizations and key findings.
+6. **Act:** Provide top three actionable recommendations based on findings.
 
 ## Scenario
 
@@ -160,9 +232,7 @@ riders use Cyclistic bikes differently?
 
 Deliverable: A clear statement of the business task
 
-How do annual members and casual riders use Cyclistic bikes differently? 
-
-Base the analysis on Cyclistic historical bike trip data.
+How do annual members and casual riders use Cyclistic bikes differently? Base the analysis on Cyclistic historical bike trip data.
 
 ## Prepare
 
@@ -172,7 +242,9 @@ Google provided the [data](https://divvy-tripdata.s3.amazonaws.com/index.html), 
 
 > The [data](https://divvy-tripdata.s3.amazonaws.com/index.html) has been made available by Motivate International Inc. under this [license](https://divvybikes.com/data-license-agreement).
 
-I used data for 2019, because it has info on gender and birthyear. Pretend that was last year and the data is current and useful.
+The analysis incorporates cleaned ride data from all four quarters of 2019, detailing trip durations, ride frequencies, station destinations, and date-time.
+
+I used data for 2019 because it has info on gender and birthyear. Pretend that was last year and the data is current and useful.
 
 ## Process
 
@@ -201,11 +273,21 @@ the "tripduration" column. This briefly catastrophically halted data analysis, a
 
 Deliverable: A summary of the data analysis
 
+Casual riders' trips last approximately four times longer than those of members (one hour vs 15 mins).
+
+Members take significantly more trips overall, with routine weekday usage.
+
+Members peak during commuting hours; casual riders peak on weekend afternoons.
+
+Members favor The Loop for work-related trips, while casual riders frequent leisure destinations such as Shedd Aquarium and Theater on the Lake.
+
 See `./resources/scratch_pad.Rmd` for further insights.
 
-Casual rides are longer but less frequent than member rides.
+## Share
 
-Casual rides last longer than member rides (one hour vs 15 mins).
+Deliverable: Supporting visualizations and key findings
+
+Refer to the [Executive Summary](#executive-summary).
 
 ```{r, echo=FALSE}
 # sum average ride length by membership type
@@ -388,65 +470,54 @@ ggplot(df, aes(x = gender, fill = member_casual)) +
   labs(title = "Gender Breakdown by Rider Type", x = "Gender", y = "Count")
 ```
 
-
-## Share
-
-Deliverable: Supporting visualizations and key findings
-
-This document, especially the [Executive Summary](#executive-summary).
-
 ## Act
 
 Deliverable: Top three recommendations based on analysis
 
 Purpose of advertising
 
-- Ad campaign relating to using a bike for leisure.
+- Position membership as an enhancement to the existing leisure experience.
 
-- Include member testimonials on the joy of using bicycles for fun.
+- Showcase testimonials from members who use Cyclistic for recreational purposes.
+
+- Highlight the convenience of unlimited rides, extended trip durations, and cost savings.
 
 Advertising:
 
-- Advertise in popular digital spaces (restaurants, newpapers, vacation boards, arts & leisure mags, 'Things To Do in Chicago', social media, travel blogs, event pages) related to the top destinations of casual users (Shedd Aquarium, Theater on the Lake, et al).
+- Place ads on relevant online platforms (e.g., travel blogs, event pages, dining and entertainment guides).
 
-- Advertise around major events, and partner with them. St Patty's Day, Blues festival, Air & Water Show, Pride. ("Skip the traffic with a special Lollapalooza festival pass!")
+- Promote Cyclistic at major Chicago events such as St. Patrick’s Day, the Chicago Blues Festival, the Air & Water Show, and Pride, offering limited-time festival passes ("Skip the traffic with a special Lollapalooza festival pass!").
 
-- Geotargeted ads near high-traffic casual rider stations ("Unlock unlimited rides this weekend with a membership trial!").
-
-- Feature imagery of scenic rides.
-
-- Advertise on weekends when they are riding.
+- Utilize geo-targeted mobile ads near high-traffic casual rider stations with messages like “Ride unlimited this weekend – try a membership today!”
 
 - Follow-up email marketing ("You rode three times this month. A membership would've saved you $X!").
 
-- Influencer partnerships. Get travel vloggers, fitness influencers, and urban explorers to showcase real-life experiences. Guided bike tours, like a "Museum Ride", or a "Scenic Chicago Ride".
-
-- Gamification, with leaderboards (of miles biked) for friend groups, like Strava.
-
-- Visuals in ads or emails of cost-savings ("Ride six times this month? You're already paying for a membership - unlock unlimited rides today!").
+- Engage influencers and travel vloggers to create content showcasing scenic rides and group bike tours (e.g., “Museum Ride” or “Scenic Chicago Ride”).
 
 Promotions:
 
-- Offer a weekend membership plan ("Leisure package"). Offer extended ride times on weekends, or a membership explicitly for weekends only.
+- **Weekend Membership Plans:** Introduce a “Leisure Package” offering extended weekend ride times.
 
-- Summer pass deals, a limited-time discount.
+- **Seasonal Discounts:** Launch summer promotions when ridership peaks.
 
-- Have a summer sale, capitalizing on peak ridership, when Cyclistic is at the top of popularity and fresh in consumer's minds.
+- **Referral Bonuses:** Encourage existing members to invite friends by offering incentives. Casual riders frequently bike in groups.
 
-- Member bonuses for referring a friend to become a member. Casual riders frequently bike in groups.
+- **Trial Memberships:** Offer discounted first-month trials to entice casual users ("First month free!").
 
-- Discounted trial rides ("First month free!").
+- **Partnership Discounts:** Collaborate with local attractions (e.g., discounted admission to museums or restaurants for members).
 
-- Partnerships with leisure destinations. $5 off of the aquarium, 20% off at a restaurant.
-
-- Offer extra passes to foster usage ("Ride four times this month, earn a free day pass" - to hopefully convert to membership).
+- **Gamification & Rewards:** Implement a leaderboard tracking miles ridden among friends (similar to Strava) and reward milestones with merchandise or free guest passes.
 
 Commuter crossover marketing.
 
-- Show convenience of commuting by bicycle. Use real-world examples of saving time and money ("Beat rush hour traffic!").
+- Highlight the convenience and cost-effectiveness of commuting by bike ("Beat rush hour traffic!").
 
-- Free guest trial passes to people who commute during peak commuting times 7-9am, 4-6pm (enlist significant others / house mates in commuting). (Admittedly dubious on this one).
+- Offer free trial passes to potential commuters during peak weekday hours, 8am and 5pm.
 
-- Corporate or student partnerships, offering discounted memberships to students and young professionals.
+- Establish corporate and student membership partnerships with discounts for employees and young professionals.
 
-- CTA (Chicago Transit Authority) partnership, offering bike and bus/train bundles.
+- Develop a transit partnership with CTA (Chicago Transit Authority) for bundled bike-and-train/bus memberships.
+
+# Conclusion
+
+The analysis reveals clear distinctions between casual riders and annual members, providing a strategic opportunity for conversion. By emphasizing leisure benefits, implementing targeted digital marketing, and introducing promotional incentives, Cyclistic can effectively increase membership conversion rates while enhancing the overall rider experience.
