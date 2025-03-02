@@ -81,6 +81,7 @@ df %>%
 ```
 
 - Top Station destinations (one chart, color-coded for casual vs member)
+
 ```{r, echo=FALSE}
 # aggregate member rider counts by station
 member_peak_stations <- df %>%
@@ -120,8 +121,73 @@ ggplot() +
   labs(title = "Top Stations for Member and Casual Riders",
        x = "Longitude", y = "Latitude", color = "Rider Type") +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1),
+        plot.title = element_text(hjust = 0.5)) +
   scale_color_manual(values = c("Member" = "red", "Casual" = "blue"))
+```
+
+Compare with this Chicago sightseeing map. Note the comparison with top casual destinations.
+
+```{r, echo=FALSE}
+knitr::include_graphics("./resources/images/Chicago_Sightseeing_Map.jpg")
+```
+
+```{r, echo=FALSE}
+library(gridExtra)
+library(grid)
+library(jpeg)
+# aggregate member rider counts by station
+member_peak_stations <- df %>%
+  filter(member_casual == "member") %>%
+  count(start_station_name, sort = TRUE) %>%
+  top_n(10, n)
+
+# aggregate casual rider counts by station
+casual_peak_stations <- df %>%
+  filter(member_casual == "casual") %>%
+  count(start_station_name, sort = TRUE) %>%
+  top_n(10, n)
+
+# convert top member start stations to sf object
+member_start_sf <- member_peak_stations %>%
+  left_join(df, by = c("start_station_name")) %>%
+  distinct(start_station_name, start_lat, start_lng) %>%
+  drop_na(start_lat, start_lng) %>%
+  st_as_sf(coords = c("start_lng", "start_lat"), crs = 4326) %>%
+  mutate(type = "Member")
+
+# convert top casual start stations to sf object
+casual_start_sf <- casual_peak_stations %>%
+  left_join(df, by = c("start_station_name")) %>%
+  distinct(start_station_name, start_lat, start_lng) %>%
+  drop_na(start_lat, start_lng) %>%
+  st_as_sf(coords = c("start_lng", "start_lat"), crs = 4326) %>%
+  mutate(type = "Casual")
+
+# combine the sf objects
+combined_sf <- bind_rows(member_start_sf, casual_start_sf)
+
+# plot
+plot_top_stations <- ggplot() +
+  annotation_map_tile(type = "osm", zoom = 12) +
+  geom_sf(data = combined_sf, aes(color = type), size = 3, alpha = 0.7) +
+  labs(title = "Top Stations for Member and Casual Riders",
+       color = "Rider Type") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    plot.title = element_text(hjust = 0.5)
+  ) +
+  scale_color_manual(values = c("Member" = "red", "Casual" = "blue"))
+
+# image
+image_path <- "./resources/images/Chicago_Sightseeing_Map.jpg"
+img <- readJPEG(image_path)
+image_grob <- rasterGrob(img, interpolate = TRUE)
+
+# arrange plot and image side-by-side
+grid.arrange(image_grob, plot_top_stations, ncol = 2)
 ```
 
 
@@ -373,7 +439,73 @@ df %>%
   scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
 ```
 
-Top 10 stations! Members riders go to the "Loop". They use Cyclistic for commuting to places of employment.
+Top 10 stations
+
+Members riders go to the "Loop". They use Cyclistic for commuting to places of employment.
+
+Casual riders seem to hit tourist / leisure destinations (I assume? Must research Chicago landmarks. "Milleniumn Park", "Shedd Aquarium", "Theater on the Lake", "Dusable Harbor", and "Adler Planetarium" sound like destinations for the occasional bike rider).
+
+```{r, echo=FALSE}
+# aggregate member rider counts by station and add an index
+member_peak_stations <- df %>%
+  filter(member_casual == "member") %>%
+  count(start_station_name, sort = TRUE) %>%
+  top_n(10, n) %>%
+  mutate(index = row_number())
+
+# aggregate casual rider counts by station and add an index
+casual_peak_stations <- df %>%
+  filter(member_casual == "casual") %>%
+  count(start_station_name, sort = TRUE) %>%
+  top_n(10, n) %>%
+  mutate(index = row_number())
+
+# merge
+merged_peak_stations <- member_peak_stations %>%
+  rename(member_rides = n, member_station = start_station_name) %>%
+  full_join(casual_peak_stations %>% rename(casual_rides = n, casual_station = start_station_name), by = "index")
+
+# drop index
+merged_peak_stations <- merged_peak_stations %>% select(-index)
+
+# print
+merged_peak_stations
+```
+
+```{r, echo=FALSE}
+library(kableExtra)
+library(htmltools)
+
+# style tables
+member_table <- member_peak_stations %>%
+  rename(Member_Rides = n) %>%
+  select(start_station_name, Member_Rides) %>%  # exclude index
+  kable("html", caption = "Top 10 Member Peak Stations") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+casual_table <- casual_peak_stations %>%
+  rename(Casual_Rides = n) %>%
+  select(start_station_name, Casual_Rides) %>%  # exclude index
+  kable("html", caption = "Top 10 Casual Peak Stations") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+# CSS flexbox to align
+browsable(div(
+  style = "display: flex; justify-content: space-around;",
+  div(style = "width: 45%;", HTML(as.character(member_table))),
+  div(style = "width: 45%;", HTML(as.character(casual_table)))
+))
+```
+
+```{r, echo=FALSE}
+library(gridExtra)
+# create tables
+member_table <- tableGrob(member_peak_stations %>% rename(Member_Rides = n))
+casual_table <- tableGrob(casual_peak_stations %>% rename(Casual_Rides = n))
+
+# print tables side-by-side
+grid.arrange(member_table, casual_table, ncol = 2)
+```
 
 ```{r, echo=FALSE}
 # aggregate member rider counts by station
@@ -382,70 +514,47 @@ member_peak_stations <- df %>%
   count(start_station_name, sort = TRUE) %>%
   top_n(10, n)
 
-print(member_peak_stations)
-
-# bar chart of top stations for member riders
-# ggplot(member_peak_stations, aes(x = reorder(start_station_name, n), y = n, fill = start_station_name)) +
-#   geom_col(show.legend = FALSE) +
-#   coord_flip() +
-#   theme_minimal() +
-#   labs(title = "Top Stations for Member Riders", x = "Station Name", y = "Number of Rides")
-```
-
-```{r, echo=FALSE}
-# convert top member start stations to sf object
-member_start_sf <- member_peak_stations %>%
-  left_join(df, by = c("start_station_name")) %>% 
-  distinct(start_station_name, start_lat, start_lng) %>% 
-  drop_na(start_lat, start_lng) %>% 
-  st_as_sf(coords = c("start_lng", "start_lat"), crs = 4326)
-
-# plot map
-ggplot() +
-  annotation_map_tile(type = "osm", zoom = 12) +
-  geom_sf(data = member_start_sf, color = "red", size = 3, alpha = 0.7) +
-  labs(title = "Top Stations for Member Riders (Map)",
-       x = "Longitude", y = "Latitude") +
-  theme_minimal()
-```
-
-Casual riders seem to hit tourist / leisure destinations (I assume? Must research Chicago landmarks. "Milleniumn Park", "Shedd Aquarium", "Theater on the Lake", "Dusable Harbor", and "Adler Planetarium" sound like destinations for the occasional bike rider).
-
-```{r,echo=FALSE}
 # aggregate casual rider counts by station
 casual_peak_stations <- df %>%
   filter(member_casual == "casual") %>%
   count(start_station_name, sort = TRUE) %>%
   top_n(10, n)
 
-print(casual_peak_stations)
-
-# bar chart of top stations for casual riders
-# ggplot(casual_peak_stations, aes(x = reorder(start_station_name, n), y = n, fill = start_station_name)) +
-#   geom_col(show.legend = FALSE) +
-#   coord_flip() +
-#   theme_minimal() +
-#   labs(title = "Top Start Stations for Casual Riders", x = "Station Name", y = "Number of Rides")
-```
-
-```{r, echo=FALSE}
-# map of top start stations for casual riders
+# convert top member start stations to sf object
+member_start_sf <- member_peak_stations %>%
+  left_join(df, by = c("start_station_name")) %>%
+  distinct(start_station_name, start_lat, start_lng) %>%
+  drop_na(start_lat, start_lng) %>%
+  st_as_sf(coords = c("start_lng", "start_lat"), crs = 4326) %>%
+  mutate(type = "Member")
 
 # convert top casual start stations to sf object
 casual_start_sf <- casual_peak_stations %>%
-  left_join(df, by = c("start_station_name")) %>% # Join to get lat/lng
-  distinct(start_station_name, start_lat, start_lng) %>% # Remove duplicates
-  drop_na(start_lat, start_lng) %>% 
-  st_as_sf(coords = c("start_lng", "start_lat"), crs = 4326)
+  left_join(df, by = c("start_station_name")) %>%
+  distinct(start_station_name, start_lat, start_lng) %>%
+  drop_na(start_lat, start_lng) %>%
+  st_as_sf(coords = c("start_lng", "start_lat"), crs = 4326) %>%
+  mutate(type = "Casual")
 
-# plot the map
+# combine the two sf objects
+combined_sf <- bind_rows(member_start_sf, casual_start_sf)
+
+# plot the map with both member and casual stations
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
-  geom_sf(data = casual_start_sf, color = "blue", size = 3, alpha = 0.7) +
-  labs(title = "Top Stations for Casual Riders (Map)",
-       x = "Longitude", y = "Latitude") +
-  theme_minimal()
+  geom_sf(data = combined_sf, aes(color = type), size = 3, alpha = 0.7) +
+  labs(title = "Top Stations for Member and Casual Riders",
+       color = "Rider Type") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    plot.title = element_text(hjust = 0.5)
+  ) +
+  scale_color_manual(values = c("Member" = "red", "Casual" = "blue"))
 ```
+
+Demographics
 
 Members are slightly older, peaking in 30-35. Casual in 25-30.
 
