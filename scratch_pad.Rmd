@@ -167,9 +167,24 @@ df %>%
   summarise(rides = n()) %>%
   ggplot(aes(x = month, y = rides, fill = member_casual)) +
   geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = rides), vjust = -0.5, position = position_dodge(0.9)) +
   theme_minimal() +
   labs(title = "Total Rides per Month by Customer Type", x = "Month", y = "Number of Rides")
 ```
+
+```{r}
+# bar chart of ride length per month
+df %>%
+  group_by(month, member_casual) %>%
+  summarise(avg_ride_length = mean(ride_length, na.rm = TRUE)) %>%
+  ggplot(aes(x = month, y = avg_ride_length, fill = member_casual)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = round(avg_ride_length, 1)), vjust = -0.5, position = position_dodge(0.9)) +
+  theme_minimal() +
+  labs(title = "Average Trip Duration per Month by Customer Type", x = "Month", y = "Average Trip Duration (minutes)")
+```
+
+February would be an outlier - very few rides were ridden that month. The law of small numbers. Small sample size bias.
 
 ```{r}
 # rides per season
@@ -184,6 +199,21 @@ df %>%
   labs(title = "Total Rides per Season by Customer Type", x = "Season", y = "Number of Rides") +
   scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
 ```
+
+```{r}
+# ride length per season
+df %>%
+  mutate(season = factor(season, levels = c("Winter", "Spring", "Summer", "Fall"))) %>%
+  group_by(season, member_casual) %>%
+  summarise(avg_ride_length = mean(ride_length, na.rm = TRUE)) %>%
+  ggplot(aes(x = season, y = avg_ride_length, fill = member_casual)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = round(avg_ride_length, 1)), vjust = -0.5, position = position_dodge(0.9)) +
+  theme_minimal() +
+  labs(title = "Average Trip Duration per Season by Customer Type", x = "Season", y = "Average Trip Duration (minutes)") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
+```
+
 
 ```{r}
 # line chart of rides per hour
@@ -250,6 +280,20 @@ df %>%
 ```
 
 ```{r}
+# bar chart of rides / member_casual / day of week
+df %>%
+  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  group_by(member_casual, day_of_week) %>%
+  summarise(rides = n()) %>%
+  ggplot(aes(x = day_of_week, y = rides, fill = member_casual)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = rides), vjust = -0.5, position = position_dodge(0.9)) +
+  theme_minimal() +
+  labs(title = "Rides per Member Type by Day of Week", x = "Member Type", y = "Number of Rides") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
+```
+
+```{r}
 # bar chart avg ride time / member_casual / day of week
 df %>%
   mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
@@ -259,6 +303,20 @@ df %>%
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(avg_ride_length, 1)), vjust = -0.5, position = position_dodge(0.9)) +
   facet_wrap(~ day_of_week) +
+  theme_minimal() +
+  labs(title = "Average Ride Length per Member Type by Day of Week", x = "Member Type", y = "Average Ride Length (minutes)") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
+```
+
+```{r}
+# bar chart avg ride time / member_casual / day of week
+df %>%
+  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  group_by(member_casual, day_of_week) %>%
+  summarise(avg_ride_length = mean(ride_length, na.rm = TRUE)) %>%
+  ggplot(aes(x = day_of_week, y = avg_ride_length, fill = member_casual)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = round(avg_ride_length, 1)), vjust = -0.5, position = position_dodge(0.9)) +
   theme_minimal() +
   labs(title = "Average Ride Length per Member Type by Day of Week", x = "Member Type", y = "Average Ride Length (minutes)") +
   scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
