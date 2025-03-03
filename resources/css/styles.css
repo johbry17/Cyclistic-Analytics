@@ -10,3 +10,11 @@ blockquote {
     padding-left: 10px;
     margin-left: 0;
 }
+
+h1 {
+  font-weight: bold;
+}
+
+h2 {
+  font-weight: bold;
+}

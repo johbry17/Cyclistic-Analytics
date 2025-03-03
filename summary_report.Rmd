@@ -1,5 +1,5 @@
 ---
-title: "Cyclistic"
+title: "Cyclistic - Google Data Analytics Capstone"
 subtitle: "Analysis of difference in ridership patterns between casual and member customers"
 author: "Bryan Johns"
 date: "`r format(Sys.Date(), '%Y-%m')`"
@@ -11,17 +11,22 @@ output:
     css: ./resources/css/styles.css
 ---
 
+---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(sf)
 library(ggspatial)
+library(gridExtra)
+library(grid)
+library(jpeg)
+library(kableExtra)
+library(htmltools)
 ```
-
-# Google Data Analytics Capstone
 
 A hypothetical data analysis project, answering a business question for a fictional bikeshare company, analyzing customer behavior and concluding with recommendations to assist in converting casual customers into annual members.
 
+---
 ```{r, echo=FALSE}
 # load data, combine into a df
 q1_2019 = read.csv("./resources/data/q1_2019_cleaned.csv")
@@ -33,11 +38,15 @@ q4_2019 = read.csv("./resources/data/q4_2019_cleaned.csv")
 df <- bind_rows(q1_2019, q2_2019, q3_2019, q4_2019)
 ```
 
-## Executive Summary
+# Executive Summary
+
+---
 
 This report analyzes historical data on Cyclistic users to provide data-driven insights for a digital marketing campaign aimed at converting casual riders into annual members. The top three recommendations focus on leveraging existing rider behaviors to encourage membership sign-ups.
 
-## Key Findings
+### Key Findings
+
+---
 
 - **Casual riders primarily use Cyclistic for leisure:** They take longer trips (averaging an hour) and ride mostly on weekends, particularly Saturday afternoons.
 
@@ -47,10 +56,11 @@ This report analyzes historical data on Cyclistic users to provide data-driven i
 
 - **Location trends:** Members’ trips are concentrated in downtown Chicago’s central business district (The Loop), while casual riders frequent popular leisure destinations.
 
-## Key Visuals:
+### Key Visuals
 
-- Average Ride Length bar chart
-```{r, echo=FALSE}
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # sum average ride length by membership type
 average_ride_length <- df %>%
   group_by(member_casual) %>%
@@ -66,8 +76,9 @@ ggplot(average_ride_length, aes(x = member_casual, y = average_minutes, fill = m
   labs(title = "Average Ride Length by Membership Type", y = "Average Ride Length (minutes)", x = "Rider Type")
 ```
 
-- Rides per hour per day of week bar chart
-```{r, echo=FALSE}
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # bar chart of rides per hour by day of week, free y-axis
 df %>%
   mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
@@ -80,62 +91,9 @@ df %>%
   labs(title = "Rides per Hour of Day by Customer Type and Day of Week", x = "Hour of Day", y = "Number of Rides")
 ```
 
-- Top Station destinations (one chart, color-coded for casual vs member)
+---
 
-```{r, echo=FALSE}
-# aggregate member rider counts by station
-member_peak_stations <- df %>%
-  filter(member_casual == "member") %>%
-  count(start_station_name, sort = TRUE) %>%
-  top_n(10, n)
-
-# aggregate casual rider counts by station
-casual_peak_stations <- df %>%
-  filter(member_casual == "casual") %>%
-  count(start_station_name, sort = TRUE) %>%
-  top_n(10, n)
-
-# convert top member start stations to sf object
-member_start_sf <- member_peak_stations %>%
-  left_join(df, by = c("start_station_name")) %>%
-  distinct(start_station_name, start_lat, start_lng) %>%
-  drop_na(start_lat, start_lng) %>%
-  st_as_sf(coords = c("start_lng", "start_lat"), crs = 4326) %>%
-  mutate(type = "Member")
-
-# convert top casual start stations to sf object
-casual_start_sf <- casual_peak_stations %>%
-  left_join(df, by = c("start_station_name")) %>%
-  distinct(start_station_name, start_lat, start_lng) %>%
-  drop_na(start_lat, start_lng) %>%
-  st_as_sf(coords = c("start_lng", "start_lat"), crs = 4326) %>%
-  mutate(type = "Casual")
-
-# combine the two sf objects
-combined_sf <- bind_rows(member_start_sf, casual_start_sf)
-
-# plot the map with both member and casual stations
-ggplot() +
-  annotation_map_tile(type = "osm", zoom = 12) +
-  geom_sf(data = combined_sf, aes(color = type), size = 3, alpha = 0.7) +
-  labs(title = "Top Stations for Member and Casual Riders",
-       x = "Longitude", y = "Latitude", color = "Rider Type") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1),
-        plot.title = element_text(hjust = 0.5)) +
-  scale_color_manual(values = c("Member" = "red", "Casual" = "blue"))
-```
-
-Compare with this Chicago sightseeing map. Note the comparison with top casual destinations.
-
-```{r, echo=FALSE}
-knitr::include_graphics("./resources/images/Chicago_Sightseeing_Map.jpg")
-```
-
-```{r, echo=FALSE}
-library(gridExtra)
-library(grid)
-library(jpeg)
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # aggregate member rider counts by station
 member_peak_stations <- df %>%
   filter(member_casual == "member") %>%
@@ -169,8 +127,8 @@ combined_sf <- bind_rows(member_start_sf, casual_start_sf)
 
 # plot
 plot_top_stations <- ggplot() +
-  annotation_map_tile(type = "osm", zoom = 12) +
-  geom_sf(data = combined_sf, aes(color = type), size = 3, alpha = 0.7) +
+  annotation_map_tile(type = "osm", zoom = 12, alpha = 0.3) +
+  geom_sf(data = combined_sf, aes(color = type), size = 3, alpha = 1) +
   labs(title = "Top Stations for Member and Casual Riders",
        color = "Rider Type") +
   theme_minimal() +
@@ -178,8 +136,8 @@ plot_top_stations <- ggplot() +
     axis.text.x = element_blank(),
     axis.text.y = element_blank(),
     plot.title = element_text(hjust = 0.5)
-  ) +
-  scale_color_manual(values = c("Member" = "red", "Casual" = "blue"))
+  ) # +
+  # scale_color_manual(values = c("Member" = "blue", "Casual" = "orange"))
 
 # image
 image_path <- "./resources/images/Chicago_Sightseeing_Map.jpg"
@@ -190,8 +148,11 @@ image_grob <- rasterGrob(img, interpolate = TRUE)
 grid.arrange(image_grob, plot_top_stations, ncol = 2)
 ```
 
+Compare the map of each group's top 10 stations, especially the top casual destinations, with the Chicago sightseeing map.
 
-## Recommendation Summary
+### Recommendation Summary
+
+---
 
 **Leisure-Focused Marketing:** Position membership as a way to enhance casual riders' existing leisure habits by emphasizing benefits such as unlimited rides and extended ride times.
 
@@ -199,11 +160,12 @@ grid.arrange(image_grob, plot_top_stations, ncol = 2)
 
 **Promotional Incentives:** Offer weekend-focused memberships, seasonal discounts, referral bonuses, and strategic partnerships with major Chicago events and leisure attractions.
 
-
+\
+\
 
 # Methodology
 
-## Google's Data Analysis Framework
+---
 
 ```{r, echo=FALSE}
 knitr::include_graphics("./resources/images/six_phases_of_data_analytics.png")
@@ -219,6 +181,8 @@ This analysis follows the framework outlined in Google's [Data Analytics certifi
 6. **Act:** Provide top three actionable recommendations based on findings.
 
 ## Scenario
+
+---
 
 See `./resources/Case Study 1_How does a bike-share navigate speedy success.pdf`. Quoted from the Google Data Analytics Capstone:
 
@@ -296,23 +260,103 @@ riders use Cyclistic bikes differently?
 
 ## Ask
 
+---
+
 Deliverable: A clear statement of the business task
 
 How do annual members and casual riders use Cyclistic bikes differently? Base the analysis on Cyclistic historical bike trip data.
 
 ## Prepare
 
+---
+
 Deliverable: A description of all data sources used
-
-Google provided the [data](https://divvy-tripdata.s3.amazonaws.com/index.html), meaning Lyft and Divvy provided them with data from Chicago.
-
-> The [data](https://divvy-tripdata.s3.amazonaws.com/index.html) has been made available by Motivate International Inc. under this [license](https://divvybikes.com/data-license-agreement).
 
 The analysis incorporates cleaned ride data from all four quarters of 2019, detailing trip durations, ride frequencies, station destinations, and date-time.
 
 I used data for 2019 because it has info on gender and birthyear. Pretend that was last year and the data is current and useful.
 
+### Data Dictionary
+
+---
+
+**ride_id**  
+&nbsp;&nbsp;&nbsp;&nbsp; Unique identifier for each ride.  
+
+**started_at**  
+&nbsp;&nbsp;&nbsp;&nbsp; Timestamp indicating when the ride started (YYYY-MM-DD HH:MM:SS).  
+
+**ended_at**  
+&nbsp;&nbsp;&nbsp;&nbsp; Timestamp indicating when the ride ended (YYYY-MM-DD HH:MM:SS).  
+
+**rideable_type**  
+&nbsp;&nbsp;&nbsp;&nbsp; Unique identifier for the bicycle.  
+
+**start_station_id**  
+&nbsp;&nbsp;&nbsp;&nbsp; Unique identifier for the starting station.  
+
+**start_station_name**  
+&nbsp;&nbsp;&nbsp;&nbsp; Name of the starting station.  
+
+**end_station_id**  
+&nbsp;&nbsp;&nbsp;&nbsp; Unique identifier for the ending station.  
+
+**end_station_name**  
+&nbsp;&nbsp;&nbsp;&nbsp; Name of the ending station.  
+
+**member_casual**  
+&nbsp;&nbsp;&nbsp;&nbsp; Type of rider (member for annual subscribers, casual for non-members).  
+
+**gender**  
+&nbsp;&nbsp;&nbsp;&nbsp; Gender of the rider (if available).  
+
+**birthyear**  
+&nbsp;&nbsp;&nbsp;&nbsp; Birth year of the rider (if available).  
+
+**date**  
+&nbsp;&nbsp;&nbsp;&nbsp; Date of the ride (YYYY-MM-DD).  
+
+**month**  
+&nbsp;&nbsp;&nbsp;&nbsp; Month when the ride occurred (1–12).  
+
+**day**  
+&nbsp;&nbsp;&nbsp;&nbsp; Day of the month when the ride occurred (1–31).  
+
+**year**  
+&nbsp;&nbsp;&nbsp;&nbsp; Year when the ride occurred (YYYY).  
+
+**day_of_week**  
+&nbsp;&nbsp;&nbsp;&nbsp; Day of the week when the ride occurred (Monday–Sunday).  
+
+**season**  
+&nbsp;&nbsp;&nbsp;&nbsp; Season in which the ride took place (Winter, Spring, Summer, Fall).  
+
+**hour**  
+&nbsp;&nbsp;&nbsp;&nbsp; Hour when the ride started (0–23).  
+
+**ride_length**  
+&nbsp;&nbsp;&nbsp;&nbsp; Duration of the ride in minutes.  
+
+**start_lat**  
+&nbsp;&nbsp;&nbsp;&nbsp; Latitude coordinate of the starting location.  
+
+**start_lng**  
+&nbsp;&nbsp;&nbsp;&nbsp; Longitude coordinate of the starting location.  
+
+**end_lat**  
+&nbsp;&nbsp;&nbsp;&nbsp; Latitude coordinate of the ending location.  
+
+**end_lng**  
+&nbsp;&nbsp;&nbsp;&nbsp; Longitude coordinate of the ending location.  
+
+  
+Google linked to [data](https://divvy-tripdata.s3.amazonaws.com/index.html) provided by Lyft and Divvy from their Chicago operations.
+
+> The [data](https://divvy-tripdata.s3.amazonaws.com/index.html) has been made available by Motivate International Inc. under this [license](https://divvybikes.com/data-license-agreement).
+
 ## Process
+
+---
 
 Deliverable: Documentation of any cleaning or manipulation of data
 
@@ -337,6 +381,8 @@ the "tripduration" column. This briefly catastrophically halted data analysis, a
 
 ## Analyze
 
+---
+
 Deliverable: A summary of the data analysis
 
 Casual riders' trips last approximately four times longer than those of members (one hour vs 15 mins).
@@ -351,11 +397,13 @@ See `./resources/scratch_pad.Rmd` for further insights.
 
 ## Share
 
+---
+
 Deliverable: Supporting visualizations and key findings
 
 Refer to the [Executive Summary](#executive-summary).
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # sum average ride length by membership type
 average_ride_length <- df %>%
   group_by(member_casual) %>%
@@ -373,7 +421,7 @@ ggplot(average_ride_length, aes(x = member_casual, y = average_minutes, fill = m
 
 There are three times more member rides than casual rides (3 million vs 1 million).
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # bar chart 0f ride frequency per user
 ggplot(df, aes(x = member_casual, fill = member_casual)) +
   geom_bar() +
@@ -386,7 +434,7 @@ ggplot(df, aes(x = member_casual, fill = member_casual)) +
 
 Ridership peaks in August and nadirs in February, porportionally for both groups. Winter is dead. Crickets for activity.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # line chart of rides per month
 df %>%
   group_by(month, member_casual) %>%
@@ -400,7 +448,7 @@ df %>%
 
 Casual riders ride late morning, peaking late afternoon, especially Saturday, quite a bit Sunday. Weekend Warriors. Members have two peaks - weekdays at 8am and 5pm. Commuters. They also ride roughly the same on weekends, a gentle curve from late morning to late afternoon.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # line chart of rides per hour
 df %>%
   group_by(hour, member_casual) %>%
@@ -411,7 +459,7 @@ df %>%
   theme_minimal() +
   labs(title = "Rides per Hour of the Day, by Customer Type", x = "Hour", y = "Number of Rides")
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # bar chart of rides per hour by day of week, free y-axis
 df %>%
   mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
@@ -424,7 +472,7 @@ df %>%
   labs(title = "Rides per Hour of Day by Customer Type and Day of Week", subtitle = "Free y-axis", x = "Hour of Day", y = "Number of Rides")
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # bar chart of rides / member_casual / day of week
 df %>%
   mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
@@ -445,37 +493,34 @@ Members riders go to the "Loop". They use Cyclistic for commuting to places of e
 
 Casual riders seem to hit tourist / leisure destinations (I assume? Must research Chicago landmarks. "Milleniumn Park", "Shedd Aquarium", "Theater on the Lake", "Dusable Harbor", and "Adler Planetarium" sound like destinations for the occasional bike rider).
 
-```{r, echo=FALSE}
-# aggregate member rider counts by station and add an index
-member_peak_stations <- df %>%
-  filter(member_casual == "member") %>%
-  count(start_station_name, sort = TRUE) %>%
-  top_n(10, n) %>%
-  mutate(index = row_number())
-
-# aggregate casual rider counts by station and add an index
-casual_peak_stations <- df %>%
-  filter(member_casual == "casual") %>%
-  count(start_station_name, sort = TRUE) %>%
-  top_n(10, n) %>%
-  mutate(index = row_number())
-
-# merge
-merged_peak_stations <- member_peak_stations %>%
-  rename(member_rides = n, member_station = start_station_name) %>%
-  full_join(casual_peak_stations %>% rename(casual_rides = n, casual_station = start_station_name), by = "index")
-
-# drop index
-merged_peak_stations <- merged_peak_stations %>% select(-index)
-
-# print
-merged_peak_stations
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# # aggregate member rider counts by station and add an index
+# member_peak_stations <- df %>%
+#   filter(member_casual == "member") %>%
+#   count(start_station_name, sort = TRUE) %>%
+#   top_n(10, n) %>%
+#   mutate(index = row_number())
+# 
+# # aggregate casual rider counts by station and add an index
+# casual_peak_stations <- df %>%
+#   filter(member_casual == "casual") %>%
+#   count(start_station_name, sort = TRUE) %>%
+#   top_n(10, n) %>%
+#   mutate(index = row_number())
+# 
+# # merge
+# merged_peak_stations <- member_peak_stations %>%
+#   rename(member_rides = n, member_station = start_station_name) %>%
+#   full_join(casual_peak_stations %>% rename(casual_rides = n, casual_station = start_station_name), by = "index")
+# 
+# # drop index
+# merged_peak_stations <- merged_peak_stations %>% select(-index)
+# 
+# # print
+# merged_peak_stations
 ```
 
-```{r, echo=FALSE}
-library(kableExtra)
-library(htmltools)
-
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # style tables
 member_table <- member_peak_stations %>%
   rename(Member_Rides = n) %>%
@@ -497,17 +542,17 @@ browsable(div(
 ))
 ```
 
-```{r, echo=FALSE}
-library(gridExtra)
-# create tables
-member_table <- tableGrob(member_peak_stations %>% rename(Member_Rides = n))
-casual_table <- tableGrob(casual_peak_stations %>% rename(Casual_Rides = n))
-
-# print tables side-by-side
-grid.arrange(member_table, casual_table, ncol = 2)
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# library(gridExtra)
+# # create tables
+# member_table <- tableGrob(member_peak_stations %>% rename(Member_Rides = n))
+# casual_table <- tableGrob(casual_peak_stations %>% rename(Casual_Rides = n))
+# 
+# # print tables side-by-side
+# grid.arrange(member_table, casual_table, ncol = 2)
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # aggregate member rider counts by station
 member_peak_stations <- df %>%
   filter(member_casual == "member") %>%
@@ -536,11 +581,11 @@ casual_start_sf <- casual_peak_stations %>%
   st_as_sf(coords = c("start_lng", "start_lat"), crs = 4326) %>%
   mutate(type = "Casual")
 
-# combine the two sf objects
+# combine the sf objects
 combined_sf <- bind_rows(member_start_sf, casual_start_sf)
 
-# plot the map with both member and casual stations
-ggplot() +
+# plot
+plot_top_stations <- ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = combined_sf, aes(color = type), size = 3, alpha = 0.7) +
   labs(title = "Top Stations for Member and Casual Riders",
@@ -551,14 +596,25 @@ ggplot() +
     axis.text.y = element_blank(),
     plot.title = element_text(hjust = 0.5)
   ) +
-  scale_color_manual(values = c("Member" = "red", "Casual" = "blue"))
+  scale_color_manual(values = c("Member" = "blue", "Casual" = "red"))
+
+# image
+image_path <- "./resources/images/Chicago_Sightseeing_Map.jpg"
+img <- readJPEG(image_path)
+image_grob <- rasterGrob(img, interpolate = TRUE)
+
+# arrange plot and image side-by-side
+grid.arrange(image_grob, plot_top_stations, ncol = 2)
 ```
+
+Compare the above map, especially the top casual destinations, with the Chicago sightseeing map.
+
 
 Demographics
 
 Members are slightly older, peaking in 30-35. Casual in 25-30.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # age distribution
 ggplot(df, aes(x = 2020 - birthyear, fill = member_casual)) +
   geom_histogram(binwidth = 5, alpha = 0.7, position = "dodge") +
@@ -570,7 +626,7 @@ ggplot(df, aes(x = 2020 - birthyear, fill = member_casual)) +
 
 More men ride than women. Maybe an opportunity there.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # gender split
 ggplot(df, aes(x = gender, fill = member_casual)) +
   geom_bar(position = "dodge") +
@@ -580,6 +636,7 @@ ggplot(df, aes(x = gender, fill = member_casual)) +
 ```
 
 ## Act
+---
 
 Deliverable: Top three recommendations based on analysis
 
@@ -628,5 +685,7 @@ Commuter crossover marketing.
 - Develop a transit partnership with CTA (Chicago Transit Authority) for bundled bike-and-train/bus memberships.
 
 # Conclusion
+
+---
 
 The analysis reveals clear distinctions between casual riders and annual members, providing a strategic opportunity for conversion. By emphasizing leisure benefits, implementing targeted digital marketing, and introducing promotional incentives, Cyclistic can effectively increase membership conversion rates while enhancing the overall rider experience.
