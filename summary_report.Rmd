@@ -176,9 +176,11 @@ grid.arrange(image_grob, plot_top_stations, ncol = 2)
 
 ---
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.align='center', fig.cap="Image from the [Google Data Analytics Professional Certificate](https://www.coursera.org/professional-certificates/google-data-analytics)."}
 knitr::include_graphics("./resources/images/six_phases_of_data_analytics.png")
 ```
+
+\
 
 This analysis follows the framework outlined in Google's [Data Analytics certificate](https://www.coursera.org/professional-certificates/google-data-analytics), structured as follows:
 
@@ -728,3 +730,4 @@ A combination of targeted advertising, compelling promotions, and commuter-focus
 Finally, strengthening partnerships with corporations, universities, and public transit systems will enhance Cyclistic’s appeal to commuters. By capitalizing on both the leisure and commuter benefits of membership, Cyclistic can expand its reach, encourage long-term adoption, and solidify its position as Chicago’s go-to bikeshare service. Through these strategic initiatives, Cyclistic is well-positioned to drive membership growth while enriching the overall rider experience.
 
 <img src="./resources/images/Logo_Freepik.png" alt="Cyclistic Logo" style="width:200px; display:block; margin:auto;">
+<p style="font-size: 12px; color: #555; margin:auto; text-align: center;">Source: <a href="https://www.freepik.com">Freepik</a></p>

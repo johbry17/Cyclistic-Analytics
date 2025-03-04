@@ -1,7 +1,7 @@
 /* styles.css */
 .subtitle, .author, .date {
   text-decoration: none;
-  color: #6c757d !important;
+  color: #6c757d;
 }
 
 body {
@@ -17,7 +17,7 @@ blockquote {
 }
 
 h1 {
-  color: #0085A1 !important;
+  color: #0085A1;
   font-weight: bold;
 }
 
