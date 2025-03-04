@@ -41,7 +41,7 @@ MIT License, copyright 2025, Bryan Johns
 
 ## Acknowledgements
 
-Thanks to Coursera and the team at Google that put this together, and to Divvy for making the data available.
+Thanks to Coursera and the team at Google that put this together, and to Google, Lyft, Divvy, and Motivate International Inc. for making the data available.
 
 ## Author
 

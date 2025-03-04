@@ -1,13 +1,17 @@
 ---
-title: "Cyclistic - Google Data Analytics Capstone"
-subtitle: "Analysis of difference in ridership patterns between casual and member customers"
-author: "Bryan Johns"
-date: "`r format(Sys.Date(), '%Y-%m')`"
+title: "Cyclistic: A Google Data Analytics Capstone"
+subtitle: "Understanding Ridership Patterns to Drive Membership Growth"
+author: "<p style='font-style: italic;'>Bryan Johns</p>"
+# date: "`r format(Sys.Date(), '%Y-%m')`"
+date: "`r format(Sys.Date(), '%B %Y')`"
 output:
   html_document:
     toc: true
     toc_depth: 2
     toc_float: true
+    includes:
+      before_body: "header.html"
+      # after_body: "footer.html"
     css: ./resources/css/styles.css
 ---
 
@@ -26,7 +30,6 @@ library(htmltools)
 
 A hypothetical data analysis project, answering a business question for a fictional bikeshare company, analyzing customer behavior and concluding with recommendations to assist in converting casual customers into annual members.
 
----
 ```{r, echo=FALSE}
 # load data, combine into a df
 q1_2019 = read.csv("./resources/data/q1_2019_cleaned.csv")
@@ -38,27 +41,29 @@ q4_2019 = read.csv("./resources/data/q4_2019_cleaned.csv")
 df <- bind_rows(q1_2019, q2_2019, q3_2019, q4_2019)
 ```
 
+\
+
 # Executive Summary
 
 ---
 
-This report analyzes historical data on Cyclistic users to provide data-driven insights for a digital marketing campaign aimed at converting casual riders into annual members. The top three recommendations focus on leveraging existing rider behaviors to encourage membership sign-ups.
+This report analyzes historical data on Cyclistic users to provide insights for a digital marketing campaign aimed at converting casual riders into annual members. Our findings suggest that casual riders use Cyclistic differently than members, and marketing strategies should leverage these behavioral patterns to drive conversions.
+
+\
 
 ### Key Findings
 
----
-
-- **Casual riders primarily use Cyclistic for leisure:** They take longer trips (averaging an hour) and ride mostly on weekends, particularly Saturday afternoons.
+- **Casual riders use Cyclistic for leisure:** Their rides are longer (averaging 60 minutes) with peak traffic on weekends, particularly Saturday afternoons.
 
 - **Annual members are predominantly commuters:** Their rides are shorter (averaging 15 minutes) and occur mainly during weekday commuting hours (8 AM and 5 PM).
 
-- **Demographic differences:** Members tend to be slightly older, peaking in their early 30s, while casual riders peak in their early 20s.
+- **Demographic differences:** Members tend to be slightly older, with the peak in their early 30s, while casual riders are more concentrated in their mid-20s.
 
 - **Location trends:** Members’ trips are concentrated in downtown Chicago’s central business district (The Loop), while casual riders frequent popular leisure destinations.
 
-### Key Visuals
+\
 
----
+### Key Visuals
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # sum average ride length by membership type
@@ -73,7 +78,9 @@ ggplot(average_ride_length, aes(x = member_casual, y = average_minutes, fill = m
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(average_minutes, 1)), vjust = -0.5) +
   theme_minimal() +
-  labs(title = "Average Ride Length by Membership Type", y = "Average Ride Length (minutes)", x = "Rider Type")
+  labs(title = "Average Ride Length by Membership Type", 
+      subtitle = "Casual riders take longer trips, often for leisure.",
+      y = "Average Ride Length (minutes)", x = "Rider Type")
 ```
 
 ---
@@ -86,9 +93,11 @@ df %>%
   summarise(rides = n()) %>%
   ggplot(aes(x = hour, y = rides, fill = member_casual)) +
   geom_bar(stat = "identity", position = "dodge") +
-  facet_wrap(~ day_of_week, scales = "free_y") +
+  facet_wrap(~ day_of_week) +
   theme_minimal() +
-  labs(title = "Rides per Hour of Day by Customer Type and Day of Week", x = "Hour of Day", y = "Number of Rides")
+  labs(title = "Rides per Hour of Day by Customer Type and Day of Week",
+      subtitle = "Casual riders peak on weekend afternoons; members peak during rush hours.",
+      x = "Hour of Day", y = "Number of Rides")
 ```
 
 ---
@@ -130,12 +139,14 @@ plot_top_stations <- ggplot() +
   annotation_map_tile(type = "osm", zoom = 12, alpha = 0.3) +
   geom_sf(data = combined_sf, aes(color = type), size = 3, alpha = 1) +
   labs(title = "Top Stations for Member and Casual Riders",
+       subtitle = "Cross-reference top casual stations with the sightseeing map.",
        color = "Rider Type") +
   theme_minimal() +
   theme(
     axis.text.x = element_blank(),
     axis.text.y = element_blank(),
-    plot.title = element_text(hjust = 0.5)
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
   ) # +
   # scale_color_manual(values = c("Member" = "blue", "Casual" = "orange"))
 
@@ -148,13 +159,11 @@ image_grob <- rasterGrob(img, interpolate = TRUE)
 grid.arrange(image_grob, plot_top_stations, ncol = 2)
 ```
 
-Compare the map of each group's top 10 stations, especially the top casual destinations, with the Chicago sightseeing map.
+\
 
-### Recommendation Summary
+### Top Recommendations
 
----
-
-**Leisure-Focused Marketing:** Position membership as a way to enhance casual riders' existing leisure habits by emphasizing benefits such as unlimited rides and extended ride times.
+**Leisure-Focused Marketing:** Position membership as a way to enhance casual riders' existing leisure habits by emphasizing benefits, such as unlimited rides and extended ride times.
 
 **Targeted Digital Advertising:** Deploy ads on platforms frequented by casual riders, particularly those related to entertainment, travel, and dining, and use geo-targeted ads near high-traffic leisure stations.
 
@@ -174,17 +183,21 @@ knitr::include_graphics("./resources/images/six_phases_of_data_analytics.png")
 This analysis follows the framework outlined in Google's [Data Analytics certificate](https://www.coursera.org/professional-certificates/google-data-analytics), structured as follows:
 
 1. **Ask:** A clear statement of the business task – converting casual riders into annual members.
-2. **Prepare:** Used cleaned historical data from 2019 detailing trip durations, ride frequencies, and popular station destinations.
-3. **Process:** Perform and document data cleaning, manipulation, and exploratory analysis.
-4. **Analyze:** A summary of the data analysis, identifying behavioral trends and differences between customer segments.
-5. **Share:** Supporting visualizations and key findings.
-6. **Act:** Provide top three actionable recommendations based on findings.
+2. **Prepare:** Use cleaned historical data from 2019, detailing trip durations, ride frequencies, and station locations.
+3. **Process:** Perform data cleaning, transformation, and exploratory analysis.
+4. **Analyze:** Identify behavioral trends and customer segment differences.
+5. **Share:** Provide key findings and supporting visualizations.
+6. **Act:** Deliver actionable marketing recommendations.
 
-## Scenario
+\
+
+## Ask
 
 ---
 
-See `./resources/Case Study 1_How does a bike-share navigate speedy success.pdf`. Quoted from the Google Data Analytics Capstone:
+How do annual members and casual riders use Cyclistic bikes differently? Base the analysis on Cyclistic historical bike trip data. The information will be used to design marketing strategies aimed at converting casual riders into annual members.
+
+Quoted from the Google Data Analytics Capstone (see PDF [here](https://github.com/johbry17/Cyclistic-A-Google-Data-Analytics-Capstone/blob/main/resources/Case%20Study%201_How%20does%20a%20bike-share%20navigate%20speedy%20success.pdf)):
 
 <blockquote>You are a junior data analyst working on the marketing analyst team at Cyclistic, a bike-share
 company in Chicago. The director of marketing believes the company’s future success
@@ -252,156 +265,127 @@ Three questions will guide the future marketing program:
 1. How do annual members and casual riders use Cyclistic bikes differently?
 2. Why would casual riders buy Cyclistic annual memberships?
 3. How can Cyclistic use digital media to influence casual riders to become members?
-<br><br>
 
 Moreno has assigned you the first question to answer: How do annual members and casual
 riders use Cyclistic bikes differently?
+
+You will produce a report with the following deliverables:
+
+&nbsp;&nbsp;&nbsp;&nbsp; 1. A clear statement of the business task
+
+&nbsp;&nbsp;&nbsp;&nbsp; 2. A description of all data sources used
+
+&nbsp;&nbsp;&nbsp;&nbsp; 3. Documentation of any cleaning or manipulation of data
+
+&nbsp;&nbsp;&nbsp;&nbsp; 4. A summary of your analysis
+
+&nbsp;&nbsp;&nbsp;&nbsp; 5. Supporting visualizations and key findings
+
+&nbsp;&nbsp;&nbsp;&nbsp; 6. Your top three recommendations based on your analysis
+
 </blockquote>
 
-## Ask
+\
+
+## Data Sources
 
 ---
 
-Deliverable: A clear statement of the business task
+The analysis incorporates cleaned ride data from all four quarters of 2019, detailing trip durations, ride frequencies, station destinations, and date-time information. The dataset includes demographic details (gender and birth year), allowing for deeper insights.
 
-How do annual members and casual riders use Cyclistic bikes differently? Base the analysis on Cyclistic historical bike trip data.
+Google linked to [data](https://divvy-tripdata.s3.amazonaws.com/index.html) provided by Lyft and Divvy from their Chicago operations. The data has been made available by Motivate International Inc. under this [license](https://divvybikes.com/data-license-agreement).
 
-## Prepare
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
 
----
+data_dict <- data.frame(
+  Column = c("ride_id", "started_at", "ended_at", "rideable_type", 
+             "start_station_id", "start_station_name", "end_station_id", "end_station_name", 
+             "member_casual", "gender", "birthyear", "date", "month", "day", "year", 
+             "day_of_week", "season", "hour", "ride_length", "start_lat/lng", "end_lat/lng"),
+  Description = c("Unique ride identifier.", 
+                  "Ride start time (YYYY-MM-DD HH:MM:SS).",
+                  "Ride end time (YYYY-MM-DD HH:MM:SS).",
+                  "Type of bicycle.",
+                  "Starting station ID.",
+                  "Starting station name.",
+                  "Ending station ID.",
+                  "Ending station name.",
+                  "Rider type (member/casual).",
+                  "Rider gender (if available).",
+                  "Rider birth year (if available).",
+                  "Ride date (YYYY-MM-DD).",
+                  "Ride month (1–12).",
+                  "Ride day (1–31).",
+                  "Ride year (YYYY).",
+                  "Day of the week (Mon–Sun).",
+                  "Season (Winter, Spring, Summer, Fall).",
+                  "Ride start hour (0–23).",
+                  "Duration in minutes.",
+                  "Starting location coordinates.",
+                  "Ending location coordinates.")
+)
 
-Deliverable: A description of all data sources used
+kable(data_dict, caption = "Cyclistic Ride Data Dictionary", format = "html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+ 
 
-The analysis incorporates cleaned ride data from all four quarters of 2019, detailing trip durations, ride frequencies, station destinations, and date-time.
+\
 
-I used data for 2019 because it has info on gender and birthyear. Pretend that was last year and the data is current and useful.
-
-### Data Dictionary
-
----
-
-**ride_id**  
-&nbsp;&nbsp;&nbsp;&nbsp; Unique identifier for each ride.  
-
-**started_at**  
-&nbsp;&nbsp;&nbsp;&nbsp; Timestamp indicating when the ride started (YYYY-MM-DD HH:MM:SS).  
-
-**ended_at**  
-&nbsp;&nbsp;&nbsp;&nbsp; Timestamp indicating when the ride ended (YYYY-MM-DD HH:MM:SS).  
-
-**rideable_type**  
-&nbsp;&nbsp;&nbsp;&nbsp; Unique identifier for the bicycle.  
-
-**start_station_id**  
-&nbsp;&nbsp;&nbsp;&nbsp; Unique identifier for the starting station.  
-
-**start_station_name**  
-&nbsp;&nbsp;&nbsp;&nbsp; Name of the starting station.  
-
-**end_station_id**  
-&nbsp;&nbsp;&nbsp;&nbsp; Unique identifier for the ending station.  
-
-**end_station_name**  
-&nbsp;&nbsp;&nbsp;&nbsp; Name of the ending station.  
-
-**member_casual**  
-&nbsp;&nbsp;&nbsp;&nbsp; Type of rider (member for annual subscribers, casual for non-members).  
-
-**gender**  
-&nbsp;&nbsp;&nbsp;&nbsp; Gender of the rider (if available).  
-
-**birthyear**  
-&nbsp;&nbsp;&nbsp;&nbsp; Birth year of the rider (if available).  
-
-**date**  
-&nbsp;&nbsp;&nbsp;&nbsp; Date of the ride (YYYY-MM-DD).  
-
-**month**  
-&nbsp;&nbsp;&nbsp;&nbsp; Month when the ride occurred (1–12).  
-
-**day**  
-&nbsp;&nbsp;&nbsp;&nbsp; Day of the month when the ride occurred (1–31).  
-
-**year**  
-&nbsp;&nbsp;&nbsp;&nbsp; Year when the ride occurred (YYYY).  
-
-**day_of_week**  
-&nbsp;&nbsp;&nbsp;&nbsp; Day of the week when the ride occurred (Monday–Sunday).  
-
-**season**  
-&nbsp;&nbsp;&nbsp;&nbsp; Season in which the ride took place (Winter, Spring, Summer, Fall).  
-
-**hour**  
-&nbsp;&nbsp;&nbsp;&nbsp; Hour when the ride started (0–23).  
-
-**ride_length**  
-&nbsp;&nbsp;&nbsp;&nbsp; Duration of the ride in minutes.  
-
-**start_lat**  
-&nbsp;&nbsp;&nbsp;&nbsp; Latitude coordinate of the starting location.  
-
-**start_lng**  
-&nbsp;&nbsp;&nbsp;&nbsp; Longitude coordinate of the starting location.  
-
-**end_lat**  
-&nbsp;&nbsp;&nbsp;&nbsp; Latitude coordinate of the ending location.  
-
-**end_lng**  
-&nbsp;&nbsp;&nbsp;&nbsp; Longitude coordinate of the ending location.  
-
-  
-Google linked to [data](https://divvy-tripdata.s3.amazonaws.com/index.html) provided by Lyft and Divvy from their Chicago operations.
-
-> The [data](https://divvy-tripdata.s3.amazonaws.com/index.html) has been made available by Motivate International Inc. under this [license](https://divvybikes.com/data-license-agreement).
-
-## Process
+## Data Cleaning and Manipulation
 
 ---
 
-Deliverable: Documentation of any cleaning or manipulation of data
+Google provided a starter template to clean the data (see [here](https://github.com/johbry17/Cyclistic-A-Google-Data-Analytics-Capstone/blob/main/data_cleaning_v1.R), covering only Q1 2019 and Q1 2020. To analyze all of 2019, I modified the script to clean individual quarters of Cyclistic data.
 
-Google provided a starter template to clean the data. See `data_cleaning_v1.R`.
-
-Google's template covered only Q1 2019 and Q1 2020. I wanted to have all of 2019 available, so I modified the script to clean individual quarters of Cyclistic data. To join Q1 2019 and Q1 2020, Google's template removed trip duration, gender, and birth year from 2019, station latitude and longitude from 2020. I wanted to keep that info, so I dropped 2020 (lacking gender and birthyear), and added 2020's lat/lng to 2019.
+Google’s template removed trip duration, gender, and birth year from 2019 and omitted station latitude/longitude from 2020. I retained gender and birth year by excluding 2020 and added 2020's lat/lng to 2019.
 
 Data cleaning consisted of:
 
-● Extracting station latitude and longitude from 2020 and adding it to start and end stations in 2019 (labeling all but 366 of almost 4 million rows).
+● Extracted station latitude/longitude from 2020 and assigned them to 2019 stations, labeling all but 366 of nearly 4 million rows.
 
-● Removing "tripduration" from 2019.
+● Removed the `tripduration` column from 2019.
 
-● Consolidating the "member_casual" column from four labels to two ("member" and "casual"), instead of the original two names for members ("member" and "Subscriber") and two names for casual riders ("Customer" and "casual").
+● Standardized `member_casual` labels from four categories to two (`member` and `casual`).
 
-● Extracting day, month, year, season, and day of the week from the start date and creating columns for each, to provide additional opportunities to aggregate the data.
+● Created columns for day, month, year, season, and day of the week to support aggregation.
 
-● Adding a calculated field ("ride_length") for length of ride since the 2020Q1 data did not have
-the "tripduration" column. This briefly catastrophically halted data analysis, as ride length was calculated in minutes for 2019, and seconds in 2020.
+● Calculated `ride_length` since Q1 2020 lacked `tripduration`. This initially caused issues, as 2019’s ride length was in minutes, while 2020’s was in seconds.
 
-● Remvoing rides where ride_length shows up as negative, including several hundred rides where the company took bikes out of circulation for Quality Control reasons.
+● Removed negative `ride_length` values, including company-flagged Quality Control rides.
 
-## Analyze
+\
 
----
-
-Deliverable: A summary of the data analysis
-
-Casual riders' trips last approximately four times longer than those of members (one hour vs 15 mins).
-
-Members take significantly more trips overall, with routine weekday usage.
-
-Members peak during commuting hours; casual riders peak on weekend afternoons.
-
-Members favor The Loop for work-related trips, while casual riders frequent leisure destinations such as Shedd Aquarium and Theater on the Lake.
-
-See `./resources/scratch_pad.Rmd` for further insights.
-
-## Share
+## Analysis
 
 ---
 
-Deliverable: Supporting visualizations and key findings
+**Casual riders’ trips** last approximately **four times longer** than members’ trips (one hour vs. 15 minutes).
 
-Refer to the [Executive Summary](#executive-summary).
+**Members take significantly more trips overall**, with regular weekday commuting patterns.
+
+**Trip timing differs**:
+
+- Members peak during weekday commuting hours (8 AM & 5 PM).
+
+- Casual riders peak on weekend afternoons.
+
+**Trip locations differ**:
+
+- Members favor **The Loop** for commuting.
+
+- Casual riders frequent **tourist/leisure spots** (e.g., Shedd Aquarium, Theater on the Lake).
+
+Further insights are available [here](https://github.com/johbry17/Cyclistic-A-Google-Data-Analytics-Capstone/blob/main/scratch_pad.Rmd).
+
+\
+
+## Supporting Visualizations
+
+---
+
+#### Ride Length Comparison 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # sum average ride length by membership type
@@ -419,7 +403,13 @@ ggplot(average_ride_length, aes(x = member_casual, y = average_minutes, fill = m
   labs(title = "Average Ride Length by Membership Type", y = "Average Ride Length (minutes)", x = "Rider Type")
 ```
 
-There are three times more member rides than casual rides (3 million vs 1 million).
+- **Casual Riders**: ~60-minute rides
+
+- **Members**: ~15-minute rides
+
+---
+
+#### Ride Volume Comparison
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # bar chart 0f ride frequency per user
@@ -432,7 +422,11 @@ ggplot(df, aes(x = member_casual, fill = member_casual)) +
   theme_minimal()
 ```
 
-Ridership peaks in August and nadirs in February, porportionally for both groups. Winter is dead. Crickets for activity.
+- **Members take 3x more trips** than casual riders (~3 million vs. ~1 million).
+
+---
+
+#### Seasonal Trends
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # line chart of rides per month
@@ -446,7 +440,13 @@ df %>%
   labs(title = "Rides per Month, by Customer Type", x = "Month", y = "Number of Rides")
 ```
 
-Casual riders ride late morning, peaking late afternoon, especially Saturday, quite a bit Sunday. Weekend Warriors. Members have two peaks - weekdays at 8am and 5pm. Commuters. They also ride roughly the same on weekends, a gentle curve from late morning to late afternoon.
+- Ridership peaks in August and drops in February.
+
+- Seasonality affects both groups similarly.
+
+---
+
+#### Hourly Ride Patterns
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # line chart of rides per hour
@@ -459,6 +459,13 @@ df %>%
   theme_minimal() +
   labs(title = "Rides per Hour of the Day, by Customer Type", x = "Hour", y = "Number of Rides")
 ```
+
+- **Casual Riders**: Peak late morning & afternoon, especially on weekends.
+
+- **Members**: Peak during weekday commuting hours (8 AM & 5 PM).
+
+---
+
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # bar chart of rides per hour by day of week, free y-axis
 df %>%
@@ -469,8 +476,12 @@ df %>%
   geom_bar(stat = "identity", position = "dodge") +
   facet_wrap(~ day_of_week, scales = "free_y") +
   theme_minimal() +
-  labs(title = "Rides per Hour of Day by Customer Type and Day of Week", subtitle = "Free y-axis", x = "Hour of Day", y = "Number of Rides")
+  labs(title = "Rides per Hour of Day by Customer Type and Day of Week",
+       subtitle = "Free y-axis highlights weekend differences",
+       x = "Hour of Day", y = "Number of Rides")
 ```
+
+---
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # bar chart of rides / member_casual / day of week
@@ -487,11 +498,9 @@ df %>%
   scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
 ```
 
-Top 10 stations
+---
 
-Members riders go to the "Loop". They use Cyclistic for commuting to places of employment.
-
-Casual riders seem to hit tourist / leisure destinations (I assume? Must research Chicago landmarks. "Milleniumn Park", "Shedd Aquarium", "Theater on the Lake", "Dusable Harbor", and "Adler Planetarium" sound like destinations for the occasional bike rider).
+#### Top Stations by Rider Type
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # # aggregate member rider counts by station and add an index
@@ -523,14 +532,14 @@ Casual riders seem to hit tourist / leisure destinations (I assume? Must researc
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # style tables
 member_table <- member_peak_stations %>%
-  rename(Member_Rides = n) %>%
-  select(start_station_name, Member_Rides) %>%  # exclude index
+  rename(Station = start_station_name, "Member Rides" = n) %>%
+  select(Station, "Member Rides") %>%  # exclude index
   kable("html", caption = "Top 10 Member Peak Stations") %>%
   kable_styling(bootstrap_options = c("striped", "hover"))
 
 casual_table <- casual_peak_stations %>%
-  rename(Casual_Rides = n) %>%
-  select(start_station_name, Casual_Rides) %>%  # exclude index
+  rename(Station = start_station_name, "Casual Rides" = n) %>%
+  select(Station, "Casual Rides") %>%  # exclude index
   kable("html", caption = "Top 10 Casual Peak Stations") %>%
   kable_styling(bootstrap_options = c("striped", "hover"))
 
@@ -541,6 +550,8 @@ browsable(div(
   div(style = "width: 45%;", HTML(as.character(casual_table)))
 ))
 ```
+
+---
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # library(gridExtra)
@@ -607,12 +618,13 @@ image_grob <- rasterGrob(img, interpolate = TRUE)
 grid.arrange(image_grob, plot_top_stations, ncol = 2)
 ```
 
-Compare the above map, especially the top casual destinations, with the Chicago sightseeing map.
+- **Members**: Cluster in The Loop, likely for commuting.
 
+- **Casual Riders**: Frequent tourist/leisure spots (Millennium Park, Shedd Aquarium, Theater on the Lake, etc.).
 
-Demographics
+---
 
-Members are slightly older, peaking in 30-35. Casual in 25-30.
+#### Age Distribution
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # age distribution
@@ -624,7 +636,11 @@ ggplot(df, aes(x = 2020 - birthyear, fill = member_casual)) +
   xlim(0, 100)
 ```
 
-More men ride than women. Maybe an opportunity there.
+- Members are slightly older, peaking at 30-35, while casual riders peak at 25-30.
+
+---
+
+#### Gender Breakdown
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # gender split
@@ -635,32 +651,46 @@ ggplot(df, aes(x = gender, fill = member_casual)) +
   labs(title = "Gender Breakdown by Rider Type", x = "Gender", y = "Count")
 ```
 
-## Act
 ---
 
-Deliverable: Top three recommendations based on analysis
+#### Summary
 
-Purpose of advertising
+- Members dominate total rides and peak during commuting hours.
 
-- Position membership as an enhancement to the existing leisure experience.
+- Casual riders take longer, leisure-oriented trips, peaking on weekends.
 
-- Showcase testimonials from members who use Cyclistic for recreational purposes.
+- Seasonal variation impacts both groups similarly, with low winter activity.
 
-- Highlight the convenience of unlimited rides, extended trip durations, and cost savings.
+- Business Recommendation: Cyclistic should tailor promotions based on these insights (e.g., discount weekend passes for casual riders or commuter incentives for members).
 
-Advertising:
 
-- Place ads on relevant online platforms (e.g., travel blogs, event pages, dining and entertainment guides).
+\
 
-- Promote Cyclistic at major Chicago events such as St. Patrick’s Day, the Chicago Blues Festival, the Air & Water Show, and Pride, offering limited-time festival passes ("Skip the traffic with a special Lollapalooza festival pass!").
+## Actionable Recommendations
 
-- Utilize geo-targeted mobile ads near high-traffic casual rider stations with messages like “Ride unlimited this weekend – try a membership today!”
+---
 
-- Follow-up email marketing ("You rode three times this month. A membership would've saved you $X!").
+### Purpose of advertising
 
-- Engage influencers and travel vloggers to create content showcasing scenic rides and group bike tours (e.g., “Museum Ride” or “Scenic Chicago Ride”).
+- **Promote Membership as a Lifestyle Upgrade**: Position membership as an enhancement to the existing leisure experience.
 
-Promotions:
+- **Leverage Member Testimonials**: Showcase testimonials from members who use Cyclistic for recreational purposes.
+
+- **Emphasize Value**: Highlight the convenience of unlimited rides, extended trip durations, and cost savings.
+
+### Advertising:
+
+- **Target Relevant Online Audiences**: Place ads on travel blogs, event pages, and dining/entertainment guides.
+
+- **Leverage Local Events for Exposure**: Promote Cyclistic at major Chicago events such as St. Patrick’s Day, the Chicago Blues Festival, the Air & Water Show, and Pride, offering limited-time festival passes (e.g., "Skip the traffic with a special Lollapalooza festival pass!").
+
+- **Use Geo-Targeted Mobile Ads**: Display ads near high-traffic casual rider stations with messages like "Ride unlimited this weekend – try a membership today!"
+
+- **Implement Personalized Email Marketing**: Follow up with casual riders via email (e.g., "You rode three times this month. A membership would've saved you $X!").
+
+- **Engage Social Media Influencers**: Partner with travel vloggers and influencers to create content showcasing scenic rides and group bike tours (e.g., "Museum Ride" or "Scenic Chicago Ride").
+
+### Promotions:
 
 - **Weekend Membership Plans:** Introduce a “Leisure Package” offering extended weekend ride times.
 
@@ -674,18 +704,27 @@ Promotions:
 
 - **Gamification & Rewards:** Implement a leaderboard tracking miles ridden among friends (similar to Strava) and reward milestones with merchandise or free guest passes.
 
-Commuter crossover marketing.
+### Commuter crossover marketing.
 
-- Highlight the convenience and cost-effectiveness of commuting by bike ("Beat rush hour traffic!").
+- **Promote Bike Commuting as a Smart Alternative**: Highlight the convenience and cost-effectiveness of commuting by bike (e.g., "Beat rush hour traffic!").
 
-- Offer free trial passes to potential commuters during peak weekday hours, 8am and 5pm.
+- **Offer Trial Passes During Peak Hours**: Provide free trial passes to potential commuters during weekday rush hours (8 AM and 5 PM).
 
-- Establish corporate and student membership partnerships with discounts for employees and young professionals.
+- **Develop Corporate and Student Memberships**: Establish partnerships offering discounts for employees and young professionals.
 
-- Develop a transit partnership with CTA (Chicago Transit Authority) for bundled bike-and-train/bus memberships.
+- **Integrate with Public Transit**: Develop a transit partnership with CTA (Chicago Transit Authority) for bundled bike-and-train/bus memberships.
+
+\
+\
 
 # Conclusion
 
 ---
 
-The analysis reveals clear distinctions between casual riders and annual members, providing a strategic opportunity for conversion. By emphasizing leisure benefits, implementing targeted digital marketing, and introducing promotional incentives, Cyclistic can effectively increase membership conversion rates while enhancing the overall rider experience.
+The analysis reveals clear distinctions between casual riders and annual members, providing a strategic opportunity for conversion. Casual riders tend to use Cyclistic for leisure and social activities, while members prioritize convenience and cost savings. By tailoring marketing efforts, Cyclistic can effectively shift casual users toward membership.
+
+A combination of targeted advertising, compelling promotions, and commuter-focused incentives will maximize conversion rates. Engaging casual riders through event-based marketing, geo-targeted ads, and influencer collaborations will help create stronger brand awareness. Additionally, promotions such as weekend memberships, referral bonuses, and trial offers will lower the barrier to entry.
+
+Finally, strengthening partnerships with corporations, universities, and public transit systems will enhance Cyclistic’s appeal to commuters. By capitalizing on both the leisure and commuter benefits of membership, Cyclistic can expand its reach, encourage long-term adoption, and solidify its position as Chicago’s go-to bikeshare service. Through these strategic initiatives, Cyclistic is well-positioned to drive membership growth while enriching the overall rider experience.
+
+<img src="./resources/images/Logo_Freepik.png" alt="Cyclistic Logo" style="width:200px; display:block; margin:auto;">
