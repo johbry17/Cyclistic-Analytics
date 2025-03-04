@@ -8,3 +8,6 @@ q4_2019_cleaned.csv
 q1_2020_cleaned.csv
 
 .RDataTmp
+
+# Ignore the entire resources/data folder
+/resources/data/
