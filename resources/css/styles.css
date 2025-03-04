@@ -1,12 +1,7 @@
 /* styles.css */
-.custom-title {
-  color: #2C3E50 !important;
-  font-size: 42px;
-  font-weight: bold;
-}
-
 .subtitle, .author, .date {
   text-decoration: none;
+  color: #6c757d !important;
 }
 
 body {
@@ -22,7 +17,7 @@ blockquote {
 }
 
 h1 {
-  color: #2C3E50 !important;
+  color: #0085A1 !important;
   font-weight: bold;
 }
 
@@ -36,4 +31,5 @@ h3 {
 
 h4 {
   text-decoration: underline;
+  font-weight: bold;
 }

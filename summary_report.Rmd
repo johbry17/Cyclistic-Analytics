@@ -1,5 +1,5 @@
 ---
-title: "Cyclistic: A Google Data Analytics Capstone"
+title: "<h1 style='font-size: 42px;'>Cyclistic: A Google Data Analytics Capstone</h1>"
 subtitle: "Understanding Ridership Patterns to Drive Membership Growth"
 author: "<p style='font-style: italic;'>Bryan Johns</p>"
 # date: "`r format(Sys.Date(), '%Y-%m')`"
