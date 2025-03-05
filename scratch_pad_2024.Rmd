@@ -653,6 +653,63 @@ ggplot(df, aes(x = rideable_type, fill = member_casual)) +
        y = "Count")
 ```
 
+```{r}
+# boxplot, ride length by rideable type and member type
+ggplot(df, aes(x = rideable_type, y = ride_length, fill = member_casual)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Ride Length Distribution by Rideable Type and Member Type",
+       x = "Rideable Type",
+       y = "Ride Length (minutes)")
+```
+
+Classic pedal bikes go longer.
+
+```{r}
+# bar chart: ride frequency by day of the week
+df %>%
+  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  group_by(day_of_week, rideable_type, member_casual) %>%
+  summarise(rides = n()) %>%
+  ggplot(aes(x = day_of_week, y = rides, fill = member_casual)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ rideable_type) +
+  theme_minimal() +
+  labs(title = "Ride Frequency by Day of the Week",
+       x = "Day of the Week",
+       y = "Number of Rides")
+```
+
+```{r}
+# line chart of ride frequency by hour of the day
+df %>%
+  group_by(hour, rideable_type, member_casual) %>%
+  summarise(rides = n()) %>%
+  ggplot(aes(x = hour, y = rides, color = member_casual, group = member_casual)) +
+  geom_line() +
+  facet_wrap(~ rideable_type) +
+  theme_minimal() +
+  labs(title = "Ride Frequency by Hour of the Day",
+       x = "Hour of the Day",
+       y = "Number of Rides")
+```
+
+```{r}
+# heatmap of ride frequency / day of the week / hour of the day
+df %>%
+  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  group_by(day_of_week, hour, rideable_type, member_casual) %>%
+  summarise(rides = n()) %>%
+  ggplot(aes(x = hour, y = day_of_week, fill = rides)) +
+  geom_tile() +
+  facet_wrap(~ rideable_type + member_casual, ncol = 2) +
+  scale_fill_viridis_c() +
+  theme_minimal() +
+  labs(title = "Heatmap of Ride Frequency by Day of the Week and Hour of the Day",
+       x = "Hour of the Day",
+       y = "Day of the Week")
+```
+
 
 ## Stations
 
@@ -1004,6 +1061,77 @@ ggplot() +
   labs(title = "Start Stations for Trips Ending at Top End Stations",
        x = "Longitude", y = "Latitude") +
   theme_minimal()
+
+```
+
+```{r}
+# heatmap function
+plot_heatmap <- function(data, title) {
+  ggplot(data, aes(x = end_lng, y = end_lat)) +
+    geom_bin2d(bins = 100) + # Adjust bins for granularity
+    scale_fill_gradient(low = "blue", high = "red") +
+    theme_minimal() +
+    labs(title = title, x = "Longitude", y = "Latitude")
+}
+
+# Electric vs. Classic heatmaps
+electric <- df %>% filter(rideable_type == "electric_bike")
+classic <- df %>% filter(rideable_type == "classic_bike")
+
+# Member vs. Casual heatmaps
+member <- df %>% filter(member_casual == "member")
+casual <- df %>% filter(member_casual == "casual")
+```
+
+```{r}
+plot_heatmap(electric, "Electric Bike Trips Heatmap")
+```
+
+```{r}
+plot_heatmap(classic, "Classic Bike Trips Heatmap")
+```
+
+```{r}
+plot_heatmap(member, "Member Trips Heatmap")
+```
+
+```{r}
+plot_heatmap(casual, "Casual Trips Heatmap")
+```
+
+```{r}
+# # define bounding box for Chicago (approximate lat/lng bounds)
+# chicago_bbox <- st_bbox(c(xmin = -88, xmax = -87.4, ymin = 41.6, ymax = 42), crs = st_crs(4326))
+# 
+# # Filter dataset within Chicago bounds
+# df_filtered <- df %>%
+#   filter(end_lng >= chicago_bbox["xmin"], end_lng <= chicago_bbox["xmax"],
+#          end_lat >= chicago_bbox["ymin"], end_lat <= chicago_bbox["ymax"])
+# 
+# # Convert to sf object
+# df_sf <- st_as_sf(df_filtered, coords = c("end_lng", "end_lat"), crs = 4326)
+# 
+# # Base heatmap function
+# plot_heatmap <- function(data, title) {
+#   ggplot() +
+#     annotation_map_tile(type = "osm", zoom = 12) +  # OSM background
+#     geom_bin2d(data = data, aes(x = st_coordinates(.)[,1], y = st_coordinates(.)[,2]), bins = 100) +
+#     scale_fill_gradient(low = "blue", high = "red") +
+#     theme_minimal() +
+#     labs(title = title, x = "Longitude", y = "Latitude")
+# }
+# 
+# # Subset data
+# electric <- df_sf %>% filter(rideable_type == "electric_bike")
+# classic <- df_sf %>% filter(rideable_type == "classic_bike")
+# member <- df_sf %>% filter(member_casual == "member")
+# casual <- df_sf %>% filter(member_casual == "casual")
+# 
+# # Plot separately
+# plot_heatmap(electric, "Electric Bike Trips Heatmap")
+# plot_heatmap(classic, "Classic Bike Trips Heatmap")
+# plot_heatmap(member, "Member Trips Heatmap")
+# plot_heatmap(casual, "Casual Trips Heatmap")
 
 ```
 
