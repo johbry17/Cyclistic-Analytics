@@ -643,7 +643,8 @@ df %>%
 ```{r}
 # bar chart: top start stations
 df %>%
-  count(start_station_name, member_casual, sort = TRUE, na.rm = TRUE) %>%
+  filter(!is.na(start_station_name)) %>% 
+  count(start_station_name, member_casual, sort = TRUE) %>%
   group_by(member_casual) %>%
   top_n(20, n) %>%
   ggplot(aes(x = reorder(start_station_name, n), y = n, fill = member_casual)) +
@@ -653,11 +654,12 @@ df %>%
   labs(title = "Top Start Stations by Rider Type", x = "Station Name", y = "Number of Rides")
 ```
 
-Those two bars are weird and don't seem right. I am guessing that if I knew the geography of Chicago, the casual / member stations would be more illuminating. "Milleniumn Park", "Shedd Aquarium", "Theater on the Lake", "Dusable Harbor", and "Adler Planetarium" sound like destinations for the occasional bike rider.
+"Milleniumn Park", "Shedd Aquarium", "Theater on the Lake", "Dusable Lake Shore / Harbor", and "Adler Planetarium" sound like destinations for the occasional bike rider.
 
 ```{r}
 # bar chart: top end stations
 df %>%
+  filter(!is.na(end_station_name)) %>% 
   count(end_station_name, member_casual, sort = TRUE) %>%
   group_by(member_casual) %>%
   top_n(20, n) %>%
@@ -671,6 +673,7 @@ df %>%
 ```{r}
 # most popular start stations
 top_stations <- df %>%
+  filter(!is.na(start_station_name)) %>% 
   count(start_station_name, member_casual, sort = TRUE) %>%
   group_by(member_casual) %>%
   top_n(20, n)
@@ -681,6 +684,7 @@ print(top_stations)
 ```{r}
 # most popular end stations
 top_stations <- df %>%
+  filter(!is.na(end_station_name)) %>% 
   count(end_station_name, member_casual, sort = TRUE) %>%
   group_by(member_casual) %>%
   top_n(20, n)
@@ -705,6 +709,8 @@ leaflet(data = cleaned_data) %>%
   addTiles() %>%
   addMarkers(lng = ~start_lng, lat = ~start_lat, clusterOptions = markerClusterOptions())
 ```
+
+Remember, there are 1800 stations (per the data), not 692 (per the company - in scenario), for mysterious reasons.
 
 ```{r}
 # Leaflet: popular end stations with cleaned data
@@ -753,6 +759,7 @@ ggplot() +
 ```{r}
 # aggregate casual rider counts by station
 casual_peak_stations <- df %>%
+  filter(!is.na(start_station_name)) %>% 
   filter(member_casual == "casual") %>%
   count(start_station_name, sort = TRUE) %>%
   top_n(10, n)
@@ -790,6 +797,7 @@ ggplot() +
 ```{r}
 # extract end stations for trips originating at top casual start stations
 casual_end_from_start_sf <- df %>%
+  filter(!is.na(end_station_name)) %>% 
   filter(start_station_name %in% casual_peak_stations$start_station_name) %>%
   distinct(start_station_name, end_station_name, end_lat, end_lng) %>%
   drop_na(end_lat, end_lng) %>%
@@ -809,6 +817,7 @@ ggplot() +
 ```{r}
 # aggregate casual rider counts by station
 casual_peak_stations <- df %>%
+  filter(!is.na(end_station_name)) %>% 
   filter(member_casual == "casual") %>%
   count(end_station_name, sort = TRUE) %>%
   top_n(10, n)
@@ -824,6 +833,7 @@ ggplot(casual_peak_stations, aes(x = reorder(end_station_name, n), y = n, fill =
 ```{r}
 # Convert top casual end stations to sf object
 casual_end_sf <- casual_peak_stations %>%
+  filter(!is.na(end_station_name)) %>% 
   left_join(df, by = c("end_station_name")) %>% 
   distinct(end_station_name, end_lat, end_lng) %>% 
   drop_na(end_lat, end_lng) %>% 
@@ -842,6 +852,7 @@ ggplot() +
 ```{r}
 # extract start stations for trips ending at top casual end stations
 casual_start_from_end_sf <- df %>%
+  filter(!is.na(start_station_name)) %>% 
   filter(end_station_name %in% casual_peak_stations$end_station_name) %>%
   distinct(end_station_name, start_station_name, start_lat, start_lng) %>%
   drop_na(start_lat, start_lng) %>%
@@ -861,6 +872,7 @@ ggplot() +
 ```{r}
 # aggregate member rider counts by station
 member_peak_stations <- df %>%
+  filter(!is.na(start_station_name)) %>% 
   filter(member_casual == "member") %>%
   count(start_station_name, sort = TRUE) %>%
   top_n(10, n)
@@ -894,6 +906,7 @@ ggplot() +
 ```{r}
 # extract end stations for trips starting at top member start stations
 member_end_sf <- df %>%
+  filter(!is.na(end_station_name)) %>% 
   filter(start_station_name %in% member_peak_stations$start_station_name) %>%
   distinct(start_station_name, end_station_name, end_lat, end_lng) %>%
   drop_na(end_lat, end_lng) %>%
@@ -912,6 +925,7 @@ ggplot() +
 ```{r}
 # aggregate member rider counts by station
 member_peak_stations <- df %>%
+  filter(!is.na(end_station_name)) %>% 
   filter(member_casual == "member") %>%
   count(end_station_name, sort = TRUE) %>%
   top_n(10, n)
@@ -944,6 +958,7 @@ ggplot() +
 ```{r}
 # Extract start stations for trips ending at top member end stations
 member_start_sf <- df %>%
+  filter(!is.na(start_station_name)) %>% 
   filter(end_station_name %in% member_peak_stations$end_station_name) %>%
   distinct(end_station_name, start_station_name, start_lat, start_lng) %>%
   drop_na(start_lat, start_lng) %>%
