@@ -1065,6 +1065,27 @@ ggplot() +
 ```
 
 ```{r}
+# prep heatmaps
+
+# Define bounding box for Chicago (approximate lat/lng bounds)
+chicago_bbox <- st_bbox(c(xmin = -88, xmax = -87.4, ymin = 41.6, ymax = 42), crs = st_crs(4326))
+
+# Filter dataset within Chicago bounds
+df_bbox <- df %>%
+  filter(end_lng >= chicago_bbox["xmin"], end_lng <= chicago_bbox["xmax"],
+         end_lat >= chicago_bbox["ymin"], end_lat <= chicago_bbox["ymax"])
+
+# Electric vs. Classic heatmaps
+electric <- df_bbox %>% filter(rideable_type == "electric_bike")
+classic <- df_bbox %>% filter(rideable_type == "classic_bike")
+
+# Member vs. Casual heatmaps
+member <- df_bbox %>% filter(member_casual == "member")
+casual <- df_bbox %>% filter(member_casual == "casual")
+```
+
+
+```{r}
 # heatmap function
 plot_heatmap <- function(data, title) {
   ggplot(data, aes(x = end_lng, y = end_lat)) +
@@ -1074,13 +1095,23 @@ plot_heatmap <- function(data, title) {
     labs(title = title, x = "Longitude", y = "Latitude")
 }
 
-# Electric vs. Classic heatmaps
-electric <- df %>% filter(rideable_type == "electric_bike")
-classic <- df %>% filter(rideable_type == "classic_bike")
-
-# Member vs. Casual heatmaps
-member <- df %>% filter(member_casual == "member")
-casual <- df %>% filter(member_casual == "casual")
+# # Convert to sf object
+# df_sf <- st_as_sf(df_bbox, coords = c("end_lng", "end_lat"), crs = 4326)
+# 
+# # Base heatmap function
+# plot_heatmap <- function(data, title) {
+#   ggplot() +
+#     annotation_map_tile(type = "osm", zoom = 12) +  # OSM background
+#     geom_bin2d(data = data, aes(x = st_coordinates(.)[,1], y = st_coordinates(.)[,2]), bins = 100) +
+#     scale_fill_gradient(low = "blue", high = "red") +
+#     theme_minimal() +
+#     labs(title = title, x = "Longitude", y = "Latitude")
+# }
+# 
+# electric <- df_sf %>% filter(rideable_type == "electric_bike")
+# classic <- df_sf %>% filter(rideable_type == "classic_bike")
+# member <- df_sf %>% filter(member_casual == "member")
+# casual <- df_sf %>% filter(member_casual == "casual")
 ```
 
 ```{r}
