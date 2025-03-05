@@ -14,12 +14,14 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
 
-## Scratch Pad for 2024 Cyclistic Data Analysis
+# Scratch Pad for 2024 Cyclistic Data Analysis
 
 Exploratory Data Analysis, unencumbered by the need to be **too** presentable. 
 
+## Load data
+
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-# Load the data, combine into a df
+# load data, combine into a df
 read_cyclistic_data <- function(year) {
   for (i in 1:12) {
     month <- sprintf("%02d", i)  # Format as 01, 02, ..., 12
@@ -34,10 +36,15 @@ read_cyclistic_data <- function(year) {
     }
   }
 }
+
 read_cyclistic_data(2024)
 
-# Dynamically bind rows of all monthly data frames
+# regex to bind rows of all monthly data frames
 df <- bind_rows(mget(ls(pattern = "^m\\d{2}$")))
+
+# dump memory
+rm(list = ls(pattern = "^m\\d{2}(_cleaned)?$"))
+gc()
 ```
 
 Number of member vs casual rides
@@ -45,12 +52,12 @@ Number of member vs casual rides
 ```{r}
 table(df$member_casual)
 ```
-3 million member rides vs 1 million casual rides. Unfortunately, there is no way to tell how many are repeat users. Presumably, many member riders repeat far more often than casual riders.
 
-In the scenario, and in real life, the data is shared without any sort of identifying information that would help track that, probably why after 2019 they removed gender and birthyear.
+3.7 million member rides vs 2.2 million casual rides. Unfortunately, there is no way to tell how many are repeat users. Presumably, many member riders repeat far more often than casual riders. The scenario puts members at 30% of Cyclistic.
 
+In the scenario, and in real life, the data is shared without any sort of identifying information that would help track that, probably why after 2019 they removed gender and birth year. It wasn't much help anyway.
 
---------------
+## NA stations and e-bikes
 
 ```{r}
 # Count the number of NA values for each column
@@ -60,31 +67,210 @@ na_counts <- sapply(df, function(x) sum(is.na(x)))
 print(na_counts)
 ```
 
+Start station counts by rideable_type
 
+```{r}
+df %>%
+  mutate(missing_name = is.na(start_station_name)) %>%
+  group_by(rideable_type) %>%
+  summarize(missing_count = sum(missing_name), total = n(), perc_missing = mean(missing_name)) %>%
+  arrange(desc(perc_missing))
+```
+
+Yup. Missing stations are electric bikes without a docking station.
+
+End stations counts by rideable_type
+
+```{r}
+df %>%
+  mutate(missing_name = is.na(end_station_name)) %>%
+  group_by(rideable_type) %>%
+  summarize(missing_count = sum(missing_name), total = n(), perc_missing = mean(missing_name)) %>%
+  arrange(desc(perc_missing))
+
+```
+
+```{r}
+known_stations <- df %>%
+  filter(!is.na(start_station_id) & !is.na(start_station_name)) %>%
+  select(start_station_id, start_station_name, start_lat, start_lng) %>%
+  distinct()
+print(count(known_stations))
+```
+
+```{r}
+# attempt to consolidate known stations
+known_stations <- df %>%
+  filter(!is.na(start_station_id) & !is.na(start_station_name)) %>%
+  mutate(
+    start_lat = round(start_lat, 4), # roughly the length of a bus
+    start_lng = round(start_lng, 4)
+  ) %>%
+  select(start_station_id, start_station_name, start_lat, start_lng) %>%
+  distinct()
+print(count(known_stations))
+```
+
+Stations no longer have a specific lat/lng. No exact station location maps anymore. Have to do heatmaps.
+
+```{r}
+# Count distinct start_station_id values
+distinct_start_station_count <- df %>%
+  summarise(distinct_count = n_distinct(start_station_name))
+
+# Print the count
+print(distinct_start_station_count)
+```
+ It's supposed to be 692, per the scenario. (I found 608 in 2019).
+
+```{r}
+# Count distinct start_station_id values
+distinct_start_station_count <- df %>%
+  summarise(distinct_count = n_distinct(start_station_id))
+
+# Print the count
+print(distinct_start_station_count)
+```
+
+So, 45 duplicate station names, probably easily explained. Easier than the extra ~1000 station id's.
+
+Electronic bikes are a game changer. I thought switching from 2019 to 2024 was gonna be easy.
+
+## Ride length (and NA end_lat/lng)
+
+IQR
 
 ```{r}
 summary(df$ride_length)
 ```
-There are some ridiculously long rides.
+
+The mean is higher than the 3rd quartile. Data set skews. Makes sense, as many commuter rides are quick, but leisure rides can last a while. And sometimes people just dump the bike in a ditch so it appears to be a long ride.
 
 ```{r}
-max(df$ride_length, na.rm = TRUE)/60/24
+max(df$ride_length)/60/24
 ```
-123 days! Hell of an outlier.
+
+A little over a day. Somebody forgot to dock a bike.
 
 ```{r}
 print(df[which.max(df$ride_length), ])
 ```
 
+Average of rides with no end lat(/lng also missing)
+
 ```{r}
-# ggplot(df, aes(y = ride_length)) +
-#   geom_boxplot() +
-#   labs(title = "Boxplot of Ride Lengths",
-#        y = "Ride Length (minutes)",
-#        x = "") +
-#   theme_minimal()
+# average ride_length for rows with missing end_lat
+avg_ride_length_missing_end_lat <- df %>%
+  filter(is.na(end_lat)) %>%
+  summarise(avg_ride_length = mean(ride_length, na.rm = TRUE))
+
+# print
+print(avg_ride_length_missing_end_lat)/60/24
 ```
-Kinda pointless to plot that.
+
+A little over a day.
+
+Min of rides with no end lat(/lng also missing)
+
+```{r}
+# minimum ride_length for rows with missing end_lat
+min_ride_length_missing_end_lat <- df %>%
+  filter(is.na(end_lat)) %>%
+  summarise(min_ride_length = min(ride_length, na.rm = TRUE))
+
+# print
+print(min_ride_length_missing_end_lat)/60/24
+```
+
+```{r}
+## histogram of ride_length
+ggplot(df, aes(x = ride_length)) +
+  geom_histogram(binwidth = 5, fill = "blue", color = "black", alpha = 0.7) +
+  scale_x_continuous(limits = c(0, quantile(df$ride_length, 0.99))) + # trim extreme outliers
+  labs(title = "Distribution of Ride Length",
+       subtitle = "Removed the 99th percentile outliers - the 1%!",
+       x = "Ride Length (minutes)",
+       y = "Count") +
+  theme_minimal()
+```
+
+## Ride length outliers / IQR
+
+Note that I can toggle between these and "run all" to see the impact... and the power to skew results. Mwahahahaha!
+
+```{r}
+# IQR * 1.5 for outliers
+# calculate Q1, Q3, and IQR
+Q1 <- quantile(df$ride_length, 0.25, na.rm = TRUE)
+Q3 <- quantile(df$ride_length, 0.75, na.rm = TRUE)
+IQR <- Q3 - Q1
+
+# lower and upper bounds for outliers
+lower_bound <- Q1 - 1.5 * IQR
+upper_bound <- Q3 + 1.5 * IQR
+
+# filter out outliers
+df_no_outliers <- df %>%
+  filter(ride_length >= lower_bound & ride_length <= upper_bound)
+
+# print
+summary(df_no_outliers$ride_length)
+```
+
+```{r}
+# IQR * 3 for outliers
+lower_bound_strict <- Q1 - 3 * IQR
+upper_bound_strict <- Q3 + 3 * IQR
+
+# filter out outliers
+df_no_outliers <- df %>%
+  filter(ride_length >= lower_bound_strict & ride_length <= upper_bound_strict)
+
+# print
+summary(df_no_outliers$ride_length)
+```
+
+```{r}
+# remove the 99th percentile
+upper_1_percent <- quantile(df$ride_length, 0.99, na.rm = TRUE)
+
+# filter out the top 1% of the data
+df_no_outliers <- df %>%
+  filter(ride_length <= upper_1_percent)
+
+# print
+summary(df_no_outliers$ride_length)
+```
+
+```{r}
+# the 99.5 percentile
+upper_.5_percent <- quantile(df$ride_length, 0.995, na.rm = TRUE)
+
+# filter out the top 0.5% of the data
+df_no_outliers <- df %>%
+  filter(ride_length <= upper_.5_percent)
+
+# print
+summary(df_no_outliers$ride_length)
+```
+
+```{r}
+# the 99.75 percentile
+upper_.25_percent <- quantile(df$ride_length, 0.9975, na.rm = TRUE)
+
+# filter out the top 0.025% of the data
+df_no_outliers <- df %>%
+  filter(ride_length <= upper_.25_percent)
+
+# print
+summary(df_no_outliers$ride_length)
+
+
+```
+
+I will very conservatively drop the 0.25% of rides over four and a half hours long.
+
+# Visualizations
 
 ## Rides by Member type (total rides, duration)
 
@@ -104,6 +290,21 @@ ggplot(total_minutes_ridden, aes(x = member_casual, y = total_minutes, fill = me
 ```
 
 ```{r}
+# sum total ride length by membership type
+total_minutes_ridden <- df_no_outliers %>%
+  group_by(member_casual) %>%
+  summarise(total_minutes = sum(ride_length, na.rm = TRUE))
+
+# bar chart of total minutes ridden
+ggplot(total_minutes_ridden, aes(x = member_casual, y = total_minutes, fill = member_casual)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = round(total_minutes)), vjust = -0.5) +
+  theme_minimal() +
+  labs(title = "Total Minutes Ridden by Membership Type, No Outliers", y = "Total Minutes Ridden", x = "Rider Type")
+
+```
+
+```{r}
 # sum average ride length by membership type
 average_ride_length <- df %>%
   group_by(member_casual) %>%
@@ -118,11 +319,37 @@ ggplot(average_ride_length, aes(x = member_casual, y = average_minutes, fill = m
 ```
 
 ```{r}
+# sum average ride length by membership type
+average_ride_length <- df_no_outliers %>%
+  group_by(member_casual) %>%
+  summarise(average_minutes = mean(ride_length, na.rm = TRUE))
+
+# bar chart of average ride length
+ggplot(average_ride_length, aes(x = member_casual, y = average_minutes, fill = member_casual)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = round(average_minutes, 1)), vjust = -0.5) +
+  theme_minimal() +
+  labs(title = "Average Ride Length by Membership Type, No Outliers", y = "Average Ride Length (minutes)", x = "Rider Type")
+```
+
+```{r}
 # bar chart 0f ride frequency per user
 ggplot(df, aes(x = member_casual, fill = member_casual)) +
   geom_bar() +
   geom_text(stat = "count", aes(label = ..count..), vjust = -0.5) +
   labs(title = "Total Rides by Membership Type",
+       x = "Rider Type",
+       y = "Total Rides") +
+  theme_minimal()
+
+```
+
+```{r}
+# bar chart 0f ride frequency per user
+ggplot(df_no_outliers, aes(x = member_casual, fill = member_casual)) +
+  geom_bar() +
+  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5) +
+  labs(title = "Total Rides by Membership Type, No Outliers",
        x = "Rider Type",
        y = "Total Rides") +
   theme_minimal()
@@ -144,7 +371,7 @@ ggplot(df, aes(x = ride_length, fill = member_casual)) +
 
 Members ride more frequently for shorter duration (probably commuting).
 
-Casuals ride longer, enough to beat members for total minutes on a bicycle.
+Casuals ride longer (probably leisure).
 
 ## Time and Ridership
 
@@ -160,7 +387,7 @@ df %>%
   labs(title = "Rides per Month, by Customer Type", x = "Month", y = "Number of Rides")
 ```
 
-Peak in August, unsurprisingly.
+Peak in summer, unsurprisingly.
 
 ```{r}
 # bar chart of rides per month
@@ -186,7 +413,12 @@ df %>%
   labs(title = "Average Trip Duration per Month by Customer Type", x = "Month", y = "Average Trip Duration (minutes)")
 ```
 
-February would be an outlier - very few rides were ridden that month. The law of small numbers. Small sample size bias.
+Interesting. I have a "9" month.
+
+```{r}
+table(df$month)
+```
+
 
 ```{r}
 # rides per season
@@ -312,6 +544,21 @@ df %>%
 
 ```{r}
 # bar chart avg ride time / member_casual / day of week
+df_no_outliers %>%
+  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  group_by(member_casual, day_of_week) %>%
+  summarise(avg_ride_length = mean(ride_length, na.rm = TRUE)) %>%
+  ggplot(aes(x = member_casual, y = avg_ride_length, fill = member_casual)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = round(avg_ride_length, 1)), vjust = -0.5, position = position_dodge(0.9)) +
+  facet_wrap(~ day_of_week) +
+  theme_minimal() +
+  labs(title = "Average Ride Length per Member Type by Day of Week, No Outliers", x = "Member Type", y = "Average Ride Length (minutes)") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
+```
+
+```{r}
+# bar chart avg ride time / member_casual / day of week
 df %>%
   mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
   group_by(member_casual, day_of_week) %>%
@@ -321,6 +568,20 @@ df %>%
   geom_text(aes(label = round(avg_ride_length, 1)), vjust = -0.5, position = position_dodge(0.9)) +
   theme_minimal() +
   labs(title = "Average Ride Length per Member Type by Day of Week", x = "Member Type", y = "Average Ride Length (minutes)") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
+```
+
+```{r}
+# bar chart avg ride time / member_casual / day of week
+df_no_outliers %>%
+  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  group_by(member_casual, day_of_week) %>%
+  summarise(avg_ride_length = mean(ride_length, na.rm = TRUE)) %>%
+  ggplot(aes(x = day_of_week, y = avg_ride_length, fill = member_casual)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = round(avg_ride_length, 1)), vjust = -0.5, position = position_dodge(0.9)) +
+  theme_minimal() +
+  labs(title = "Average Ride Length per Member Type by Day of Week, No Outliers", x = "Member Type", y = "Average Ride Length (minutes)") +
   scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
 ```
 
@@ -356,25 +617,14 @@ ggplot(casual_peak_times, aes(x = hour, y = day_of_week, fill = rides)) +
   labs(title = "Peak Usage Times for Casual Riders", x = "Hour of Day", y = "Day of Week")
 ```
 
-Peak time is Saturday afternoon, followed by Sunday afternoon. Unsurprising.
+Peak time is Saturday afternoon, followed by Sunday afternoon. But also a little around peak end-of-work hour. Are casual riders transiting in to work, and biking back?
 
 ## Stations
 
 ```{r}
+# may be unnecessary
 library(sf)
 library(ggspatial)
-
-# convert the stations_2020 data frame to an sf object
-stations_sf <- stations %>% drop_na() %>% st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
-
-# plot the map with the station locations
-ggplot() +
-  annotation_map_tile(type = "osm", zoom = 12) +
-  geom_sf(data = stations_sf, color = "red", size = 2) +
-  labs(title = "Scatter Plot of all Station Locations",
-       x = "Longitude",
-       y = "Latitude") +
-  theme_minimal()
 ```
 
 ```{r}
@@ -389,6 +639,20 @@ df %>%
   theme_minimal() +
   labs(title = "Top Start Stations by Rider Type", x = "Station Name", y = "Number of Rides")
 ```
+
+```{r}
+# bar chart: top start stations
+df %>%
+  count(start_station_name, member_casual, sort = TRUE, na.rm = TRUE) %>%
+  group_by(member_casual) %>%
+  top_n(20, n) %>%
+  ggplot(aes(x = reorder(start_station_name, n), y = n, fill = member_casual)) +
+  geom_col() +
+  coord_flip() +
+  theme_minimal() +
+  labs(title = "Top Start Stations by Rider Type", x = "Station Name", y = "Number of Rides")
+```
+
 Those two bars are weird and don't seem right. I am guessing that if I knew the geography of Chicago, the casual / member stations would be more illuminating. "Milleniumn Park", "Shedd Aquarium", "Theater on the Lake", "Dusable Harbor", and "Adler Planetarium" sound like destinations for the occasional bike rider.
 
 ```{r}
