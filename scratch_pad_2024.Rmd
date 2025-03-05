@@ -1067,19 +1067,19 @@ ggplot() +
 ```{r}
 # prep heatmaps
 
-# Define bounding box for Chicago (approximate lat/lng bounds)
-chicago_bbox <- st_bbox(c(xmin = -88, xmax = -87.4, ymin = 41.6, ymax = 42), crs = st_crs(4326))
+# bounding box for Chicago (approximate lat/lng bounds) to exclude strange outliers
+chicago_bbox <- st_bbox(c(xmin = -88.1, xmax = -87.3, ymin = 41.5, ymax = 42.1), crs = st_crs(4326))
 
-# Filter dataset within Chicago bounds
+# filter to bbox
 df_bbox <- df %>%
   filter(end_lng >= chicago_bbox["xmin"], end_lng <= chicago_bbox["xmax"],
          end_lat >= chicago_bbox["ymin"], end_lat <= chicago_bbox["ymax"])
 
-# Electric vs. Classic heatmaps
+# electric vs. classic heatmaps
 electric <- df_bbox %>% filter(rideable_type == "electric_bike")
 classic <- df_bbox %>% filter(rideable_type == "classic_bike")
 
-# Member vs. Casual heatmaps
+# member vs. casual heatmaps
 member <- df_bbox %>% filter(member_casual == "member")
 casual <- df_bbox %>% filter(member_casual == "casual")
 ```
@@ -1088,30 +1088,29 @@ casual <- df_bbox %>% filter(member_casual == "casual")
 ```{r}
 # heatmap function
 plot_heatmap <- function(data, title) {
-  ggplot(data, aes(x = end_lng, y = end_lat)) +
+  ggplot(data, aes(x = start_lng, y = start_lat)) +
     geom_bin2d(bins = 100) + # Adjust bins for granularity
     scale_fill_gradient(low = "blue", high = "red") +
     theme_minimal() +
     labs(title = title, x = "Longitude", y = "Latitude")
 }
 
-# # Convert to sf object
+# Convert to sf object
 # df_sf <- st_as_sf(df_bbox, coords = c("end_lng", "end_lat"), crs = 4326)
-# 
-# # Base heatmap function
-# plot_heatmap <- function(data, title) {
-#   ggplot() +
-#     annotation_map_tile(type = "osm", zoom = 12) +  # OSM background
-#     geom_bin2d(data = data, aes(x = st_coordinates(.)[,1], y = st_coordinates(.)[,2]), bins = 100) +
-#     scale_fill_gradient(low = "blue", high = "red") +
-#     theme_minimal() +
-#     labs(title = title, x = "Longitude", y = "Latitude")
-# }
 # 
 # electric <- df_sf %>% filter(rideable_type == "electric_bike")
 # classic <- df_sf %>% filter(rideable_type == "classic_bike")
 # member <- df_sf %>% filter(member_casual == "member")
 # casual <- df_sf %>% filter(member_casual == "casual")
+
+# plot_heatmap <- function(data, title) {
+#   ggplot(data, aes(x = end_lng, y = end_lat)) +
+#     annotation_map_tile(type = "osm", zoom = 12) +  # OSM background
+#     geom_bin2d(bins = 100) +
+#     scale_fill_gradient(low = "blue", high = "red") +
+#     theme_minimal() +
+#     labs(title = title, x = "Longitude", y = "Latitude")
+# }
 ```
 
 ```{r}
@@ -1131,38 +1130,110 @@ plot_heatmap(casual, "Casual Trips Heatmap")
 ```
 
 ```{r}
-# # define bounding box for Chicago (approximate lat/lng bounds)
-# chicago_bbox <- st_bbox(c(xmin = -88, xmax = -87.4, ymin = 41.6, ymax = 42), crs = st_crs(4326))
-# 
-# # Filter dataset within Chicago bounds
-# df_filtered <- df %>%
-#   filter(end_lng >= chicago_bbox["xmin"], end_lng <= chicago_bbox["xmax"],
-#          end_lat >= chicago_bbox["ymin"], end_lat <= chicago_bbox["ymax"])
-# 
-# # Convert to sf object
-# df_sf <- st_as_sf(df_filtered, coords = c("end_lng", "end_lat"), crs = 4326)
-# 
-# # Base heatmap function
-# plot_heatmap <- function(data, title) {
-#   ggplot() +
+# # contour plot
+# plot_contour_heatmap <- function(data, title) {
+#   ggplot(data, aes(x = end_lng, y = end_lat)) +
 #     annotation_map_tile(type = "osm", zoom = 12) +  # OSM background
-#     geom_bin2d(data = data, aes(x = st_coordinates(.)[,1], y = st_coordinates(.)[,2]), bins = 100) +
-#     scale_fill_gradient(low = "blue", high = "red") +
+#     geom_density2d_filled(alpha = 0.6) +  # Adjust transparency
 #     theme_minimal() +
 #     labs(title = title, x = "Longitude", y = "Latitude")
 # }
-# 
-# # Subset data
-# electric <- df_sf %>% filter(rideable_type == "electric_bike")
-# classic <- df_sf %>% filter(rideable_type == "classic_bike")
-# member <- df_sf %>% filter(member_casual == "member")
-# casual <- df_sf %>% filter(member_casual == "casual")
-# 
-# # Plot separately
-# plot_heatmap(electric, "Electric Bike Trips Heatmap")
-# plot_heatmap(classic, "Classic Bike Trips Heatmap")
-# plot_heatmap(member, "Member Trips Heatmap")
-# plot_heatmap(casual, "Casual Trips Heatmap")
+```
 
+```{r}
+library(leaflet)
+library(leaflet.extras)
+
+plot_leaflet_heatmap <- function(data, title, sample_size = 50000) {
+  data_sample <- data %>% sample_n(sample_size)
+  
+  # Compute density (counts per unique lat/lng combination)
+  density_data <- data_sample %>%
+    count(end_lng, end_lat)
+  
+  # Define a continuous color palette
+  color_palette <- colorNumeric(palette = "viridis", domain = density_data$n) 
+  
+  leaflet(data_sample) %>%
+    addTiles() %>%
+    setView(lng = -87.63, lat = 41.88, zoom = 13) %>%  # Center on downtown Chicago
+    addHeatmap(lng = ~end_lng, lat = ~end_lat, blur = 15, max = 1, radius = 10) %>%
+    addLegend(position = "bottomright",
+              pal = color_palette,
+              values = density_data$n,
+              title = title)
+}
+```
+
+```{r}
+set.seed(42)  # Global seed for reproducibility
+
+# Sample each group separately
+electric <- df_bbox %>% filter(rideable_type == "electric_bike") %>% sample_n(50000)
+classic <- df_bbox %>% filter(rideable_type == "classic_bike") %>% sample_n(50000)
+member <- df_bbox %>% filter(member_casual == "member") %>% sample_n(50000)
+casual <- df_bbox %>% filter(member_casual == "casual") %>% sample_n(50000)
+```
+
+```{r}
+# # Plot Contour Heatmaps
+# plot_contour_heatmap(electric, "Electric Bike Trips Heatmap")
+# plot_contour_heatmap(classic, "Classic Bike Trips Heatmap")
+# plot_contour_heatmap(member, "Member Trips Heatmap")
+# plot_contour_heatmap(casual, "Casual Trips Heatmap")
+```
+
+```{r}
+
+# Plot Leaflet Heatmaps
+plot_leaflet_heatmap(electric, "Electric Bike Trips")
+```
+
+```{r}
+plot_leaflet_heatmap(classic, "Classic Bike Trips")
+```
+
+```{r}
+plot_leaflet_heatmap(member, "Member Bike Trips")
+```
+
+```{r}
+plot_leaflet_heatmap(casual, "Casual Bike Trips")
+```
+
+```{r}
+library(leaflet)
+library(leaflet.extras)
+library(dplyr)
+
+plot_leaflet_heatmap <- function(data, title) {
+  # Compute density (counts per unique lat/lng combination)
+  density_data <- data %>%
+    count(end_lng, end_lat)
+  
+  # Define a continuous color palette
+  color_palette <- colorNumeric(palette = "viridis", domain = density_data$n) 
+  
+  leaflet(data) %>%
+    addTiles() %>%
+    setView(lng = -87.63, lat = 41.88, zoom = 13) %>%  # Center on downtown Chicago
+    addHeatmap(lng = ~end_lng, lat = ~end_lat, blur = 15, max = 1, radius = 10) %>%
+    addLegend(position = "bottomright",
+              pal = color_palette,
+              values = density_data$n,
+              title = title)
+}
+
+# Use the entire dataset without sampling
+electric <- df_bbox %>% filter(rideable_type == "electric_bike")
+classic <- df_bbox %>% filter(rideable_type == "classic_bike")
+member <- df_bbox %>% filter(member_casual == "member")
+casual <- df_bbox %>% filter(member_casual == "casual")
+
+# Plot heatmaps for each group
+plot_leaflet_heatmap(electric, "Electric Bike Trips Heatmap")
+plot_leaflet_heatmap(classic, "Classic Bike Trips Heatmap")
+plot_leaflet_heatmap(member, "Member Trips Heatmap")
+plot_leaflet_heatmap(casual, "Casual Trips Heatmap")
 ```
 
