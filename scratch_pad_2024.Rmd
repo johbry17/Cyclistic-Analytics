@@ -12,6 +12,8 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(sf)
+library(ggspatial)
 ```
 
 # Scratch Pad for 2024 Cyclistic Data Analysis
@@ -57,13 +59,25 @@ table(df$member_casual)
 
 In the scenario, and in real life, the data is shared without any sort of identifying information that would help track that, probably why after 2019 they removed gender and birth year. It wasn't much help anyway.
 
+```{r}
+table(df$month)
+```
+
+Reassigning the month "9" to "09".
+
+```{r}
+df$month <- sprintf("%02d", as.numeric(format(df$date, "%m")))
+table(df$month)
+```
+
+
 ## NA stations and e-bikes
 
 ```{r}
-# Count the number of NA values for each column
+# NA value counts
 na_counts <- sapply(df, function(x) sum(is.na(x)))
 
-# Print the NA counts
+# print
 print(na_counts)
 ```
 
@@ -77,7 +91,7 @@ df %>%
   arrange(desc(perc_missing))
 ```
 
-Yup. Missing stations are electric bikes without a docking station.
+Yup. Missing stations are electric bikes without a docking station, left randomly throughout the city.
 
 End stations counts by rideable_type
 
@@ -114,21 +128,21 @@ print(count(known_stations))
 Stations no longer have a specific lat/lng. No exact station location maps anymore. Have to do heatmaps.
 
 ```{r}
-# Count distinct start_station_id values
+# distinct start_station_name count
 distinct_start_station_count <- df %>%
   summarise(distinct_count = n_distinct(start_station_name))
 
-# Print the count
+# print
 print(distinct_start_station_count)
 ```
  It's supposed to be 692, per the scenario. (I found 608 in 2019).
 
 ```{r}
-# Count distinct start_station_id values
+# distinct start_station_id count
 distinct_start_station_count <- df %>%
   summarise(distinct_count = n_distinct(start_station_id))
 
-# Print the count
+# print
 print(distinct_start_station_count)
 ```
 
@@ -144,7 +158,7 @@ IQR
 summary(df$ride_length)
 ```
 
-The mean is higher than the 3rd quartile. Data set skews. Makes sense, as many commuter rides are quick, but leisure rides can last a while. And sometimes people just dump the bike in a ditch so it appears to be a long ride.
+The mean is higher than the 3rd quartile. Data set skews left. Makes sense, as many commuter rides are quick, but leisure rides can last a while. And sometimes people just dump the bike in a ditch so it appears to be a long ride.
 
 ```{r}
 max(df$ride_length)/60/24
@@ -413,11 +427,7 @@ df %>%
   labs(title = "Average Trip Duration per Month by Customer Type", x = "Month", y = "Average Trip Duration (minutes)")
 ```
 
-Interesting. I have a "9" month.
-
-```{r}
-table(df$month)
-```
+Here is where I noticed a "9" month. There were 35 rides in the month "9" instead of "09". Stuck out at 100 and 450 minute long trip durations (outliers). I fixed it up at the top.
 
 
 ```{r}
@@ -619,13 +629,32 @@ ggplot(casual_peak_times, aes(x = hour, y = day_of_week, fill = rides)) +
 
 Peak time is Saturday afternoon, followed by Sunday afternoon. But also a little around peak end-of-work hour. Are casual riders transiting in to work, and biking back?
 
-## Stations
+## Bike Type
 
 ```{r}
-# may be unnecessary
-library(sf)
-library(ggspatial)
+# bar chart of total count of rideable_type
+ggplot(df, aes(x = rideable_type, fill = rideable_type)) +
+  geom_bar() +
+  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5) +
+  theme_minimal() +
+  labs(title = "Total Count of Rideable Types",
+       x = "Rideable Type",
+       y = "Count")
 ```
+
+```{r}
+# bar chart of rideable_type count per member_casual
+ggplot(df, aes(x = rideable_type, fill = member_casual)) +
+  geom_bar(position = "dodge") +
+  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5, position = position_dodge(0.9)) +
+  theme_minimal() +
+  labs(title = "Count of Rideable Types per Member Type",
+       x = "Rideable Type",
+       y = "Count")
+```
+
+
+## Stations
 
 ```{r}
 # bar chart: top start stations
@@ -849,6 +878,8 @@ ggplot() +
 
 ```
 
+Roughly looks like 2019.
+
 ```{r}
 # extract start stations for trips ending at top casual end stations
 casual_start_from_end_sf <- df %>%
@@ -954,6 +985,8 @@ ggplot() +
        x = "Longitude", y = "Latitude") +
   theme_minimal()
 ```
+
+Again, looks like 2019. Members go to The Loop, Chicago's business district.
 
 ```{r}
 # Extract start stations for trips ending at top member end stations
