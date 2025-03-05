@@ -1,6 +1,9 @@
 #=====================
 # Any oddities commented out are...
 # ...legacy steps from converting the Google template to the current version
+# Note that these functions work for any given year.
+# Divvy switched to these columns in 2020. As of early 2025, this works for any year,
+# although the first three months of 2020 are in one file, Q12020, which'd be a problem
 #=====================
 
 library(tidyverse)  #helps wrangle data
@@ -14,9 +17,8 @@ conflict_prefer("lag", "dplyr")
 #=====================
 # COLLECT DATA
 #=====================
-# # Upload Divvy datasets (csv files) here
 
-# read files into separate df's (m01 - m12)
+# reads files into separate df's (m01 - m12)
 read_cyclistic_data <- function(year) {
   for (i in 1:12) {
     month <- sprintf("%02d", i)  # Format as 01, 02, ..., 12
@@ -30,25 +32,8 @@ read_cyclistic_data <- function(year) {
   }
 }
 
+# call read function
 read_cyclistic_data(2024)
-
-# check_na_summary <- function(df, month) {
-#   paste(
-#     month, "started_at NA's:", sum(is.na(df$started_at)), "|",
-#     "ended_at NA's:", sum(is.na(df$ended_at)), "|",
-#     "date NA's:", sum(is.na(df$date)), "|",
-#     "ride_length NA's:", sum(is.na(df$ride_length)), "|",
-#     "hour NA's:", sum(is.na(df$hour)), "|",
-#     "season NA's:", sum(is.na(df$season))
-#   )
-# }
-# 
-# # Run for m01 to m12
-# months <- paste0("m", sprintf("%02d", 1:12))
-# na_summaries <- sapply(months, function(m) check_na_summary(get(m), m))
-# 
-# # Print results
-# cat(na_summaries, sep="\n")
 
 #======================================================
 # CLEAN UP AND ADD DATA TO PREPARE FOR ANALYSIS
@@ -67,7 +52,7 @@ get_season <- function(month) {
   }
 }
 
-# clean data for m01-m12
+# cleans data for m01-m12
 clean_cyclistic_data <- function(year) {
   for (i in 1:12) {
     month <- sprintf("%02d", i)
@@ -76,10 +61,6 @@ clean_cyclistic_data <- function(year) {
     
     if (exists(df_name)) {
       df <- get(df_name)
-      
-      # Explicitly format dates, hope it resolves NA issue
-      # df$started_at <- as.POSIXct(df$started_at, format="%Y-%m-%d %H:%M:%S")
-      # df$ended_at <- as.POSIXct(df$ended_at, format="%Y-%m-%d %H:%M:%S")
       
       # add date-related columns
       df$date <- as.Date(df$started_at)
@@ -94,8 +75,8 @@ clean_cyclistic_data <- function(year) {
       df$ride_length <- as.numeric(difftime(df$ended_at, df$started_at, units = "mins"))
       
       # remove invalid rows
-      df <- df %>%
-        filter(!(start_station_name == "HQ QR" | ride_length < 0))
+      # remove negative ride_lengths, part of company maintenance. No more "HQ QR" stations
+      df <- df %>% filter(ride_length >= 0)
       
       # assign cleaned data back to global environment
       assign(cleaned_name, df, envir = .GlobalEnv)
@@ -103,30 +84,13 @@ clean_cyclistic_data <- function(year) {
   }
 }
 
+# call clean function
 clean_cyclistic_data(2024)
-
-# check_na_summary <- function(df, month) {
-#   paste(
-#     month, "started_at NA's:", sum(is.na(df$started_at)), "|",
-#     "ended_at NA's:", sum(is.na(df$ended_at)), "|",
-#     "date NA's:", sum(is.na(df$date)), "|",
-#     "ride_length NA's:", sum(is.na(df$ride_length)), "|",
-#     "hour NA's:", sum(is.na(df$hour)), "|",
-#     "season NA's:", sum(is.na(df$season))
-#   )
-# }
-# 
-# # Run for m01 to m12
-# months <- paste0("m", sprintf("%02d", 1:12), "_cleaned")
-# na_summaries_cleaned <- sapply(months, function(m) check_na_summary(get(m), m))
-# 
-# # Print results
-# cat(na_summaries_cleaned, sep="\n")
 
 #=================================================
 # EXPORT SUMMARY FILE FOR FURTHER ANALYSIS
 #=================================================
-# Create a csv file that we will visualize in Excel, Tableau, or presentation software
+# creates csv files to visualize with
 write_cleaned_data <- function(year) {
   for (i in 1:12) {
     month <- sprintf("%02d", i)
@@ -135,16 +99,13 @@ write_cleaned_data <- function(year) {
     if (exists(df_name)) {
       df_cleaned <- get(df_name)
       
-      # # Modify this section with actual cleaning steps
-      # df_cleaned <- df_cleaned %>%
-      #   mutate(started_at = as.POSIXct(started_at, format = "%Y-%m-%d %H:%M:%S"))
-      
       output_file <- paste0("resources/data/", year, "/", year, month, "-divvy-tripdata_cleaned.csv")
       write_csv(df_cleaned, output_file)
     }
   }
 }
 
+# call write function
 write_cleaned_data(2024)
 
 # dump memory
