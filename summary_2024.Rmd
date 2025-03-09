@@ -15,10 +15,7 @@ output:
     css: ./resources/css/styles.css
 ---
 
-```{r}
-# ensure maps work / image work
-# move data dictionary to appendix - with links back and forth
-# shorten Scenario quote (ellipsis / summarize)
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # save plot(s)
 # final proofread
 # add links for scratch pad, connect 2019 and 2024
@@ -40,6 +37,7 @@ library(png)
 library(kableExtra)
 library(htmltools)
 library(leaflet)
+library(leaflet.extras)
 ```
 
 A hypothetical data analysis project, answering a business question for a fictional bikeshare company, analyzing customer behavior and concluding with recommendations to assist in converting casual customers into annual members.
@@ -66,9 +64,9 @@ read_cyclistic_data(2024)
 # regex to bind rows of all monthly data frames
 df <- bind_rows(mget(ls(pattern = "^m\\d{2}$")))
 
-# dump memory
-rm(list = ls(pattern = "^m\\d{2}(_cleaned)?$"))
-gc()
+# dump memory - invisible suppresses output
+invisible(rm(list = ls(pattern = "^m\\d{2}(_cleaned)?$")))
+invisible(gc())
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
@@ -148,70 +146,66 @@ df %>%
 ---
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-# # Function to get top 10 stations for start or end locations
-# get_top_stations <- function(data, station_col, member_type) {
-#   data %>%
-#     filter(!is.na(!!sym(station_col)), member_casual == member_type) %>%
-#     count(!!sym(station_col), sort = TRUE) %>%
-#     top_n(10, n) %>%
-#     pull(!!sym(station_col))
-# }
-# 
-# # Get top 10 stations
-# top_start_members <- get_top_stations(df, "start_station_name", "member")
-# top_start_casual <- get_top_stations(df, "start_station_name", "casual")
-# 
-# # Function to filter trips matching the top 10 stations
-# filter_trips <- function(data, station_list, station_col) {
-#   data %>% filter(!!sym(station_col) %in% station_list)
-# }
-# 
-# # Filter trips based on top stations
-# trips_from_top_start_members <- filter_trips(df, top_start_members, "start_station_name")
-# trips_from_top_start_casual <- filter_trips(df, top_start_casual, "start_station_name")
-# 
-# # Function to plot Leaflet heatmaps
-# plot_leaflet_heatmap <- function(data, lng_col, lat_col, title, zoom_level = 13) {
-#   data <- data %>% filter(!is.na(!!sym(lng_col)) & !is.na(!!sym(lat_col)))
-#   
-#   density_data <- data %>% count(!!sym(lng_col), !!sym(lat_col))
-#   color_palette <- colorNumeric(palette = "viridis", domain = density_data$n)
-# 
-#   leaflet(data) %>%
-#     addTiles() %>%
-#     setView(lng = -87.63, lat = 41.88, zoom = zoom_level) %>%
-#     addHeatmap(lng = as.formula(paste0("~", lng_col)),
-#                lat = as.formula(paste0("~", lat_col)),
-#                blur = 15, max = 1, radius = 10) %>%
-#     addLegend(position = "bottomright",
-#               pal = color_palette,
-#               values = density_data$n,
-#               title = title)
-# }
+# Function to get top 10 stations for start or end locations
+get_top_stations <- function(data, station_col, member_type) {
+  data %>%
+    filter(!is.na(!!sym(station_col)), member_casual == member_type) %>%
+    count(!!sym(station_col), sort = TRUE) %>%
+    top_n(10, n) %>%
+    pull(!!sym(station_col))
+}
+
+# Get top 10 stations
+top_start_members <- get_top_stations(df, "start_station_name", "member")
+top_start_casual <- get_top_stations(df, "start_station_name", "casual")
+
+# Function to filter trips matching the top 10 stations
+filter_trips <- function(data, station_list, station_col) {
+  data %>% filter(!!sym(station_col) %in% station_list)
+}
+
+# Filter trips based on top stations
+trips_from_top_start_members <- filter_trips(df, top_start_members, "start_station_name")
+trips_from_top_start_casual <- filter_trips(df, top_start_casual, "start_station_name")
+
+# Function to plot Leaflet heatmaps
+plot_leaflet_heatmap <- function(data, lng_col, lat_col, title, zoom_level = 13) {
+  data <- data %>% filter(!is.na(!!sym(lng_col)) & !is.na(!!sym(lat_col)))
+
+  density_data <- data %>% count(!!sym(lng_col), !!sym(lat_col))
+  color_palette <- colorNumeric(palette = "viridis", domain = density_data$n)
+
+  leaflet(data) %>%
+    addTiles() %>%
+    setView(lng = -87.61, lat = 41.895, zoom = zoom_level) %>%
+    addHeatmap(lng = as.formula(paste0("~", lng_col)),
+               lat = as.formula(paste0("~", lat_col)),
+               blur = 15, max = 1, radius = 10) %>%
+    addLegend(position = "bottomleft",
+              pal = color_palette,
+              values = density_data$n,
+              title = title)
+}
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-# plot_leaflet_heatmap(trips_from_top_start_members, "start_lng", "start_lat", "Top 10 Stations (Members)")
+plot_leaflet_heatmap(trips_from_top_start_members, "start_lng", "start_lat", "Top 10 Stations<br>(Members)")
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-# plot_leaflet_heatmap(trips_from_top_start_casual, "start_lng", "start_lat", "Top 10 Stations (Casuals)")
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Compare the above 2024 maps with 2019's map of top stations and sightseeing locations."}
+plot_leaflet_heatmap(trips_from_top_start_casual, "start_lng", "start_lat", "Top 10 Stations<br>(Casuals)")
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-# Add 2019 station plot, Chicago sightseeing map
-# # image
-# image_path <- "./resources/images/Chicago_Sightseeing_Map.jpg"
-# img <- readJPEG(image_path)
-# image_grob <- rasterGrob(img, interpolate = TRUE)
-#
-# # map
-# image_path <- "./resources/images/2019_map.png"
-# img <- readPNG(image_path)
-# top_stations_grob <- rasterGrob(img, interpolate = TRUE)
-# 
-# # arrange plot and image side-by-side
-# grid.arrange(image_grob, top_stations_grob, ncol = 2)
+---
+
+```{r, echo=FALSE, fig.cap="2019's Top Member and Casual Stations."}
+knitr::include_graphics("./resources/images/2019_map.png")
+```
+
+---
+
+```{r, echo=FALSE, fig.cap="Chicago Sightseeing Map."}
+knitr::include_graphics("./resources/images/Chicago_Sightseeing_map.jpg")
 ```
 
 \
@@ -224,8 +218,7 @@ df %>%
 
 **Promotional Incentives:** Offer weekend-focused memberships, seasonal discounts, referral bonuses, and strategic partnerships with major Chicago events and leisure attractions.
 
-\
-\
+<img src="./resources/images/Logo_Freepik.png" alt="Cyclistic Logo" style="width:200px; display:block; margin:auto;">
 
 # Methodology
 
@@ -252,95 +245,15 @@ This analysis follows the framework outlined in Google's [Data Analytics certifi
 
 ---
 
-How do annual members and casual riders use Cyclistic bikes differently? Base the analysis on Cyclistic historical bike trip data. The information will be used to design marketing strategies aimed at converting casual riders into annual members.
+> <span style='font-style: italic; font-size: 14pt;'>&nbsp;&nbsp;&nbsp;&nbsp; How do annual members and casual riders differ in their use of Cyclistic bikes, and how can this inform marketing strategies to convert casual riders into members?</span>
 
-Quoted from the Google Data Analytics Capstone (see PDF [here](https://github.com/johbry17/Cyclistic-A-Google-Data-Analytics-Capstone/blob/main/resources/Case%20Study%201_How%20does%20a%20bike-share%20navigate%20speedy%20success.pdf)):
+#### Summary of the Business Case
 
-<blockquote>You are a junior data analyst working on the marketing analyst team at Cyclistic, a bike-share
-company in Chicago. The director of marketing believes the company’s future success
-depends on maximizing the number of annual memberships. Therefore, your team wants to
-understand how casual riders and annual members use Cyclistic bikes dierently. From these
-insights, your team will design a new marketing strategy to convert casual riders into annual
-members. But first, Cyclistic executives must approve your recommendations, so they must be
-backed up with compelling data insights and professional data visualizations.
+Cyclistic, a bike-share company in Chicago, aims to increase its number of annual members, as they are more profitable than casual riders. Rather than targeting new customers, the marketing team wants to convert casual riders into annual members by understanding their riding behaviors.
 
-Characters and teams
+To support this initiative, I have been assigned to analyze how annual members and casual riders use Cyclistic bikes differently. This analysis will identify key trends in usage patterns, which will inform marketing strategies designed to encourage casual riders to become members.
 
-● Cyclistic: A bike-share program that features more than 5,800 bicycles and 600
-docking stations. Cyclistic sets itself apart by also offering reclining bikes, hand
-tricycles, and cargo bikes, making bike-share more inclusive to people with disabilities
-and riders who can’t use a standard two-wheeled bike. The majority of riders opt for
-traditional bikes; about 8% of riders use the assistive options. Cyclistic users are more
-likely to ride for leisure, but about 30% use the bikes to commute to work each day.
-
-● Lily Moreno: The director of marketing and your manager. Moreno is responsible for
-the development of campaigns and initiatives to promote the bike-share program.
-These may include email, social media, and other channels.
-
-● Cyclistic marketing analytics team: A team of data analysts who are responsible for
-collecting, analyzing, and reporting data that helps guide Cyclistic marketing strategy.
-You joined this team six months ago and have been busy learning about Cyclistic’s
-mission and business goals—as well as how you, as a junior data analyst, can help
-Cyclistic achieve them.
-
-● Cyclistic executive team: The notoriously detail-oriented executive team will decide
-whether to approve the recommended marketing program.
-
-About the company
-
-In 2016, Cyclistic launched a successful bike-share offering. Since then, the program has grown
-to a fleet of 5,824 bicycles that are geotracked and locked into a network of 692 stations across
-Chicago. The bikes can be unlocked from one station and returned to any other station in the
-system anytime.
-
-Until now, Cyclistic’s marketing strategy relied on building general awareness and appealing to
-broad consumer segments. One approach that helped make these things possible was the
-flexibility of its pricing plans: single-ride passes, full-day passes, and annual memberships.
-Customers who purchase single-ride or full-day passes are referred to as casual riders.
-Customers who purchase annual memberships are Cyclistic members.
-
-Cyclistic’s finance analysts have concluded that annual members are much more profitable
-than casual riders. Although the pricing flexibility helps Cyclistic attract more customers,
-Moreno believes that maximizing the number of annual members will be key to future growth.
-Rather than creating a marketing campaign that targets all-new customers, Moreno believes
-there is a solid opportunity to convert casual riders into members. She notes that casual riders
-are already aware of the Cyclistic program and have chosen Cyclistic for their mobility needs.
-
-Moreno has set a clear goal: Design marketing strategies aimed at converting casual riders into
-annual members. In order to do that, however, the team needs to better understand how
-annual members and casual riders differ, why casual riders would buy a membership, and how
-digital media could affect their marketing tactics. Moreno and her team are interested in
-analyzing the Cyclistic historical bike trip data to identify trends.
-
-Note that data-privacy issues prohibit you from using riders’ personally identifiable information.
-This means that you won’t be able to connect pass purchases to credit card numbers to
-determine if casual riders live in the Cyclistic service area or if they have purchased multiple
-single passes.
-
-Three questions will guide the future marketing program:
-
-1. How do annual members and casual riders use Cyclistic bikes differently?
-2. Why would casual riders buy Cyclistic annual memberships?
-3. How can Cyclistic use digital media to influence casual riders to become members?
-
-Moreno has assigned you the first question to answer: How do annual members and casual
-riders use Cyclistic bikes differently?
-
-You will produce a report with the following deliverables:
-
-&nbsp;&nbsp;&nbsp;&nbsp; 1. A clear statement of the business task
-
-&nbsp;&nbsp;&nbsp;&nbsp; 2. A description of all data sources used
-
-&nbsp;&nbsp;&nbsp;&nbsp; 3. Documentation of any cleaning or manipulation of data
-
-&nbsp;&nbsp;&nbsp;&nbsp; 4. A summary of your analysis
-
-&nbsp;&nbsp;&nbsp;&nbsp; 5. Supporting visualizations and key findings
-
-&nbsp;&nbsp;&nbsp;&nbsp; 6. Your top three recommendations based on your analysis
-
-</blockquote>
+For reference, the full case study details can be found in the [Appendix](#scenario).
 
 \
 
@@ -348,45 +261,11 @@ You will produce a report with the following deliverables:
 
 ---
 
-The analysis incorporates cleaned ride data from all of 2024, detailing trip durations, ride frequencies, station destinations, and date-time information.
+The analysis incorporates cleaned ride data from all `r format(nrow(df), big.mark = ",")` bike rides of 2024, detailing trip durations, ride frequencies, station destinations, and date-time information.
 
 Google linked to [data](https://divvy-tripdata.s3.amazonaws.com/index.html) provided by Lyft and Divvy from their Chicago operations. The data has been made available by Motivate International Inc. under this [license](https://divvybikes.com/data-license-agreement).
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-library(knitr)
-
-data_dict <- data.frame(
-  Column = c("ride_id", "started_at", "ended_at", "rideable_type", 
-             "start_station_id", "start_station_name", "end_station_id", "end_station_name", 
-             "member_casual", "gender", "birthyear", "date", "month", "day", "year", 
-             "day_of_week", "season", "hour", "ride_length", "start_lat/lng", "end_lat/lng"),
-  Description = c("Unique ride identifier.", 
-                  "Ride start time (YYYY-MM-DD HH:MM:SS).",
-                  "Ride end time (YYYY-MM-DD HH:MM:SS).",
-                  "Type of bicycle.",
-                  "Starting station ID.",
-                  "Starting station name.",
-                  "Ending station ID.",
-                  "Ending station name.",
-                  "Rider type (member/casual).",
-                  "Rider gender (if available).",
-                  "Rider birth year (if available).",
-                  "Ride date (YYYY-MM-DD).",
-                  "Ride month (1–12).",
-                  "Ride day (1–31).",
-                  "Ride year (YYYY).",
-                  "Day of the week (Mon–Sun).",
-                  "Season (Winter, Spring, Summer, Fall).",
-                  "Ride start hour (0–23).",
-                  "Duration in minutes.",
-                  "Starting location coordinates.",
-                  "Ending location coordinates.")
-)
-
-kable(data_dict, caption = "Cyclistic Ride Data Dictionary", format = "html") %>%
-  kable_styling(bootstrap_options = c("striped", "hover"))
-```
- 
+A [Data Dictionary](#data-dictionary) is attached in the Appendix.
 
 \
 
@@ -594,18 +473,28 @@ This skips the top station, NA, as electric bikes commonly don't use a docking s
 ---
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-# plot_leaflet_heatmap(trips_from_top_start_members, "start_lng", "start_lat", "Top 10 Stations (Members)")
+plot_leaflet_heatmap(trips_from_top_start_members, "start_lng", "start_lat", "Top 10 Stations<br>(Members)")
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-# plot_leaflet_heatmap(trips_from_top_start_casual, "start_lng", "start_lat", "Top 10 Stations (Casuals)")
+plot_leaflet_heatmap(trips_from_top_start_casual, "start_lng", "start_lat", "Top 10 Stations<br>(Casuals)")
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # Add 2019 station plot, Chicago sightseeing map
 
-# # arrange plot and image side-by-side
-# grid.arrange(image_grob, top_stations_grob, ncol = 2)
+# image
+image_path <- "./resources/images/Chicago_Sightseeing_Map.jpg"
+img <- readJPEG(image_path)
+image_grob <- rasterGrob(img, interpolate = TRUE)
+
+# map
+image_path <- "./resources/images/2019_map.png"
+img <- readPNG(image_path)
+top_stations_grob <- rasterGrob(img, interpolate = TRUE)
+
+# arrange plot and image side-by-side
+grid.arrange(image_grob, top_stations_grob, ncol = 2)
 ```
 
 
@@ -701,8 +590,7 @@ df %>%
 
 - **Integrate with Public Transit**: Develop a transit partnership with CTA (Chicago Transit Authority) for bundled bike-and-train/bus memberships.
 
-\
-\
+<img src="./resources/images/Logo_Freepik.png" alt="Cyclistic Logo" style="width:200px; display:block; margin:auto;">
 
 # Conclusion
 
@@ -714,6 +602,144 @@ A combination of targeted advertising, compelling promotions, and commuter-focus
 
 Finally, strengthening partnerships with corporations, universities, and public transit systems will enhance Cyclistic’s appeal to commuters. By capitalizing on both the leisure and commuter benefits of membership, Cyclistic can expand its reach, encourage long-term adoption, and solidify its position as Chicago’s go-to bikeshare service. Through these strategic initiatives, Cyclistic is well-positioned to drive membership growth while enriching the overall rider experience.
 
+<img src="./resources/images/Logo_AI.jpeg" alt="Cyclistic Logo" style="width:200px; display:block; margin:auto;">
+
+# Appendix
+
+---
+
+## Data Dictionary
+
+<span style="font-size: 10pt;">[Back to Data Sources](#data-sources)</span>
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+
+data_dict <- data.frame(
+  Column = c("ride_id", "started_at", "ended_at", "rideable_type", 
+             "start_station_id", "start_station_name", "end_station_id", "end_station_name", 
+             "member_casual", "gender", "birthyear", "date", "month", "day", "year", 
+             "day_of_week", "season", "hour", "ride_length", "start_lat/lng", "end_lat/lng"),
+  Description = c("Unique ride identifier.", 
+                  "Ride start time (YYYY-MM-DD HH:MM:SS).",
+                  "Ride end time (YYYY-MM-DD HH:MM:SS).",
+                  "Type of bicycle.",
+                  "Starting station ID.",
+                  "Starting station name.",
+                  "Ending station ID.",
+                  "Ending station name.",
+                  "Rider type (member/casual).",
+                  "Rider gender (if available).",
+                  "Rider birth year (if available).",
+                  "Ride date (YYYY-MM-DD).",
+                  "Ride month (1–12).",
+                  "Ride day (1–31).",
+                  "Ride year (YYYY).",
+                  "Day of the week (Mon–Sun).",
+                  "Season (Winter, Spring, Summer, Fall).",
+                  "Ride start hour (0–23).",
+                  "Duration in minutes.",
+                  "Starting location coordinates.",
+                  "Ending location coordinates.")
+)
+
+kable(data_dict, caption = "Cyclistic Ride Data Dictionary", format = "html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+---
+
+## Scenario
+
+<span style="font-size: 10pt;">[Back to Ask](#ask)</span>
+
+Quoted from the Google Data Analytics Capstone (see PDF [here](https://github.com/johbry17/Cyclistic-A-Google-Data-Analytics-Capstone/blob/main/resources/Case%20Study%201_How%20does%20a%20bike-share%20navigate%20speedy%20success.pdf)):
+
+<blockquote>You are a junior data analyst working on the marketing analyst team at Cyclistic, a bike-share
+company in Chicago. The director of marketing believes the company’s future success
+depends on maximizing the number of annual memberships. Therefore, your team wants to
+understand how casual riders and annual members use Cyclistic bikes dierently. From these
+insights, your team will design a new marketing strategy to convert casual riders into annual
+members. But first, Cyclistic executives must approve your recommendations, so they must be
+backed up with compelling data insights and professional data visualizations.
+
+Characters and teams
+
+● Cyclistic: A bike-share program that features more than 5,800 bicycles and 600
+docking stations. Cyclistic sets itself apart by also offering reclining bikes, hand
+tricycles, and cargo bikes, making bike-share more inclusive to people with disabilities
+and riders who can’t use a standard two-wheeled bike. The majority of riders opt for
+traditional bikes; about 8% of riders use the assistive options. Cyclistic users are more
+likely to ride for leisure, but about 30% use the bikes to commute to work each day.
+
+● Lily Moreno: The director of marketing and your manager. Moreno is responsible for
+the development of campaigns and initiatives to promote the bike-share program.
+These may include email, social media, and other channels.
+
+● Cyclistic marketing analytics team: A team of data analysts who are responsible for
+collecting, analyzing, and reporting data that helps guide Cyclistic marketing strategy.
+You joined this team six months ago and have been busy learning about Cyclistic’s
+mission and business goals—as well as how you, as a junior data analyst, can help
+Cyclistic achieve them.
+
+● Cyclistic executive team: The notoriously detail-oriented executive team will decide
+whether to approve the recommended marketing program.
+
+About the company
+
+In 2016, Cyclistic launched a successful bike-share offering. Since then, the program has grown
+to a fleet of 5,824 bicycles that are geotracked and locked into a network of 692 stations across
+Chicago. The bikes can be unlocked from one station and returned to any other station in the
+system anytime.
+
+Until now, Cyclistic’s marketing strategy relied on building general awareness and appealing to
+broad consumer segments. One approach that helped make these things possible was the
+flexibility of its pricing plans: single-ride passes, full-day passes, and annual memberships.
+Customers who purchase single-ride or full-day passes are referred to as casual riders.
+Customers who purchase annual memberships are Cyclistic members.
+
+Cyclistic’s finance analysts have concluded that annual members are much more profitable
+than casual riders. Although the pricing flexibility helps Cyclistic attract more customers,
+Moreno believes that maximizing the number of annual members will be key to future growth.
+Rather than creating a marketing campaign that targets all-new customers, Moreno believes
+there is a solid opportunity to convert casual riders into members. She notes that casual riders
+are already aware of the Cyclistic program and have chosen Cyclistic for their mobility needs.
+
+Moreno has set a clear goal: Design marketing strategies aimed at converting casual riders into
+annual members. In order to do that, however, the team needs to better understand how
+annual members and casual riders differ, why casual riders would buy a membership, and how
+digital media could affect their marketing tactics. Moreno and her team are interested in
+analyzing the Cyclistic historical bike trip data to identify trends.
+
+Note that data-privacy issues prohibit you from using riders’ personally identifiable information.
+This means that you won’t be able to connect pass purchases to credit card numbers to
+determine if casual riders live in the Cyclistic service area or if they have purchased multiple
+single passes.
+
+Three questions will guide the future marketing program:
+
+1. How do annual members and casual riders use Cyclistic bikes differently?
+2. Why would casual riders buy Cyclistic annual memberships?
+3. How can Cyclistic use digital media to influence casual riders to become members?
+
+Moreno has assigned you the first question to answer: How do annual members and casual
+riders use Cyclistic bikes differently?
+
+You will produce a report with the following deliverables:
+
+&nbsp;&nbsp;&nbsp;&nbsp; 1. A clear statement of the business task
+
+&nbsp;&nbsp;&nbsp;&nbsp; 2. A description of all data sources used
+
+&nbsp;&nbsp;&nbsp;&nbsp; 3. Documentation of any cleaning or manipulation of data
+
+&nbsp;&nbsp;&nbsp;&nbsp; 4. A summary of your analysis
+
+&nbsp;&nbsp;&nbsp;&nbsp; 5. Supporting visualizations and key findings
+
+&nbsp;&nbsp;&nbsp;&nbsp; 6. Your top three recommendations based on your analysis
+
+</blockquote>
+
 <img src="./resources/images/Logo_Freepik.png" alt="Cyclistic Logo" style="width:200px; display:block; margin:auto;">
 <p style="font-size: 12px; color: #555; margin:auto; text-align: center;">Source: <a href="https://www.freepik.com">Freepik</a></p>
-

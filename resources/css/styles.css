@@ -33,3 +33,28 @@ h4 {
   text-decoration: underline;
   font-weight: bold;
 }
+
+.button {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.button a {
+  background-color: #f8f9fa;
+  color: #212529;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 0.25rem; 
+  /* border-radius: 5px; */
+  font-weight: bold;
+  border: 1px solid #ced4da;
+  transition: background-color 0.3s ease;
+}
+
+.button a:hover {
+  background-color: #0085A1;
+  /* background-color: #e2e6ea; */
+}
