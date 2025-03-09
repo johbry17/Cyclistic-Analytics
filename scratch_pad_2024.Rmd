@@ -34,12 +34,12 @@ Exploratory Data Analysis, unencumbered by the need to be **too** presentable.
 # load data, combine into a df
 read_cyclistic_data <- function(year) {
   for (i in 1:12) {
-    month <- sprintf("%02d", i)  # Format as 01, 02, ..., 12
+    month <- sprintf("%02d", i) # Format as 01, 02, ..., 12
     file_path <- paste0("resources/data/", year, "/", year, month, "-divvy-tripdata_cleaned.csv")
-    
+
     if (file.exists(file_path)) {
       data <- read_csv(file_path)
-      data$month <- as.character(data$month)  # ensure month is character
+      data$month <- as.character(data$month) # ensure month is character
       assign(paste0("m", month), data, envir = .GlobalEnv)
     } else {
       message("File not found: ", file_path)
@@ -126,7 +126,6 @@ df %>%
   group_by(rideable_type) %>%
   summarize(missing_count = sum(missing_name), total = n(), perc_missing = mean(missing_name)) %>%
   arrange(desc(perc_missing))
-
 ```
 
 ```{r}
@@ -186,7 +185,7 @@ summary(df$ride_length)
 The mean is higher than the 3rd quartile. Data set skews left. Makes sense, as many commuter rides are quick, but leisure rides can last a while. And sometimes people just dump the bike in a ditch so it appears to be a long ride.
 
 ```{r}
-max(df$ride_length)/60/24
+max(df$ride_length) / 60 / 24
 ```
 
 A little over a day. Somebody forgot to dock a bike.
@@ -204,7 +203,7 @@ avg_ride_length_missing_end_lat <- df %>%
   summarise(avg_ride_length = mean(ride_length, na.rm = TRUE))
 
 # print
-print(avg_ride_length_missing_end_lat)/60/24
+print(avg_ride_length_missing_end_lat) / 60 / 24
 ```
 
 A little over a day.
@@ -218,7 +217,7 @@ min_ride_length_missing_end_lat <- df %>%
   summarise(min_ride_length = min(ride_length, na.rm = TRUE))
 
 # print
-print(min_ride_length_missing_end_lat)/60/24
+print(min_ride_length_missing_end_lat) / 60 / 24
 ```
 
 ```{r}
@@ -226,10 +225,12 @@ print(min_ride_length_missing_end_lat)/60/24
 ggplot(df, aes(x = ride_length)) +
   geom_histogram(binwidth = 5, fill = "blue", color = "black", alpha = 0.7) +
   scale_x_continuous(limits = c(0, quantile(df$ride_length, 0.99))) + # trim extreme outliers
-  labs(title = "Distribution of Ride Length",
-       subtitle = "Removed the 99th percentile outliers - the 1%!",
-       x = "Ride Length (minutes)",
-       y = "Count") +
+  labs(
+    title = "Distribution of Ride Length",
+    subtitle = "Removed the 99th percentile outliers - the 1%!",
+    x = "Ride Length (minutes)",
+    y = "Count"
+  ) +
   theme_minimal()
 ```
 
@@ -303,8 +304,6 @@ df_no_outliers <- df %>%
 
 # print
 summary(df_no_outliers$ride_length)
-
-
 ```
 
 I will very conservatively drop the 0.25% of rides over four and a half hours long.
@@ -325,7 +324,6 @@ ggplot(total_minutes_ridden, aes(x = member_casual, y = total_minutes, fill = me
   geom_text(aes(label = round(total_minutes)), vjust = -0.5) +
   theme_minimal() +
   labs(title = "Total Minutes Ridden by Membership Type", y = "Total Minutes Ridden", x = "Rider Type")
-
 ```
 
 ```{r}
@@ -340,7 +338,6 @@ ggplot(total_minutes_ridden, aes(x = member_casual, y = total_minutes, fill = me
   geom_text(aes(label = round(total_minutes)), vjust = -0.5) +
   theme_minimal() +
   labs(title = "Total Minutes Ridden by Membership Type, No Outliers", y = "Total Minutes Ridden", x = "Rider Type")
-
 ```
 
 ```{r}
@@ -376,11 +373,12 @@ ggplot(average_ride_length, aes(x = member_casual, y = average_minutes, fill = m
 ggplot(df, aes(x = member_casual, fill = member_casual)) +
   geom_bar() +
   geom_text(stat = "count", aes(label = ..count..), vjust = -0.5) +
-  labs(title = "Total Rides by Membership Type",
-       x = "Rider Type",
-       y = "Total Rides") +
+  labs(
+    title = "Total Rides by Membership Type",
+    x = "Rider Type",
+    y = "Total Rides"
+  ) +
   theme_minimal()
-
 ```
 
 ```{r}
@@ -388,24 +386,27 @@ ggplot(df, aes(x = member_casual, fill = member_casual)) +
 ggplot(df_no_outliers, aes(x = member_casual, fill = member_casual)) +
   geom_bar() +
   geom_text(stat = "count", aes(label = ..count..), vjust = -0.5) +
-  labs(title = "Total Rides by Membership Type, No Outliers",
-       x = "Rider Type",
-       y = "Total Rides") +
+  labs(
+    title = "Total Rides by Membership Type, No Outliers",
+    x = "Rider Type",
+    y = "Total Rides"
+  ) +
   theme_minimal()
-
 ```
 
 ```{r}
 # histograms of ride length per user type
 ggplot(df, aes(x = ride_length, fill = member_casual)) +
   geom_histogram(binwidth = 5, alpha = 0.7) +
-  facet_wrap(~ member_casual, scales = "free_y") +
-  labs(title = "Histogram of Ride Lengths by Membership Type",
-       x = "Ride Length (minutes)",
-       y = "Frequency") +
+  facet_wrap(~member_casual, scales = "free_y") +
+  labs(
+    title = "Histogram of Ride Lengths by Membership Type",
+    x = "Ride Length (minutes)",
+    y = "Frequency"
+  ) +
   theme_minimal() +
   # scale_fill_manual(values = c("member" = "blue", "casual" = "red")) +
-  xlim(0,100)
+  xlim(0, 100)
 ```
 
 Members ride more frequently for shorter duration (probably commuting).
@@ -515,7 +516,7 @@ df %>%
   summarise(rides = n()) %>%
   ggplot(aes(x = hour, y = rides, fill = member_casual)) +
   geom_bar(stat = "identity", position = "dodge") +
-  facet_wrap(~ day_of_week, scales = "free_y") +
+  facet_wrap(~day_of_week, scales = "free_y") +
   theme_minimal() +
   labs(title = "Rides per Hour of Day by Customer Type and Day of Week", subtitle = "Free y-axis", x = "Hour of Day", y = "Number of Rides")
 ```
@@ -528,7 +529,7 @@ df %>%
   summarise(rides = n()) %>%
   ggplot(aes(x = hour, y = rides, fill = member_casual)) +
   geom_bar(stat = "identity", position = "dodge") +
-  facet_wrap(~ day_of_week) +
+  facet_wrap(~day_of_week) +
   theme_minimal() +
   labs(title = "Rides per Hour of Day by Customer Type and Day of Week", subtitle = "Locked y-axis", x = "Hour of Day", y = "Number of Rides")
 ```
@@ -542,7 +543,7 @@ df %>%
   ggplot(aes(x = member_casual, y = rides, fill = member_casual)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = rides), vjust = -0.5, position = position_dodge(0.9)) +
-  facet_wrap(~ day_of_week) +
+  facet_wrap(~day_of_week) +
   theme_minimal() +
   labs(title = "Rides per Member Type by Day of Week", x = "Member Type", y = "Number of Rides") +
   scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
@@ -571,7 +572,7 @@ df %>%
   ggplot(aes(x = member_casual, y = avg_ride_length, fill = member_casual)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(avg_ride_length, 1)), vjust = -0.5, position = position_dodge(0.9)) +
-  facet_wrap(~ day_of_week) +
+  facet_wrap(~day_of_week) +
   theme_minimal() +
   labs(title = "Average Ride Length per Member Type by Day of Week", x = "Member Type", y = "Average Ride Length (minutes)") +
   scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
@@ -586,7 +587,7 @@ df_no_outliers %>%
   ggplot(aes(x = member_casual, y = avg_ride_length, fill = member_casual)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(avg_ride_length, 1)), vjust = -0.5, position = position_dodge(0.9)) +
-  facet_wrap(~ day_of_week) +
+  facet_wrap(~day_of_week) +
   theme_minimal() +
   labs(title = "Average Ride Length per Member Type by Day of Week, No Outliers", x = "Member Type", y = "Average Ride Length (minutes)") +
   scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
@@ -623,7 +624,8 @@ df_no_outliers %>%
 ```{r}
 # aggregate member rider counts by hour and day of the week
 member_peak_times <- df %>%
-  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%  filter(member_casual == "member") %>%
+  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  filter(member_casual == "member") %>%
   group_by(day_of_week, hour) %>%
   summarise(rides = n(), .groups = "drop")
 
@@ -640,7 +642,8 @@ Members peak with commuter hours.
 ```{r}
 # aggregate casual rider counts by hour and day of the week
 casual_peak_times <- df %>%
-  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%  filter(member_casual == "casual") %>%
+  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  filter(member_casual == "casual") %>%
   group_by(day_of_week, hour) %>%
   summarise(rides = n(), .groups = "drop")
 
@@ -662,9 +665,11 @@ ggplot(df, aes(x = rideable_type, fill = rideable_type)) +
   geom_bar() +
   geom_text(stat = "count", aes(label = ..count..), vjust = -0.5) +
   theme_minimal() +
-  labs(title = "Total Count of Rideable Types",
-       x = "Rideable Type",
-       y = "Count")
+  labs(
+    title = "Total Count of Rideable Types",
+    x = "Rideable Type",
+    y = "Count"
+  )
 ```
 
 ```{r}
@@ -673,9 +678,11 @@ ggplot(df, aes(x = rideable_type, fill = member_casual)) +
   geom_bar(position = "dodge") +
   geom_text(stat = "count", aes(label = ..count..), vjust = -0.5, position = position_dodge(0.9)) +
   theme_minimal() +
-  labs(title = "Count of Rideable Types per Member Type",
-       x = "Rideable Type",
-       y = "Count")
+  labs(
+    title = "Count of Rideable Types per Member Type",
+    x = "Rideable Type",
+    y = "Count"
+  )
 ```
 
 ```{r}
@@ -683,9 +690,11 @@ ggplot(df, aes(x = rideable_type, fill = member_casual)) +
 ggplot(df, aes(x = rideable_type, y = ride_length, fill = member_casual)) +
   geom_boxplot() +
   theme_minimal() +
-  labs(title = "Ride Length Distribution by Rideable Type and Member Type",
-       x = "Rideable Type",
-       y = "Ride Length (minutes)")
+  labs(
+    title = "Ride Length Distribution by Rideable Type and Member Type",
+    x = "Rideable Type",
+    y = "Ride Length (minutes)"
+  )
 ```
 
 Classic pedal bikes rides last longer. Is that because there's a bigger supply, or greater consumer preference? I bet it's because the electric ones ran out of power.
@@ -698,11 +707,13 @@ df %>%
   summarise(rides = n()) %>%
   ggplot(aes(x = day_of_week, y = rides, fill = member_casual)) +
   geom_bar(stat = "identity", position = "dodge") +
-  facet_wrap(~ rideable_type) +
+  facet_wrap(~rideable_type) +
   theme_minimal() +
-  labs(title = "Ride Frequency by Day of the Week",
-       x = "Day of the Week",
-       y = "Number of Rides")
+  labs(
+    title = "Ride Frequency by Day of the Week",
+    x = "Day of the Week",
+    y = "Number of Rides"
+  )
 ```
 
 ```{r}
@@ -712,11 +723,13 @@ df %>%
   summarise(rides = n()) %>%
   ggplot(aes(x = hour, y = rides, color = member_casual, group = member_casual)) +
   geom_line() +
-  facet_wrap(~ rideable_type) +
+  facet_wrap(~rideable_type) +
   theme_minimal() +
-  labs(title = "Ride Frequency by Hour of the Day",
-       x = "Hour of the Day",
-       y = "Number of Rides")
+  labs(
+    title = "Ride Frequency by Hour of the Day",
+    x = "Hour of the Day",
+    y = "Number of Rides"
+  )
 ```
 
 ```{r}
@@ -730,9 +743,11 @@ df %>%
   facet_wrap(~ rideable_type + member_casual, ncol = 2) +
   scale_fill_viridis_c() +
   theme_minimal() +
-  labs(title = "Heatmap of Ride Frequency by Day of the Week and Hour of the Day",
-       x = "Hour of the Day",
-       y = "Day of the Week")
+  labs(
+    title = "Heatmap of Ride Frequency by Day of the Week and Hour of the Day",
+    x = "Hour of the Day",
+    y = "Day of the Week"
+  )
 ```
 
 ```{r}
@@ -742,11 +757,13 @@ df %>%
   summarise(rides = n(), .groups = "drop") %>%
   ggplot(aes(x = month, y = rides, fill = rideable_type)) +
   geom_bar(stat = "identity", position = "dodge") +
-  facet_wrap(~ member_casual) +
+  facet_wrap(~member_casual) +
   theme_minimal() +
-  labs(title = "Rideable Type Usage per Month",
-       x = "Month",
-       y = "Number of Rides") +
+  labs(
+    title = "Rideable Type Usage per Month",
+    x = "Month",
+    y = "Number of Rides"
+  ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
@@ -772,7 +789,7 @@ df %>%
 ```{r}
 # bar chart: top start stations
 df %>%
-  filter(!is.na(start_station_name)) %>% 
+  filter(!is.na(start_station_name)) %>%
   count(start_station_name, member_casual, sort = TRUE) %>%
   group_by(member_casual) %>%
   top_n(20, n) %>%
@@ -788,7 +805,7 @@ df %>%
 ```{r}
 # bar chart: top end stations
 df %>%
-  filter(!is.na(end_station_name)) %>% 
+  filter(!is.na(end_station_name)) %>%
   count(end_station_name, member_casual, sort = TRUE) %>%
   group_by(member_casual) %>%
   top_n(20, n) %>%
@@ -802,7 +819,7 @@ df %>%
 ```{r}
 # most popular start stations
 top_stations <- df %>%
-  filter(!is.na(start_station_name)) %>% 
+  filter(!is.na(start_station_name)) %>%
   count(start_station_name, member_casual, sort = TRUE) %>%
   group_by(member_casual) %>%
   top_n(20, n)
@@ -813,7 +830,7 @@ print(top_stations)
 ```{r}
 # most popular end stations
 top_stations <- df %>%
-  filter(!is.na(end_station_name)) %>% 
+  filter(!is.na(end_station_name)) %>%
   count(end_station_name, member_casual, sort = TRUE) %>%
   group_by(member_casual) %>%
   top_n(20, n)
@@ -830,7 +847,7 @@ cleaned_data <- df %>%
   filter(!is.na(start_lng) & !is.na(start_lat))
 
 # get a sample - too many rows, it crashes my computer to plot all 4 million
-set.seed(123)  # for reproducibility of sample
+set.seed(123) # for reproducibility of sample
 cleaned_data <- cleaned_data %>% sample_n(1000)
 
 # plot sampled stations
@@ -850,7 +867,7 @@ cleaned_data <- df %>%
   filter(!is.na(end_lng) & !is.na(end_lat))
 
 # get a sample - too many rows, it crashes my computer to plot all 4 million
-set.seed(123)  # for reproducibility of sample
+set.seed(123) # for reproducibility of sample
 cleaned_data <- cleaned_data %>% sample_n(1000)
 
 # plot sampled stations
@@ -864,7 +881,7 @@ library(sf)
 library(ggspatial)
 
 # sample data
-set.seed(123)  # for reproducibility
+set.seed(123) # for reproducibility
 cleaned_data <- df %>% sample_n(1000)
 
 # create linestring geometries for routes
@@ -878,17 +895,18 @@ routes <- cleaned_data %>%
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = routes, aes(geometry = geometry), color = "blue", size = 0.5, alpha = 0.5) +
-  labs(title = "Sample Routes",
-       x = "Longitude",
-       y = "Latitude") +
+  labs(
+    title = "Sample Routes",
+    x = "Longitude",
+    y = "Latitude"
+  ) +
   theme_minimal()
-
 ```
 
 ```{r}
 # aggregate casual rider counts by station
 casual_peak_stations <- df %>%
-  filter(!is.na(start_station_name)) %>% 
+  filter(!is.na(start_station_name)) %>%
   filter(member_casual == "casual") %>%
   count(start_station_name, sort = TRUE) %>%
   top_n(10, n)
@@ -910,23 +928,24 @@ library(ggspatial)
 casual_start_sf <- casual_peak_stations %>%
   left_join(df, by = c("start_station_name")) %>% # Join to get lat/lng
   distinct(start_station_name, start_lat, start_lng) %>% # Remove duplicates
-  drop_na(start_lat, start_lng) %>% 
+  drop_na(start_lat, start_lng) %>%
   st_as_sf(coords = c("start_lng", "start_lat"), crs = 4326)
 
 # plot the map
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = casual_start_sf, color = "blue", size = 3, alpha = 0.7) +
-  labs(title = "Top Start Stations for Casual Riders (Map)",
-       x = "Longitude", y = "Latitude") +
+  labs(
+    title = "Top Start Stations for Casual Riders (Map)",
+    x = "Longitude", y = "Latitude"
+  ) +
   theme_minimal()
-
 ```
 
 ```{r}
 # extract end stations for trips originating at top casual start stations
 casual_end_from_start_sf <- df %>%
-  filter(!is.na(end_station_name)) %>% 
+  filter(!is.na(end_station_name)) %>%
   filter(start_station_name %in% casual_peak_stations$start_station_name) %>%
   distinct(start_station_name, end_station_name, end_lat, end_lng) %>%
   drop_na(end_lat, end_lng) %>%
@@ -936,17 +955,18 @@ casual_end_from_start_sf <- df %>%
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = casual_end_from_start_sf, color = "blue", size = 3, alpha = 0.7) +
-  labs(title = "End Stations for Trips from Top Start Stations (Casual Riders)",
-       x = "Longitude", y = "Latitude") +
+  labs(
+    title = "End Stations for Trips from Top Start Stations (Casual Riders)",
+    x = "Longitude", y = "Latitude"
+  ) +
   theme_minimal()
-
 ```
 
 
 ```{r}
 # aggregate casual rider counts by station
 casual_peak_stations <- df %>%
-  filter(!is.na(end_station_name)) %>% 
+  filter(!is.na(end_station_name)) %>%
   filter(member_casual == "casual") %>%
   count(end_station_name, sort = TRUE) %>%
   top_n(10, n)
@@ -962,20 +982,21 @@ ggplot(casual_peak_stations, aes(x = reorder(end_station_name, n), y = n, fill =
 ```{r}
 # Convert top casual end stations to sf object
 casual_end_sf <- casual_peak_stations %>%
-  filter(!is.na(end_station_name)) %>% 
-  left_join(df, by = c("end_station_name")) %>% 
-  distinct(end_station_name, end_lat, end_lng) %>% 
-  drop_na(end_lat, end_lng) %>% 
+  filter(!is.na(end_station_name)) %>%
+  left_join(df, by = c("end_station_name")) %>%
+  distinct(end_station_name, end_lat, end_lng) %>%
+  drop_na(end_lat, end_lng) %>%
   st_as_sf(coords = c("end_lng", "end_lat"), crs = 4326)
 
 # Plot map
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = casual_end_sf, color = "blue", size = 3, alpha = 0.7) +
-  labs(title = "Top End Stations for Casual Riders (Map)",
-       x = "Longitude", y = "Latitude") +
+  labs(
+    title = "Top End Stations for Casual Riders (Map)",
+    x = "Longitude", y = "Latitude"
+  ) +
   theme_minimal()
-
 ```
 
 Roughly looks like 2019.
@@ -983,7 +1004,7 @@ Roughly looks like 2019.
 ```{r}
 # extract start stations for trips ending at top casual end stations
 casual_start_from_end_sf <- df %>%
-  filter(!is.na(start_station_name)) %>% 
+  filter(!is.na(start_station_name)) %>%
   filter(end_station_name %in% casual_peak_stations$end_station_name) %>%
   distinct(end_station_name, start_station_name, start_lat, start_lng) %>%
   drop_na(start_lat, start_lng) %>%
@@ -993,17 +1014,18 @@ casual_start_from_end_sf <- df %>%
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = casual_start_from_end_sf, color = "blue", size = 3, alpha = 0.7) +
-  labs(title = "Start Stations for Trips Ending at Top End Stations (Casual Riders)",
-       x = "Longitude", y = "Latitude") +
+  labs(
+    title = "Start Stations for Trips Ending at Top End Stations (Casual Riders)",
+    x = "Longitude", y = "Latitude"
+  ) +
   theme_minimal()
-
 ```
 
 
 ```{r}
 # aggregate member rider counts by station
 member_peak_stations <- df %>%
-  filter(!is.na(start_station_name)) %>% 
+  filter(!is.na(start_station_name)) %>%
   filter(member_casual == "member") %>%
   count(start_station_name, sort = TRUE) %>%
   top_n(10, n)
@@ -1019,25 +1041,26 @@ ggplot(member_peak_stations, aes(x = reorder(start_station_name, n), y = n, fill
 ```{r}
 # convert top member start stations to sf object
 member_start_sf <- member_peak_stations %>%
-  left_join(df, by = c("start_station_name")) %>% 
-  distinct(start_station_name, start_lat, start_lng) %>% 
-  drop_na(start_lat, start_lng) %>% 
+  left_join(df, by = c("start_station_name")) %>%
+  distinct(start_station_name, start_lat, start_lng) %>%
+  drop_na(start_lat, start_lng) %>%
   st_as_sf(coords = c("start_lng", "start_lat"), crs = 4326)
 
 # plot map
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = member_start_sf, color = "red", size = 3, alpha = 0.7) +
-  labs(title = "Top Start Stations for Member Riders (Map)",
-       x = "Longitude", y = "Latitude") +
+  labs(
+    title = "Top Start Stations for Member Riders (Map)",
+    x = "Longitude", y = "Latitude"
+  ) +
   theme_minimal()
-
 ```
 
 ```{r}
 # extract end stations for trips starting at top member start stations
 member_end_sf <- df %>%
-  filter(!is.na(end_station_name)) %>% 
+  filter(!is.na(end_station_name)) %>%
   filter(start_station_name %in% member_peak_stations$start_station_name) %>%
   distinct(start_station_name, end_station_name, end_lat, end_lng) %>%
   drop_na(end_lat, end_lng) %>%
@@ -1047,16 +1070,17 @@ member_end_sf <- df %>%
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = member_end_sf, color = "blue", size = 3, alpha = 0.7) +
-  labs(title = "End Stations for Trips from Top Start Stations",
-       x = "Longitude", y = "Latitude") +
+  labs(
+    title = "End Stations for Trips from Top Start Stations",
+    x = "Longitude", y = "Latitude"
+  ) +
   theme_minimal()
-
 ```
 
 ```{r}
 # aggregate member rider counts by station
 member_peak_stations <- df %>%
-  filter(!is.na(end_station_name)) %>% 
+  filter(!is.na(end_station_name)) %>%
   filter(member_casual == "member") %>%
   count(end_station_name, sort = TRUE) %>%
   top_n(10, n)
@@ -1072,17 +1096,19 @@ ggplot(member_peak_stations, aes(x = reorder(end_station_name, n), y = n, fill =
 ```{r}
 # Convert top member end stations to sf object
 member_end_sf <- member_peak_stations %>%
-  left_join(df, by = c("end_station_name")) %>% 
-  distinct(end_station_name, end_lat, end_lng) %>% 
-  drop_na(end_lat, end_lng) %>% 
+  left_join(df, by = c("end_station_name")) %>%
+  distinct(end_station_name, end_lat, end_lng) %>%
+  drop_na(end_lat, end_lng) %>%
   st_as_sf(coords = c("end_lng", "end_lat"), crs = 4326)
 
 # Plot map
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = member_end_sf, color = "red", size = 3, alpha = 0.7) +
-  labs(title = "Top End Stations for Member Riders (Map)",
-       x = "Longitude", y = "Latitude") +
+  labs(
+    title = "Top End Stations for Member Riders (Map)",
+    x = "Longitude", y = "Latitude"
+  ) +
   theme_minimal()
 ```
 
@@ -1091,7 +1117,7 @@ Again, looks like 2019. Members go to The Loop, Chicago's business district.
 ```{r}
 # Extract start stations for trips ending at top member end stations
 member_start_sf <- df %>%
-  filter(!is.na(start_station_name)) %>% 
+  filter(!is.na(start_station_name)) %>%
   filter(end_station_name %in% member_peak_stations$end_station_name) %>%
   distinct(end_station_name, start_station_name, start_lat, start_lng) %>%
   drop_na(start_lat, start_lng) %>%
@@ -1101,10 +1127,11 @@ member_start_sf <- df %>%
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = member_start_sf, color = "blue", size = 3, alpha = 0.7) +
-  labs(title = "Start Stations for Trips Ending at Top End Stations",
-       x = "Longitude", y = "Latitude") +
+  labs(
+    title = "Start Stations for Trips Ending at Top End Stations",
+    x = "Longitude", y = "Latitude"
+  ) +
   theme_minimal()
-
 ```
 
 ```{r}
@@ -1115,8 +1142,10 @@ chicago_bbox <- st_bbox(c(xmin = -88.1, xmax = -87.3, ymin = 41.5, ymax = 42.1),
 
 # filter to bbox
 df_bbox <- df %>%
-  filter(end_lng >= chicago_bbox["xmin"], end_lng <= chicago_bbox["xmax"],
-         end_lat >= chicago_bbox["ymin"], end_lat <= chicago_bbox["ymax"])
+  filter(
+    end_lng >= chicago_bbox["xmin"], end_lng <= chicago_bbox["xmax"],
+    end_lat >= chicago_bbox["ymin"], end_lat <= chicago_bbox["ymax"]
+  )
 
 # electric vs. classic heatmaps
 electric <- df_bbox %>% filter(rideable_type == "electric_bike")
@@ -1182,23 +1211,29 @@ plot_leaflet_heatmap <- function(data, title, sample_size = 50000) {
 
   leaflet(data_sample) %>%
     addTiles() %>%
-    setView(lng = -87.63, lat = 41.88, zoom = 13) %>%  # Center on downtown Chicago
+    setView(lng = -87.63, lat = 41.88, zoom = 13) %>% # Center on downtown Chicago
     addHeatmap(lng = ~end_lng, lat = ~end_lat, blur = 15, max = 1, radius = 10) %>%
-    addLegend(position = "bottomright",
-              pal = color_palette,
-              values = density_data$n,
-              title = title)
+    addLegend(
+      position = "bottomright",
+      pal = color_palette,
+      values = density_data$n,
+      title = title
+    )
 }
 ```
 
 ```{r}
-set.seed(42)  # Global seed for reproducibility
+set.seed(42) # Global seed for reproducibility
 
 # Sample each group separately
 # electric <- df_bbox %>% filter(rideable_type == "electric_bike") %>% sample_n(50000)
 # classic <- df_bbox %>% filter(rideable_type == "classic_bike") %>% sample_n(50000)
-member <- df_bbox %>% filter(member_casual == "member") %>% sample_n(50000)
-casual <- df_bbox %>% filter(member_casual == "casual") %>% sample_n(50000)
+member <- df_bbox %>%
+  filter(member_casual == "member") %>%
+  sample_n(50000)
+casual <- df_bbox %>%
+  filter(member_casual == "casual") %>%
+  sample_n(50000)
 ```
 
 ```{r}
@@ -1210,7 +1245,6 @@ casual <- df_bbox %>% filter(member_casual == "casual") %>% sample_n(50000)
 ```
 
 ```{r}
-
 # Plot Leaflet Heatmaps
 # plot_leaflet_heatmap(electric, "Electric Bike Trips")
 ```
@@ -1263,22 +1297,25 @@ trips_to_top_end_casual <- filter_trips(df, top_end_casual, "end_station_name")
 # Function to plot Leaflet heatmaps
 plot_leaflet_heatmap <- function(data, lng_col, lat_col, title, zoom_level = 13) {
   data <- data %>% filter(!is.na(!!sym(lng_col)) & !is.na(!!sym(lat_col)))
-  
+
   density_data <- data %>% count(!!sym(lng_col), !!sym(lat_col))
   color_palette <- colorNumeric(palette = "viridis", domain = density_data$n)
 
   leaflet(data) %>%
     addTiles() %>%
     setView(lng = -87.63, lat = 41.88, zoom = zoom_level) %>%
-    addHeatmap(lng = as.formula(paste0("~", lng_col)),
-               lat = as.formula(paste0("~", lat_col)),
-               blur = 15, max = 1, radius = 10) %>%
-    addLegend(position = "bottomright",
-              pal = color_palette,
-              values = density_data$n,
-              title = title)
+    addHeatmap(
+      lng = as.formula(paste0("~", lng_col)),
+      lat = as.formula(paste0("~", lat_col)),
+      blur = 15, max = 1, radius = 10
+    ) %>%
+    addLegend(
+      position = "bottomright",
+      pal = color_palette,
+      values = density_data$n,
+      title = title
+    )
 }
-
 ```
 
 ```{r}
@@ -1291,17 +1328,14 @@ plot_leaflet_heatmap(trips_from_top_start_members, "end_lng", "end_lat", "Destin
 
 ```{r}
 plot_leaflet_heatmap(trips_to_top_end_members, "end_lng", "end_lat", "Top 10 End (Members)")
-
 ```
 
 ```{r}
 plot_leaflet_heatmap(trips_to_top_end_members, "start_lng", "start_lat", "Origins for Top 10 End (Members)")
-
 ```
 
 ```{r}
 plot_leaflet_heatmap(trips_from_top_start_casual, "start_lng", "start_lat", "Top 10 Start (Casuals)")
-
 ```
 
 ```{r}
@@ -1310,12 +1344,10 @@ plot_leaflet_heatmap(trips_from_top_start_casual, "end_lng", "end_lat", "Destina
 
 ```{r}
 plot_leaflet_heatmap(trips_to_top_end_casual, "end_lng", "end_lat", "Top 10 End (Casuals)")
-
 ```
 
 ```{r}
 plot_leaflet_heatmap(trips_to_top_end_casual, "start_lng", "start_lat", "Origins for Top 10 End (Casuals)")
-
 ```
 
 

@@ -28,16 +28,16 @@ Exploratory Data Analysis, unencumbered by the need to be **too** presentable.
 
 ```{r}
 # Load the data, combine into a df
-q1_2019 = read.csv("./resources/data/q1_2019_cleaned.csv")
-q2_2019 = read.csv("./resources/data/q2_2019_cleaned.csv")
-q3_2019 = read.csv("./resources/data/q3_2019_cleaned.csv")
-q4_2019 = read.csv("./resources/data/q4_2019_cleaned.csv")
-stations = read.csv("./resources/data/stations.csv")
-# q1_2020 = read.csv("./resources/data/q1_2020_cleaned.csv")
+q1_2019 <- read.csv("./resources/data/q1_2019_cleaned.csv")
+q2_2019 <- read.csv("./resources/data/q2_2019_cleaned.csv")
+q3_2019 <- read.csv("./resources/data/q3_2019_cleaned.csv")
+q4_2019 <- read.csv("./resources/data/q4_2019_cleaned.csv")
+stations <- read.csv("./resources/data/stations.csv")
+# q1_2020 <- read.csv("./resources/data/q1_2020_cleaned.csv")
 
 # 2020 data contains chars in ride_id and rideable_type
 # convert_columns_to_character <- function(df) {
-#   df <- mutate(df, 
+#   df <- mutate(df,
 #                ride_id = as.character(ride_id),
 #                rideable_type = as.character(rideable_type))
 #   return(df)
@@ -74,7 +74,7 @@ summary(df$ride_length)
 There are some ridiculously long rides.
 
 ```{r}
-max(df$ride_length)/60/24
+max(df$ride_length) / 60 / 24
 ```
 123 days! Hell of an outlier.
 
@@ -106,7 +106,6 @@ ggplot(total_minutes_ridden, aes(x = member_casual, y = total_minutes, fill = me
   geom_text(aes(label = round(total_minutes)), vjust = -0.5) +
   theme_minimal() +
   labs(title = "Total Minutes Ridden by Membership Type", y = "Total Minutes Ridden", x = "Rider Type")
-
 ```
 
 ```{r}
@@ -128,24 +127,27 @@ ggplot(average_ride_length, aes(x = member_casual, y = average_minutes, fill = m
 ggplot(df, aes(x = member_casual, fill = member_casual)) +
   geom_bar() +
   geom_text(stat = "count", aes(label = ..count..), vjust = -0.5) +
-  labs(title = "Total Rides by Membership Type",
-       x = "Rider Type",
-       y = "Total Rides") +
+  labs(
+    title = "Total Rides by Membership Type",
+    x = "Rider Type",
+    y = "Total Rides"
+  ) +
   theme_minimal()
-
 ```
 
 ```{r}
 # histograms of ride length per user type
 ggplot(df, aes(x = ride_length, fill = member_casual)) +
   geom_histogram(binwidth = 5, alpha = 0.7) +
-  facet_wrap(~ member_casual, scales = "free_y") +
-  labs(title = "Histogram of Ride Lengths by Membership Type",
-       x = "Ride Length (minutes)",
-       y = "Frequency") +
+  facet_wrap(~member_casual, scales = "free_y") +
+  labs(
+    title = "Histogram of Ride Lengths by Membership Type",
+    x = "Ride Length (minutes)",
+    y = "Frequency"
+  ) +
   theme_minimal() +
   # scale_fill_manual(values = c("member" = "blue", "casual" = "red")) +
-  xlim(0,100)
+  xlim(0, 100)
 ```
 
 Members ride more frequently for shorter duration (probably commuting).
@@ -254,7 +256,7 @@ df %>%
   summarise(rides = n()) %>%
   ggplot(aes(x = hour, y = rides, fill = member_casual)) +
   geom_bar(stat = "identity", position = "dodge") +
-  facet_wrap(~ day_of_week, scales = "free_y") +
+  facet_wrap(~day_of_week, scales = "free_y") +
   theme_minimal() +
   labs(title = "Rides per Hour of Day by Customer Type and Day of Week", subtitle = "Free y-axis", x = "Hour of Day", y = "Number of Rides")
 ```
@@ -267,7 +269,7 @@ df %>%
   summarise(rides = n()) %>%
   ggplot(aes(x = hour, y = rides, fill = member_casual)) +
   geom_bar(stat = "identity", position = "dodge") +
-  facet_wrap(~ day_of_week) +
+  facet_wrap(~day_of_week) +
   theme_minimal() +
   labs(title = "Rides per Hour of Day by Customer Type and Day of Week", subtitle = "Locked y-axis", x = "Hour of Day", y = "Number of Rides")
 ```
@@ -281,7 +283,7 @@ df %>%
   ggplot(aes(x = member_casual, y = rides, fill = member_casual)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = rides), vjust = -0.5, position = position_dodge(0.9)) +
-  facet_wrap(~ day_of_week) +
+  facet_wrap(~day_of_week) +
   theme_minimal() +
   labs(title = "Rides per Member Type by Day of Week", x = "Member Type", y = "Number of Rides") +
   scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
@@ -310,7 +312,7 @@ df %>%
   ggplot(aes(x = member_casual, y = avg_ride_length, fill = member_casual)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(avg_ride_length, 1)), vjust = -0.5, position = position_dodge(0.9)) +
-  facet_wrap(~ day_of_week) +
+  facet_wrap(~day_of_week) +
   theme_minimal() +
   labs(title = "Average Ride Length per Member Type by Day of Week", x = "Member Type", y = "Average Ride Length (minutes)") +
   scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
@@ -333,7 +335,8 @@ df %>%
 ```{r}
 # aggregate member rider counts by hour and day of the week
 member_peak_times <- df %>%
-  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%  filter(member_casual == "member") %>%
+  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  filter(member_casual == "member") %>%
   group_by(day_of_week, hour) %>%
   summarise(rides = n(), .groups = "drop")
 
@@ -350,7 +353,8 @@ Members peak with commuter hours.
 ```{r}
 # aggregate casual rider counts by hour and day of the week
 casual_peak_times <- df %>%
-  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%  filter(member_casual == "casual") %>%
+  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  filter(member_casual == "casual") %>%
   group_by(day_of_week, hour) %>%
   summarise(rides = n(), .groups = "drop")
 
@@ -371,15 +375,19 @@ library(sf)
 library(ggspatial)
 
 # convert the stations_2020 data frame to an sf object
-stations_sf <- stations %>% drop_na() %>% st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
+stations_sf <- stations %>%
+  drop_na() %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
 
 # plot the map with the station locations
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = stations_sf, color = "red", size = 2) +
-  labs(title = "Scatter Plot of all Station Locations",
-       x = "Longitude",
-       y = "Latitude") +
+  labs(
+    title = "Scatter Plot of all Station Locations",
+    x = "Longitude",
+    y = "Latitude"
+  ) +
   theme_minimal()
 ```
 
@@ -439,7 +447,7 @@ cleaned_data <- df %>%
   filter(!is.na(start_lng) & !is.na(start_lat))
 
 # get a sample - too many rows, it crashes my computer to plot all 4 million
-set.seed(123)  # for reproducibility of sample
+set.seed(123) # for reproducibility of sample
 cleaned_data <- cleaned_data %>% sample_n(1000)
 
 # plot sampled stations
@@ -457,7 +465,7 @@ cleaned_data <- df %>%
   filter(!is.na(end_lng) & !is.na(end_lat))
 
 # get a sample - too many rows, it crashes my computer to plot all 4 million
-set.seed(123)  # for reproducibility of sample
+set.seed(123) # for reproducibility of sample
 cleaned_data <- cleaned_data %>% sample_n(1000)
 
 # plot sampled stations
@@ -471,7 +479,7 @@ library(sf)
 library(ggspatial)
 
 # sample data
-set.seed(123)  # for reproducibility
+set.seed(123) # for reproducibility
 cleaned_data <- df %>% sample_n(1000)
 
 # create linestring geometries for routes
@@ -485,11 +493,12 @@ routes <- cleaned_data %>%
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = routes, aes(geometry = geometry), color = "blue", size = 0.5, alpha = 0.5) +
-  labs(title = "Sample Routes",
-       x = "Longitude",
-       y = "Latitude") +
+  labs(
+    title = "Sample Routes",
+    x = "Longitude",
+    y = "Latitude"
+  ) +
   theme_minimal()
-
 ```
 
 ```{r}
@@ -516,17 +525,18 @@ library(ggspatial)
 casual_start_sf <- casual_peak_stations %>%
   left_join(df, by = c("start_station_name")) %>% # Join to get lat/lng
   distinct(start_station_name, start_lat, start_lng) %>% # Remove duplicates
-  drop_na(start_lat, start_lng) %>% 
+  drop_na(start_lat, start_lng) %>%
   st_as_sf(coords = c("start_lng", "start_lat"), crs = 4326)
 
 # plot the map
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = casual_start_sf, color = "blue", size = 3, alpha = 0.7) +
-  labs(title = "Top Start Stations for Casual Riders (Map)",
-       x = "Longitude", y = "Latitude") +
+  labs(
+    title = "Top Start Stations for Casual Riders (Map)",
+    x = "Longitude", y = "Latitude"
+  ) +
   theme_minimal()
-
 ```
 
 ```{r}
@@ -541,10 +551,11 @@ casual_end_from_start_sf <- df %>%
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = casual_end_from_start_sf, color = "blue", size = 3, alpha = 0.7) +
-  labs(title = "End Stations for Trips from Top Start Stations (Casual Riders)",
-       x = "Longitude", y = "Latitude") +
+  labs(
+    title = "End Stations for Trips from Top Start Stations (Casual Riders)",
+    x = "Longitude", y = "Latitude"
+  ) +
   theme_minimal()
-
 ```
 
 
@@ -566,19 +577,20 @@ ggplot(casual_peak_stations, aes(x = reorder(end_station_name, n), y = n, fill =
 ```{r}
 # Convert top casual end stations to sf object
 casual_end_sf <- casual_peak_stations %>%
-  left_join(df, by = c("end_station_name")) %>% 
-  distinct(end_station_name, end_lat, end_lng) %>% 
-  drop_na(end_lat, end_lng) %>% 
+  left_join(df, by = c("end_station_name")) %>%
+  distinct(end_station_name, end_lat, end_lng) %>%
+  drop_na(end_lat, end_lng) %>%
   st_as_sf(coords = c("end_lng", "end_lat"), crs = 4326)
 
 # Plot map
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = casual_end_sf, color = "blue", size = 3, alpha = 0.7) +
-  labs(title = "Top End Stations for Casual Riders (Map)",
-       x = "Longitude", y = "Latitude") +
+  labs(
+    title = "Top End Stations for Casual Riders (Map)",
+    x = "Longitude", y = "Latitude"
+  ) +
   theme_minimal()
-
 ```
 
 ```{r}
@@ -593,10 +605,11 @@ casual_start_from_end_sf <- df %>%
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = casual_start_from_end_sf, color = "blue", size = 3, alpha = 0.7) +
-  labs(title = "Start Stations for Trips Ending at Top End Stations (Casual Riders)",
-       x = "Longitude", y = "Latitude") +
+  labs(
+    title = "Start Stations for Trips Ending at Top End Stations (Casual Riders)",
+    x = "Longitude", y = "Latitude"
+  ) +
   theme_minimal()
-
 ```
 
 
@@ -618,19 +631,20 @@ ggplot(member_peak_stations, aes(x = reorder(start_station_name, n), y = n, fill
 ```{r}
 # convert top member start stations to sf object
 member_start_sf <- member_peak_stations %>%
-  left_join(df, by = c("start_station_name")) %>% 
-  distinct(start_station_name, start_lat, start_lng) %>% 
-  drop_na(start_lat, start_lng) %>% 
+  left_join(df, by = c("start_station_name")) %>%
+  distinct(start_station_name, start_lat, start_lng) %>%
+  drop_na(start_lat, start_lng) %>%
   st_as_sf(coords = c("start_lng", "start_lat"), crs = 4326)
 
 # plot map
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = member_start_sf, color = "red", size = 3, alpha = 0.7) +
-  labs(title = "Top Start Stations for Member Riders (Map)",
-       x = "Longitude", y = "Latitude") +
+  labs(
+    title = "Top Start Stations for Member Riders (Map)",
+    x = "Longitude", y = "Latitude"
+  ) +
   theme_minimal()
-
 ```
 
 ```{r}
@@ -645,10 +659,11 @@ member_end_sf <- df %>%
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = member_end_sf, color = "blue", size = 3, alpha = 0.7) +
-  labs(title = "End Stations for Trips from Top Start Stations",
-       x = "Longitude", y = "Latitude") +
+  labs(
+    title = "End Stations for Trips from Top Start Stations",
+    x = "Longitude", y = "Latitude"
+  ) +
   theme_minimal()
-
 ```
 
 ```{r}
@@ -669,17 +684,19 @@ ggplot(member_peak_stations, aes(x = reorder(end_station_name, n), y = n, fill =
 ```{r}
 # Convert top member end stations to sf object
 member_end_sf <- member_peak_stations %>%
-  left_join(df, by = c("end_station_name")) %>% 
-  distinct(end_station_name, end_lat, end_lng) %>% 
-  drop_na(end_lat, end_lng) %>% 
+  left_join(df, by = c("end_station_name")) %>%
+  distinct(end_station_name, end_lat, end_lng) %>%
+  drop_na(end_lat, end_lng) %>%
   st_as_sf(coords = c("end_lng", "end_lat"), crs = 4326)
 
 # Plot map
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = member_end_sf, color = "red", size = 3, alpha = 0.7) +
-  labs(title = "Top End Stations for Member Riders (Map)",
-       x = "Longitude", y = "Latitude") +
+  labs(
+    title = "Top End Stations for Member Riders (Map)",
+    x = "Longitude", y = "Latitude"
+  ) +
   theme_minimal()
 ```
 
@@ -695,10 +712,11 @@ member_start_sf <- df %>%
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = member_start_sf, color = "blue", size = 3, alpha = 0.7) +
-  labs(title = "Start Stations for Trips Ending at Top End Stations",
-       x = "Longitude", y = "Latitude") +
+  labs(
+    title = "Start Stations for Trips Ending at Top End Stations",
+    x = "Longitude", y = "Latitude"
+  ) +
   theme_minimal()
-
 ```
 
 

@@ -35,11 +35,11 @@ A hypothetical data analysis project, answering a business question for a fictio
 
 ```{r, echo=FALSE}
 # load data, combine into a df
-q1_2019 = read.csv("./resources/data/q1_2019_cleaned.csv")
-q2_2019 = read.csv("./resources/data/q2_2019_cleaned.csv")
-q3_2019 = read.csv("./resources/data/q3_2019_cleaned.csv")
-q4_2019 = read.csv("./resources/data/q4_2019_cleaned.csv")
-# stations = read.csv("./resources/data/stations.csv")
+q1_2019 <- read.csv("./resources/data/q1_2019_cleaned.csv")
+q2_2019 <- read.csv("./resources/data/q2_2019_cleaned.csv")
+q3_2019 <- read.csv("./resources/data/q3_2019_cleaned.csv")
+q4_2019 <- read.csv("./resources/data/q4_2019_cleaned.csv")
+# stations <- read.csv("./resources/data/stations.csv")
 
 df <- bind_rows(q1_2019, q2_2019, q3_2019, q4_2019)
 ```
@@ -81,9 +81,11 @@ ggplot(average_ride_length, aes(x = member_casual, y = average_minutes, fill = m
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(average_minutes, 1)), vjust = -0.5) +
   theme_minimal() +
-  labs(title = "Average Ride Length by Membership Type", 
-      subtitle = "Casual riders take longer trips, often for leisure.",
-      y = "Average Ride Length (minutes)", x = "Rider Type")
+  labs(
+    title = "Average Ride Length by Membership Type",
+    subtitle = "Casual riders take longer trips, often for leisure.",
+    y = "Average Ride Length (minutes)", x = "Rider Type"
+  )
 ```
 
 ---
@@ -96,11 +98,13 @@ df %>%
   summarise(rides = n()) %>%
   ggplot(aes(x = hour, y = rides, fill = member_casual)) +
   geom_bar(stat = "identity", position = "dodge") +
-  facet_wrap(~ day_of_week) +
+  facet_wrap(~day_of_week) +
   theme_minimal() +
-  labs(title = "Rides per Hour of Day by Customer Type and Day of Week",
-      subtitle = "Casual riders peak on weekend afternoons; members peak during rush hours.",
-      x = "Hour of Day", y = "Number of Rides")
+  labs(
+    title = "Rides per Hour of Day by Customer Type and Day of Week",
+    subtitle = "Casual riders peak on weekend afternoons; members peak during rush hours.",
+    x = "Hour of Day", y = "Number of Rides"
+  )
 ```
 
 ---
@@ -141,9 +145,11 @@ combined_sf <- bind_rows(member_start_sf, casual_start_sf)
 plot_top_stations <- ggplot() +
   annotation_map_tile(type = "osm", zoom = 12, alpha = 0.3) +
   geom_sf(data = combined_sf, aes(color = type), size = 3, alpha = 1) +
-  labs(title = "Top Stations for Member and Casual Riders",
-       subtitle = "Cross-reference top casual stations with the sightseeing map.",
-       color = "Rider Type") +
+  labs(
+    title = "Top Stations for Member and Casual Riders",
+    subtitle = "Cross-reference top casual stations with the sightseeing map.",
+    color = "Rider Type"
+  ) +
   # coord_sf(xlim = c(-87.65, -87.55), ylim = c(41.86, 41.93), expand = FALSE) +
   theme_minimal() +
   theme(
@@ -155,8 +161,10 @@ plot_top_stations <- ggplot() +
 
 # Save the plot with a different title and subtitle
 plot_top_stations_gsave <- plot_top_stations +
-  labs(title = "",
-       subtitle = "") +
+  labs(
+    title = "",
+    subtitle = ""
+  ) +
   theme(
     legend.position = "bottom",
     legend.direction = "horizontal",
@@ -297,8 +305,6 @@ average_ride_length <- df %>%
   group_by(member_casual) %>%
   summarise(average_minutes = mean(ride_length, na.rm = TRUE))
 
-# print(average_ride_length)
-
 # bar chart of average ride length
 ggplot(average_ride_length, aes(x = member_casual, y = average_minutes, fill = member_casual)) +
   geom_bar(stat = "identity") +
@@ -320,9 +326,11 @@ ggplot(average_ride_length, aes(x = member_casual, y = average_minutes, fill = m
 ggplot(df, aes(x = member_casual, fill = member_casual)) +
   geom_bar() +
   geom_text(stat = "count", aes(label = ..count..), vjust = -0.5) +
-  labs(title = "Total Rides by Membership Type",
-       x = "Rider Type",
-       y = "Total Rides") +
+  labs(
+    title = "Total Rides by Membership Type",
+    x = "Rider Type",
+    y = "Total Rides"
+  ) +
   theme_minimal()
 ```
 
@@ -378,11 +386,13 @@ df %>%
   summarise(rides = n()) %>%
   ggplot(aes(x = hour, y = rides, fill = member_casual)) +
   geom_bar(stat = "identity", position = "dodge") +
-  facet_wrap(~ day_of_week, scales = "free_y") +
+  facet_wrap(~day_of_week, scales = "free_y") +
   theme_minimal() +
-  labs(title = "Rides per Hour of Day by Customer Type and Day of Week",
-       subtitle = "Free y-axis highlights weekend differences",
-       x = "Hour of Day", y = "Number of Rides")
+  labs(
+    title = "Rides per Hour of Day by Customer Type and Day of Week",
+    subtitle = "Free y-axis highlights weekend differences",
+    x = "Hour of Day", y = "Number of Rides"
+  )
 ```
 
 ---
@@ -396,7 +406,7 @@ df %>%
   ggplot(aes(x = member_casual, y = rides, fill = member_casual)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = rides), vjust = -0.5, position = position_dodge(0.9)) +
-  facet_wrap(~ day_of_week) +
+  facet_wrap(~day_of_week) +
   theme_minimal() +
   labs(title = "Rides per Member Type by Day of Week", x = "Member Type", y = "Number of Rides") +
   scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
@@ -413,22 +423,22 @@ df %>%
 #   count(start_station_name, sort = TRUE) %>%
 #   top_n(10, n) %>%
 #   mutate(index = row_number())
-# 
+#
 # # aggregate casual rider counts by station and add an index
 # casual_peak_stations <- df %>%
 #   filter(member_casual == "casual") %>%
 #   count(start_station_name, sort = TRUE) %>%
 #   top_n(10, n) %>%
 #   mutate(index = row_number())
-# 
+#
 # # merge
 # merged_peak_stations <- member_peak_stations %>%
 #   rename(member_rides = n, member_station = start_station_name) %>%
 #   full_join(casual_peak_stations %>% rename(casual_rides = n, casual_station = start_station_name), by = "index")
-# 
+#
 # # drop index
 # merged_peak_stations <- merged_peak_stations %>% select(-index)
-# 
+#
 # # print
 # merged_peak_stations
 ```
@@ -437,13 +447,13 @@ df %>%
 # style tables
 member_table <- member_peak_stations %>%
   rename(Station = start_station_name, "Member Rides" = n) %>%
-  select(Station, "Member Rides") %>%  # exclude index
+  select(Station, "Member Rides") %>% # exclude index
   kable("html", caption = "Top 10 Member Peak Stations") %>%
   kable_styling(bootstrap_options = c("striped", "hover"))
 
 casual_table <- casual_peak_stations %>%
   rename(Station = start_station_name, "Casual Rides" = n) %>%
-  select(Station, "Casual Rides") %>%  # exclude index
+  select(Station, "Casual Rides") %>% # exclude index
   kable("html", caption = "Top 10 Casual Peak Stations") %>%
   kable_styling(bootstrap_options = c("striped", "hover"))
 
@@ -462,7 +472,7 @@ browsable(div(
 # # create tables
 # member_table <- tableGrob(member_peak_stations %>% rename(Member_Rides = n))
 # casual_table <- tableGrob(casual_peak_stations %>% rename(Casual_Rides = n))
-# 
+#
 # # print tables side-by-side
 # grid.arrange(member_table, casual_table, ncol = 2)
 ```
@@ -503,8 +513,10 @@ combined_sf <- bind_rows(member_start_sf, casual_start_sf)
 plot_top_stations <- ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = combined_sf, aes(color = type), size = 3, alpha = 0.7) +
-  labs(title = "Top Stations for Member and Casual Riders",
-       color = "Rider Type") +
+  labs(
+    title = "Top Stations for Member and Casual Riders",
+    color = "Rider Type"
+  ) +
   theme_minimal() +
   theme(
     axis.text.x = element_blank(),
@@ -644,31 +656,35 @@ Finally, strengthening partnerships with corporations, universities, and public 
 library(knitr)
 
 data_dict <- data.frame(
-  Column = c("ride_id", "started_at", "ended_at", "rideable_type", 
-             "start_station_id", "start_station_name", "end_station_id", "end_station_name", 
-             "member_casual", "gender", "birthyear", "date", "month", "day", "year", 
-             "day_of_week", "season", "hour", "ride_length", "start_lat/lng", "end_lat/lng"),
-  Description = c("Unique ride identifier.", 
-                  "Ride start time (YYYY-MM-DD HH:MM:SS).",
-                  "Ride end time (YYYY-MM-DD HH:MM:SS).",
-                  "Bicycle ID.",
-                  "Starting station ID.",
-                  "Starting station name.",
-                  "Ending station ID.",
-                  "Ending station name.",
-                  "Rider type (member/casual).",
-                  "Rider gender (if available).",
-                  "Rider birth year (if available).",
-                  "Ride date (YYYY-MM-DD).",
-                  "Ride month (1–12).",
-                  "Ride day (1–31).",
-                  "Ride year (YYYY).",
-                  "Day of the week (Mon–Sun).",
-                  "Season (Winter, Spring, Summer, Fall).",
-                  "Ride start hour (0–23).",
-                  "Duration in minutes.",
-                  "Starting location coordinates.",
-                  "Ending location coordinates.")
+  Column = c(
+    "ride_id", "started_at", "ended_at", "rideable_type",
+    "start_station_id", "start_station_name", "end_station_id", "end_station_name",
+    "member_casual", "gender", "birthyear", "date", "month", "day", "year",
+    "day_of_week", "season", "hour", "ride_length", "start_lat/lng", "end_lat/lng"
+  ),
+  Description = c(
+    "Unique ride identifier.",
+    "Ride start time (YYYY-MM-DD HH:MM:SS).",
+    "Ride end time (YYYY-MM-DD HH:MM:SS).",
+    "Bicycle ID.",
+    "Starting station ID.",
+    "Starting station name.",
+    "Ending station ID.",
+    "Ending station name.",
+    "Rider type (member/casual).",
+    "Rider gender (if available).",
+    "Rider birth year (if available).",
+    "Ride date (YYYY-MM-DD).",
+    "Ride month (1–12).",
+    "Ride day (1–31).",
+    "Ride year (YYYY).",
+    "Day of the week (Mon–Sun).",
+    "Season (Winter, Spring, Summer, Fall).",
+    "Ride start hour (0–23).",
+    "Duration in minutes.",
+    "Starting location coordinates.",
+    "Ending location coordinates."
+  )
 )
 
 kable(data_dict, caption = "Cyclistic Ride Data Dictionary", format = "html") %>%
