@@ -1,12 +1,16 @@
 ---
-title: "Scratch Pad"
-author: "Bryan Johns"
-date: "`r Sys.Date()`"
+title: "2019 Scratch Pad"
+author: "<p style='font-style: italic;'>Bryan Johns</p>"
+# date: "`r format(Sys.Date(), '%Y-%m')`"
+date: "`r format(Sys.Date(), '%B %Y')`"
 output:
   html_document:
     toc: true
     toc_depth: 2
     toc_float: true
+    includes:
+      before_body: "header.html"
+    css: ./resources/css/styles.css
 ---
 
 ```{r setup, include=FALSE}
@@ -14,7 +18,11 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
 
-## Scratch Pad for Cyclistic Data Analysis
+## Scratch Pad for 2019 Cyclistic Exploratory Data Analysis
+
+<div class="button">
+  <a href="summary_2019.html#analysis">Back to<br>Cyclistic 2019</a>
+</div>
 
 Exploratory Data Analysis, unencumbered by the need to be **too** presentable. 
 
@@ -718,3 +726,9 @@ ggplot(df, aes(x = gender, fill = member_casual)) +
 ```
 
 I went through a lot of effort to extract the age and gender data, and it might not have been worth the value-added to see that member riders are slightly older and tend to be male-dominated. Not sure this helps me launch an ad campaign.
+
+And that was how I ended up going on to recent data, 2024...
+
+
+<img src="./resources/images/Logo_Freepik.png" alt="Cyclistic Logo" style="width:200px; display:block; margin:auto;">
+<p style="font-size: 12px; color: #555; margin:auto; text-align: center;">Source: <a href="https://www.freepik.com">Freepik</a></p>

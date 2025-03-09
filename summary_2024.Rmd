@@ -11,15 +11,13 @@ output:
     toc_float: true
     includes:
       before_body: "header.html"
-      # after_body: "footer.html"
     css: ./resources/css/styles.css
 ---
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # save plot(s)
 # final proofread
-# add links for scratch pad, connect 2019 and 2024
-# post to github pages
+# styler
 # edit scratch pad 2024 - check on sample leaflet maps (they seem exactly the same)
 ```
 
@@ -39,6 +37,10 @@ library(htmltools)
 library(leaflet)
 library(leaflet.extras)
 ```
+
+<div class="button">
+  <a href="summary_2019.html">Link to<br>Cyclistic 2019</a>
+</div>
 
 A hypothetical data analysis project, answering a business question for a fictional bikeshare company, analyzing customer behavior and concluding with recommendations to assist in converting casual customers into annual members.
 
@@ -198,7 +200,7 @@ plot_leaflet_heatmap(trips_from_top_start_casual, "start_lng", "start_lat", "Top
 
 ---
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="2019's Top Stations and a Tourist Sightseeing Map."}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="2019's Top Member and Casual Stations, with a Tourist Sightseeing Map."}
 # Add 2019 station plot, Chicago sightseeing map
 
 # image
@@ -326,7 +328,7 @@ Data cleaning consisted of:
 
 - Casual riders frequent **tourist/leisure spots** (e.g., Shedd Aquarium, Theater on the Lake).
 
-Further insights are available [here](https://github.com/johbry17/Cyclistic-A-Google-Data-Analytics-Capstone/blob/main/scratch_pad_2024.Rmd).
+Further insights are available in the [exploratory data analysis](scratch_pad_2024.html).
 
 \
 
@@ -493,7 +495,7 @@ This skips the top station, NA, as electric bikes commonly don't use a docking s
 plot_leaflet_heatmap(trips_from_top_start_members, "start_lng", "start_lat", "Top 10 Stations<br>(Members)")
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Compare the above 2024 maps with 2019's top stations for members and casual rides, along with a tourist map."}
 plot_leaflet_heatmap(trips_from_top_start_casual, "start_lng", "start_lat", "Top 10 Stations<br>(Casuals)")
 ```
 

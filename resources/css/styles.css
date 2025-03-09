@@ -4,6 +4,13 @@
   color: #6c757d;
 }
 
+/* Add a border to the 2019 summary report */
+.summary-2019 {
+  border: 2px solid #343a40;
+  padding: 20px;
+  margin: 20px;
+}
+
 body {
     font-size: 12pt;
 }
@@ -42,16 +49,21 @@ h4 {
 }
 
 .button a {
-  background-color: #f8f9fa;
-  color: #212529;
+  /* background-color: #f8f9fa; */
+  background-color: #343a40;
+  /* color: #212529; */
+  color: #ffffff;
   padding: 10px 20px;
   text-align: center;
   text-decoration: none;
   border-radius: 0.25rem; 
   /* border-radius: 5px; */
   font-weight: bold;
-  border: 1px solid #ced4da;
+  /* border: 1px solid #ced4da; */
+  border: 1px solid #343a40;
   transition: background-color 0.3s ease;
+  display: inline-block; /* Ensure the button is inline-block */
+  white-space: nowrap; /* Prevent text from wrapping */
 }
 
 .button a:hover {

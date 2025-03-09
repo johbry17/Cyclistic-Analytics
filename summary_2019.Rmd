@@ -11,7 +11,6 @@ output:
     toc_float: true
     includes:
       before_body: "header.html"
-      # after_body: "footer.html"
     css: ./resources/css/styles.css
 ---
 
@@ -28,6 +27,10 @@ library(kableExtra)
 library(htmltools)
 ```
 
+<div class="button">
+  <a href="summary_2024.html">Link to<br>Cyclistic 2024</a>
+</div>
+
 A hypothetical data analysis project, answering a business question for a fictional bikeshare company, analyzing customer behavior and concluding with recommendations to assist in converting casual customers into annual members.
 
 ```{r, echo=FALSE}
@@ -41,7 +44,7 @@ q4_2019 = read.csv("./resources/data/q4_2019_cleaned.csv")
 df <- bind_rows(q1_2019, q2_2019, q3_2019, q4_2019)
 ```
 
-\
+<div class="summary-2019">
 
 # Executive Summary
 
@@ -278,7 +281,7 @@ Data cleaning consisted of:
 
 - Casual riders frequent **tourist/leisure spots** (e.g., Shedd Aquarium, Theater on the Lake).
 
-Further insights are available [here](https://github.com/johbry17/Cyclistic-A-Google-Data-Analytics-Capstone/blob/main/scratch_pad.Rmd).
+Further insights are available in the [exploratory data analysis](scratch_pad_2019.html).
 
 \
 
@@ -765,6 +768,8 @@ You will produce a report with the following deliverables:
 &nbsp;&nbsp;&nbsp;&nbsp; 6. Your top three recommendations based on your analysis
 
 </blockquote>
+
+</div>
 
 <img src="./resources/images/Logo_Freepik.png" alt="Cyclistic Logo" style="width:200px; display:block; margin:auto;">
 <p style="font-size: 12px; color: #555; margin:auto; text-align: center;">Source: <a href="https://www.freepik.com">Freepik</a></p>
