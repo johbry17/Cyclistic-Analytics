@@ -198,14 +198,31 @@ plot_leaflet_heatmap(trips_from_top_start_casual, "start_lng", "start_lat", "Top
 
 ---
 
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="2019's Top Stations and a Tourist Sightseeing Map."}
+# Add 2019 station plot, Chicago sightseeing map
+
+# image
+image_path <- "./resources/images/Chicago_Sightseeing_Map.jpg"
+img <- readJPEG(image_path)
+image_grob <- rasterGrob(img, interpolate = TRUE)
+
+# map
+image_path <- "./resources/images/2019_map_titled.png"
+img <- readPNG(image_path)
+top_stations_grob <- rasterGrob(img, interpolate = TRUE)
+
+# arrange plot and image side-by-side
+grid.arrange(top_stations_grob, image_grob, ncol = 2)
+```
+
 ```{r, echo=FALSE, fig.cap="2019's Top Member and Casual Stations."}
-knitr::include_graphics("./resources/images/2019_map.png")
+# knitr::include_graphics("./resources/images/2019_map.png")
 ```
 
 ---
 
 ```{r, echo=FALSE, fig.cap="Chicago Sightseeing Map."}
-knitr::include_graphics("./resources/images/Chicago_Sightseeing_map.jpg")
+# knitr::include_graphics("./resources/images/Chicago_Sightseeing_map.jpg")
 ```
 
 \
@@ -489,7 +506,7 @@ img <- readJPEG(image_path)
 image_grob <- rasterGrob(img, interpolate = TRUE)
 
 # map
-image_path <- "./resources/images/2019_map.png"
+image_path <- "./resources/images/2019_map_titled.png"
 img <- readPNG(image_path)
 top_stations_grob <- rasterGrob(img, interpolate = TRUE)
 
