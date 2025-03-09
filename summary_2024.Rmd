@@ -207,7 +207,7 @@ img <- readJPEG(image_path)
 image_grob <- rasterGrob(img, interpolate = TRUE)
 
 # map
-image_path <- "./resources/images/2019_map_titled.png"
+image_path <- "./resources/images/2019_map.png"
 img <- readPNG(image_path)
 top_stations_grob <- rasterGrob(img, interpolate = TRUE)
 
