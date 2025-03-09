@@ -1,5 +1,5 @@
 ---
-title: "<h1 style='font-size: 42px;'>Cyclistic: A Google Data Analytics Capstone</h1>"
+title: "<h1 style='font-size: 42px;'>Cyclistic 2019: A Google Data Analytics Capstone</h1>"
 subtitle: "Understanding Ridership Patterns to Drive Membership Growth"
 author: "<p style='font-style: italic;'>Bryan Johns</p>"
 # date: "`r format(Sys.Date(), '%Y-%m')`"
@@ -86,7 +86,7 @@ ggplot(average_ride_length, aes(x = member_casual, y = average_minutes, fill = m
 ---
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-# bar chart of rides per hour by day of week, free y-axis
+# bar chart of rides per hour by day of week
 df %>%
   mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
   group_by(hour, member_casual, day_of_week) %>%
@@ -149,6 +149,9 @@ plot_top_stations <- ggplot() +
     plot.subtitle = element_text(hjust = 0.5)
   ) # +
   # scale_color_manual(values = c("Member" = "blue", "Casual" = "orange"))
+
+# save image for 2024 and README.md
+# ggsave("./resources/images/2019_map.png", plot = plot_top_stations(), width = 8, height = 6, dpi = 300)
 
 # image
 image_path <- "./resources/images/Chicago_Sightseeing_Map.jpg"
@@ -308,7 +311,7 @@ data_dict <- data.frame(
   Description = c("Unique ride identifier.", 
                   "Ride start time (YYYY-MM-DD HH:MM:SS).",
                   "Ride end time (YYYY-MM-DD HH:MM:SS).",
-                  "Type of bicycle.",
+                  "Bicycle ID.",
                   "Starting station ID.",
                   "Starting station name.",
                   "Ending station ID.",

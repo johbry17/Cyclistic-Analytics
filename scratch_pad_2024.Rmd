@@ -680,7 +680,7 @@ ggplot(df, aes(x = rideable_type, y = ride_length, fill = member_casual)) +
        y = "Ride Length (minutes)")
 ```
 
-Classic pedal bikes are favored. Is that because there's a bigger supply, or greater consumer preference?
+Classic pedal bikes rides last longer. Is that because there's a bigger supply, or greater consumer preference? I bet it's because the electric ones ran out of power.
 
 ```{r}
 # bar chart: ride frequency by day of the week
@@ -742,7 +742,9 @@ df %>%
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-what's going on with electric_scooter there? Did they only briefly demo it in September? Or is this a categorizing error?
+What's going on with electric_scooter there? Did they only briefly demo it in September? Or is this a categorizing error?
+
+Note that the usage of electric bikes is upticking. Did they invest in electric bikes?
 
 ## Stations
 
@@ -1217,7 +1219,7 @@ plot_leaflet_heatmap(member, "Member Bike Trips")
 plot_leaflet_heatmap(casual, "Casual Bike Trips")
 ```
 
-The prior leafleat heatmaps are a sample of 50,000.
+The prior leafleat heatmaps are a sample of 50,000. Something went wrong, though, with the filter, as both maps are exactly the same.
 
 ```{r}
 library(leaflet)
