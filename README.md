@@ -15,11 +15,11 @@ Data Analysis of a fictional bicycle rideshare company business task, Cyclistic,
 
 A hypothetical data analysis project, answering a business question for a fictional bikeshare company, analyzing customer behavior and concluding with recommendations to assist in converting casual customers into annual members. The top three recommendations are provided.
 
-The summary report can be found [here](./docs/index.html).
+The summary report can be found [here](./index.html).
 
 ## Usage
 
-Look at the [Executive Summary](./docs/index.html) for a full report of results.
+Look at the [Executive Summary](./index.html) for a full report of results.
 
 `scratch_pad.Rmd` contains the initial exploratory data analysis and brainstorming.
 

@@ -306,6 +306,10 @@ Data cleaning consisted of:
   Further insights are available in the <a href="scratch_pad_2019.html">exploratory data analysis</a>.
 </span>
 
+<div class="button">
+  <a href="scratch_pad_2019.html">Exploratory Data Analysis 2019</a>
+</div>
+
 \
 
 ## Supporting Visualizations

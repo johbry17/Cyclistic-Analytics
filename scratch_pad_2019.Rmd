@@ -19,7 +19,7 @@ library(tidyverse)
 library(fontawesome)
 ```
 
-# Scratch Pad for 2019 Cyclistic Exploratory Data Analysis
+## Scratch Pad for 2019 Cyclistic Exploratory Data Analysis
 
 <div class="button">
   <a href="summary_2019.html#analysis">Back to<br>Cyclistic 2019</a>
