@@ -1,0 +1,132 @@
+---
+title: "Test"
+author: "Bryan Johns"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    includes:
+      before_body: "header.html"
+    css: ./resources/css/styles.css
+---
+
+<div class="floating-header">
+  Cyclistic 2019 Summary Report
+</div>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(fontawesome)
+```
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<i class="fas fa-book"></i>
+
+<div class="button">
+  <a href="summary_2024.html">Link to<br>Cyclistic 2024</a>
+</div>
+
+# Color Match
+
+---
+
+<p>
+  <a href="#scenario" class="fa-icon">`r fa("info-circle")`</a> 
+  For reference, the full case study details can be found in the [Appendix](#scenario).
+</p>
+
+<p>
+  <a href="#data-dictionary" class="fa-icon">`r fa("book")`</a>
+  A [Data Dictionary](#data-dictionary) is attached in the Appendix.
+</p>
+
+<p>
+  <a href="scratch_pad_2019.html" class="fa-icon">`r fa("chart-line")`</a>
+  Further insights are available in the [exploratory data analysis](scratch_pad_2024.html).
+</p>
+
+
+
+<span class="fa-container">
+  <a href="#data-dictionary" class="fa-icon">`r fa("chart-bar")`</a> 
+  A [Data Dictionary](#data-dictionary) is attached in the Appendix.
+</span>
+
+<span class="fa-container">
+  <a href="scratch_pad_2024.html" class="fa-icon">`r fa("search")`</a>
+  Further insights are available in the <a href="scratch_pad_2024.html">exploratory data analysis</a>.
+</span>
+
+<span class="fa-container">
+  <a href="scratch_pad_2024.html" class="fa-icon">`r fa("chart-line")`</a>
+  Further insights are available in the <a href="scratch_pad_2024.html">exploratory data analysis</a>.
+</span>
+
+<span class="fa-container">
+  <a href="scratch_pad_2024.html" class="fa-icon">`r fa("database")`</a>
+  Further insights are available in the <a href="scratch_pad_2024.html">exploratory data analysis</a>.
+</span>
+
+
+
+
+<span class="fa-container">
+  <a href="#scenario" class="fa-icon">`r fa("info-circle")`</a> 
+  For reference, the full case study details can be found in the [Appendix](#scenario).
+</span>
+
+\
+
+## Data Sources
+
+---
+
+<div class="text-border">
+
+The analysis incorporates cleaned ride data from all `r format(nrow(df), big.mark = ",")` bike rides of 2024, detailing trip durations, ride frequencies, station destinations, and date-time information.
+
+Google linked to [data](https://divvy-tripdata.s3.amazonaws.com/index.html) provided by Lyft and Divvy from their Chicago operations. The data has been made available by Motivate International Inc. under this [license](https://divvybikes.com/data-license-agreement).
+
+</div>
+
+<span class="fa-container">
+  <a href="#data-dictionary" class="fa-icon">`r fa("book")`</a> 
+  A [Data Dictionary](#data-dictionary) is attached in the Appendix.
+</span>
+
+
+
+
+
+bl
+
+bl
+
+bl
+
+bl
+
+bl
+
+bl
+
+<span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Data Sources](#data-sources)</span>
+
+
+# Appendix
+<span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Top](#)</span>
+
+---
+
+bleh
+
+
+# Appendix
+<span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Top](#)</span>
+
+---
+
+ta da

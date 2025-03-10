@@ -85,7 +85,8 @@ blockquote {
   position: fixed;
   top: 0;
   width: 100%;
-  background-color: #343a40;
+  /* background-color: #343a40; */
+  background-color: #0085A1;
   color: #ffffff;
   text-align: center;
   padding: 10px;
@@ -93,19 +94,13 @@ blockquote {
 }
 
 /* font awesome icons */
-/* wrapper to align icons and text */
-.fa-container {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
 .fa-icon {
   color: #0085A1;
   font-size: 20pt;
   transition: color 0.3s ease;
   margin-right: 8px;
   margin-left: 20px;
+  display: inline;
 }
 
 .fa-icon:hover {

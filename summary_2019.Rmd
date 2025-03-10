@@ -40,7 +40,6 @@ q1_2019 <- read.csv("./resources/data/q1_2019_cleaned.csv")
 q2_2019 <- read.csv("./resources/data/q2_2019_cleaned.csv")
 q3_2019 <- read.csv("./resources/data/q3_2019_cleaned.csv")
 q4_2019 <- read.csv("./resources/data/q4_2019_cleaned.csv")
-# stations <- read.csv("./resources/data/stations.csv")
 
 df <- bind_rows(q1_2019, q2_2019, q3_2019, q4_2019)
 ```
@@ -235,10 +234,10 @@ Cyclistic, a bike-share company in Chicago, aims to increase its number of annua
 
 To support this initiative, I have been assigned to analyze how annual members and casual riders use Cyclistic bikes differently. This analysis will identify key trends in usage patterns, which will inform marketing strategies designed to encourage casual riders to become members.
 
-<span class="fa-container">
+<p>
   <a href="#scenario" class="fa-icon">`r fa("info-circle")`</a> 
   For reference, the full case study details can be found in the [Appendix](#scenario).
-</span>
+</p>
 
 \
 
@@ -250,10 +249,10 @@ The analysis incorporates cleaned ride data from all `r format(nrow(df), big.mar
 
 Google linked to [data](https://divvy-tripdata.s3.amazonaws.com/index.html) provided by Lyft and Divvy from their Chicago operations. The data has been made available by Motivate International Inc. under this [license](https://divvybikes.com/data-license-agreement).
 
-<span class="fa-container">
-  <a href="#data-dictionary" class="fa-icon">`r fa("book")`</a> 
+<p>
+  <a href="#data-dictionary" class="fa-icon">`r fa("book")`</a>
   A [Data Dictionary](#data-dictionary) is attached in the Appendix.
-</span>
+</p>
 
 \
 
@@ -301,10 +300,10 @@ Data cleaning consisted of:
 
 - Casual riders frequent **tourist/leisure spots** (e.g., Shedd Aquarium, Theater on the Lake).
 
-<span class="fa-container">
-  <a href="scratch_pad_2019.html" class="fa-icon">`r fa("chart-line")`</a>
-  Further insights are available in the <a href="scratch_pad_2019.html">exploratory data analysis</a>.
-</span>
+<p>
+  <a href="scratch_pad_2019.html" class="fa-icon">`r fa("chart-bar")`</a>
+  Further insights are available in the [exploratory data analysis](scratch_pad_2024.html).
+</p>
 
 <div class="button">
   <a href="scratch_pad_2019.html">Exploratory Data Analysis 2019</a>
