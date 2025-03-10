@@ -4,23 +4,8 @@
   color: #6c757d;
 }
 
-/* Add a border to the 2019 summary report */
-.summary-2019 {
-  border: 2px solid #343a40;
-  padding: 20px;
-  margin: 20px;
-}
-
 body {
     font-size: 12pt;
-}
-
-blockquote {
-    font-size: 10pt;
-    color: #555;
-    border-left: 4px solid #ccc;
-    padding-left: 10px;
-    margin-left: 0;
 }
 
 h1 {
@@ -30,17 +15,21 @@ h1 {
 
 h2 {
   font-weight: bold;
+  color: #6c757d;
 }
 
 h3 {
   text-decoration: underline;
+  color: #6c757d;
 }
 
 h4 {
   text-decoration: underline;
   font-weight: bold;
+  color: #6c757d;
 }
 
+/* button stuff */
 .button {
   display: flex;
   justify-content: center;
@@ -50,23 +39,75 @@ h4 {
 
 .button a {
   /* background-color: #f8f9fa; */
-  background-color: #343a40;
+  /* background-color: #343a40; */
+  background-color: #0085A1;
+  /* background-color: #198754; */
   /* color: #212529; */
   color: #ffffff;
   padding: 10px 20px;
   text-align: center;
   text-decoration: none;
-  border-radius: 0.25rem; 
-  /* border-radius: 5px; */
+  /* border-radius: 0.25rem;  */
+  border-radius: 5px;
   font-weight: bold;
   /* border: 1px solid #ced4da; */
   border: 1px solid #343a40;
   transition: background-color 0.3s ease;
-  display: inline-block; /* Ensure the button is inline-block */
-  white-space: nowrap; /* Prevent text from wrapping */
+  display: inline-block; /* ensure button is inline-block */
+  white-space: nowrap; /* prevent text wrapping */
 }
 
 .button a:hover {
-  background-color: #0085A1;
-  /* background-color: #e2e6ea; */
+  background-color: #005f73; 
+  border: 1px solid #343a40; 
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+/* indented blockquote */
+blockquote {
+  /* font-size: 10pt; */
+  color: #555;
+  border-left: 4px solid #ccc;
+  padding-left: 10px;
+  margin-left: 0;
+}
+
+/* text box border */
+.text-border {
+  border: 2px solid #343a40;
+  padding: 20px;
+  margin: 20px;
+}
+
+/* floating header */
+.floating-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: #343a40;
+  color: #ffffff;
+  text-align: center;
+  padding: 10px;
+  z-index: 1000;
+}
+
+/* font awesome icons */
+/* wrapper to align icons and text */
+.fa-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fa-icon {
+  color: #0085A1;
+  font-size: 20pt;
+  transition: color 0.3s ease;
+  margin-right: 8px;
+  margin-left: 20px;
+}
+
+.fa-icon:hover {
+  color: #005f73;
 }
