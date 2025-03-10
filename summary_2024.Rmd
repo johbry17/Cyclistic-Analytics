@@ -540,7 +540,7 @@ This skips the top station, NA, as electric bikes commonly don't use a docking s
 
 ---
 
-<span style="  font-size: 14pt;">Top 10 starting stations for member and casual rides</span>
+<span style="  font-size: 13pt;">Top 10 starting stations for member and casual rides</span>
 
 <div class="map-container">
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
