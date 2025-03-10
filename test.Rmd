@@ -19,7 +19,107 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(fontawesome)
+library(leaflet)
+library(leaflet.extras)
+library(tidyverse)
+
 ```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# load data, combine into a df
+df <- read.csv("./resources/data/2024/202401-divvy-tripdata_cleaned.csv")
+
+# read_cyclistic_data <- function(year) {
+#   for (i in 1:12) {
+#     month <- sprintf("%02d", i) # Format as 01, 02, ..., 12
+#     file_path <- paste0("resources/data/", year, "/", year, month, "-divvy-tripdata_cleaned.csv")
+# 
+#     if (file.exists(file_path)) {
+#       data <- read_csv(file_path)
+#       data$month <- as.character(data$month) # ensure month is character
+#       assign(paste0("m", month), data, envir = .GlobalEnv)
+#     } else {
+#       message("File not found: ", file_path)
+#     }
+#   }
+# }
+# 
+# read_cyclistic_data(2024)
+# 
+# # regex to bind rows of all monthly data frames
+# df <- bind_rows(mget(ls(pattern = "^m\\d{2}$")))
+# 
+# # dump memory - invisible suppresses output
+# invisible(rm(list = ls(pattern = "^m\\d{2}(_cleaned)?$")))
+# invisible(gc())
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# Function to get top 10 stations for start or end locations
+get_top_stations <- function(data, station_col, member_type) {
+  data %>%
+    filter(!is.na(!!sym(station_col)), member_casual == member_type) %>%
+    count(!!sym(station_col), sort = TRUE) %>%
+    top_n(10, n) %>%
+    pull(!!sym(station_col))
+}
+
+# Get top 10 stations
+top_start_members <- get_top_stations(df, "start_station_name", "member")
+top_start_casual <- get_top_stations(df, "start_station_name", "casual")
+
+# Function to filter trips matching the top 10 stations
+filter_trips <- function(data, station_list, station_col) {
+  data %>% filter(!!sym(station_col) %in% station_list)
+}
+
+# Filter trips based on top stations
+trips_from_top_start_members <- filter_trips(df, top_start_members, "start_station_name")
+trips_from_top_start_casual <- filter_trips(df, top_start_casual, "start_station_name")
+
+# Function to plot Leaflet heatmaps
+plot_leaflet_heatmap <- function(data, lng_col, lat_col, title, zoom_level = 13) {
+  data <- data %>% filter(!is.na(!!sym(lng_col)) & !is.na(!!sym(lat_col)))
+
+  density_data <- data %>% count(!!sym(lng_col), !!sym(lat_col))
+  color_palette <- colorNumeric(palette = "viridis", domain = density_data$n)
+
+  leaflet(data) %>%
+    addTiles() %>%
+    setView(lng = -87.605, lat = 41.895, zoom = zoom_level) %>%
+    addHeatmap(
+      lng = as.formula(paste0("~", lng_col)),
+      lat = as.formula(paste0("~", lat_col)),
+      blur = 15, max = 1, radius = 10
+    ) %>%
+    addLegend(
+      position = "bottomleft",
+      pal = color_palette,
+      values = density_data$n,
+      title = title
+    )
+}
+```
+
+<span style="  font-size: 14pt;">Top 10 starting stations for member and casual rides</span>
+
+<div class="map-container">
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+plot_leaflet_heatmap(trips_from_top_start_members, "start_lng", "start_lat", "Top Stations<br>(Members)")
+```
+</div>
+
+\
+
+<div class="map-container">
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+plot_leaflet_heatmap(trips_from_top_start_casual, "start_lng", "start_lat", "Top Stations<br>(Casuals)")
+```
+</div>
+
+\
+
+Compare the above 2024 maps with 2019's map of top stations and sightseeing locations.
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 

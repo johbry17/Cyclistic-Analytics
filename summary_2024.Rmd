@@ -19,7 +19,6 @@ output:
 </div>
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-# bounds of leaflet map fixable for mobile? put it in a box
 # save plot(s)
 # final proofread
 # edit scratch pads
@@ -190,7 +189,7 @@ plot_leaflet_heatmap <- function(data, lng_col, lat_col, title, zoom_level = 13)
 
   leaflet(data) %>%
     addTiles() %>%
-    setView(lng = -87.61, lat = 41.895, zoom = zoom_level) %>%
+    setView(lng = -87.605, lat = 41.895, zoom = zoom_level) %>%
     addHeatmap(
       lng = as.formula(paste0("~", lng_col)),
       lat = as.formula(paste0("~", lat_col)),
@@ -205,13 +204,26 @@ plot_leaflet_heatmap <- function(data, lng_col, lat_col, title, zoom_level = 13)
 }
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-plot_leaflet_heatmap(trips_from_top_start_members, "start_lng", "start_lat", "Top 10 Stations<br>(Members)")
-```
+<span style="  font-size: 14pt;">Top 10 starting stations for member and casual rides</span>
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Compare the above 2024 maps with 2019's map of top stations and sightseeing locations."}
-plot_leaflet_heatmap(trips_from_top_start_casual, "start_lng", "start_lat", "Top 10 Stations<br>(Casuals)")
+<div class="map-container">
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+plot_leaflet_heatmap(trips_from_top_start_members, "start_lng", "start_lat", "Top Stations<br>(Members)")
 ```
+</div>
+
+\
+
+<div class="map-container">
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+plot_leaflet_heatmap(trips_from_top_start_casual, "start_lng", "start_lat", "Top Stations<br>(Casuals)")
+```
+</div>
+
+\
+
+Compare the above 2024 maps with 2019's map of top stations and sightseeing locations.
+
 
 ---
 
@@ -528,13 +540,26 @@ This skips the top station, NA, as electric bikes commonly don't use a docking s
 
 ---
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-plot_leaflet_heatmap(trips_from_top_start_members, "start_lng", "start_lat", "Top 10 Stations<br>(Members)")
-```
+<span style="  font-size: 14pt;">Top 10 starting stations for member and casual rides</span>
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Compare the above 2024 maps with 2019's top stations for members and casual rides, along with a tourist map."}
-plot_leaflet_heatmap(trips_from_top_start_casual, "start_lng", "start_lat", "Top 10 Stations<br>(Casuals)")
+<div class="map-container">
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+plot_leaflet_heatmap(trips_from_top_start_members, "start_lng", "start_lat", "Top Stations<br>(Members)")
 ```
+</div>
+
+\
+
+<div class="map-container">
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+plot_leaflet_heatmap(trips_from_top_start_casual, "start_lng", "start_lat", "Top Stations<br>(Casuals)")
+```
+</div>
+
+\
+
+Compare the above 2024 maps with 2019's map of top stations and sightseeing locations.
+
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # Add 2019 station plot, Chicago sightseeing map
