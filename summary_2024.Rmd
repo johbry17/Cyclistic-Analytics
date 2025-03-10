@@ -222,10 +222,9 @@ plot_leaflet_heatmap(trips_from_top_start_casual, "start_lng", "start_lat", "Top
 
 \
 
-Compare the above 2024 maps with 2019's map of top stations and sightseeing locations.
-
-
 ---
+
+Compare the above 2024 maps with 2019's:
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="2019's Top Member and Casual Stations, with a Tourist Sightseeing Map."}
 # Add 2019 station plot, Chicago sightseeing map
@@ -540,8 +539,6 @@ This skips the top station, NA, as electric bikes commonly don't use a docking s
 
 ---
 
-<span style="  font-size: 13pt;">Top 10 starting stations for member and casual rides</span>
-
 <div class="map-container">
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 plot_leaflet_heatmap(trips_from_top_start_members, "start_lng", "start_lat", "Top Stations<br>(Members)")
@@ -558,7 +555,7 @@ plot_leaflet_heatmap(trips_from_top_start_casual, "start_lng", "start_lat", "Top
 
 \
 
-Compare the above 2024 maps with 2019's map of top stations and sightseeing locations.
+Compare the above 2024 maps with 2019's map of top stations and sightseeing locations:
 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}

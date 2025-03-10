@@ -101,7 +101,7 @@ plot_leaflet_heatmap <- function(data, lng_col, lat_col, title, zoom_level = 13)
 }
 ```
 
-<span style="  font-size: 14pt;">Top 10 starting stations for member and casual rides</span>
+<span style="  font-size: 13pt;">Top 10 starting stations for member and casual rides</span>
 
 <div class="map-container">
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
