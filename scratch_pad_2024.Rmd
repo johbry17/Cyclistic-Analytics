@@ -18,6 +18,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(sf)
 library(ggspatial)
+library(fontawesome)
 ```
 
 ## Scratch Pad for 2024 Cyclistic Exploratory Data Analysis
@@ -28,7 +29,8 @@ library(ggspatial)
 
 Exploratory Data Analysis, unencumbered by the need to be **too** presentable. 
 
-## Load data
+# Load data
+<span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Top](#)</span>
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # load data, combine into a df
@@ -96,7 +98,8 @@ table(df$member_casual)
 
 In the scenario, and in real life, the data is shared without any sort of identifying information that would help track that, probably why after 2019 they removed gender and birth year. It wasn't much help anyway.
 
-## NA stations and e-bikes
+# NA stations and e-bikes
+<span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Top](#)</span>
 
 ```{r}
 # NA value counts
@@ -174,7 +177,8 @@ So, 45 duplicate station names, probably easily explained. Easier than the extra
 
 Electronic bikes are a game changer. I thought switching from 2019 to 2024 was gonna be easy.
 
-## Ride length (and NA end_lat/lng)
+# Ride length (and NA end_lat/lng)
+<span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Top](#)</span>
 
 IQR
 
@@ -234,7 +238,8 @@ ggplot(df, aes(x = ride_length)) +
   theme_minimal()
 ```
 
-## Ride length outliers / IQR
+# Ride length outliers / IQR
+<span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Top](#)</span>
 
 Note that I can toggle between these and "run all" to see the impact... and the power to skew results. Mwahahahaha!
 
@@ -309,8 +314,10 @@ summary(df_no_outliers$ride_length)
 I will very conservatively drop the 0.25% of rides over four and a half hours long.
 
 # Visualizations
+<span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Top](#)</span>
 
-## Rides by Member type (total rides, duration)
+# Rides by Member type (total rides, duration)
+<span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Top](#)</span>
 
 ```{r}
 # sum total ride length by membership type
@@ -413,7 +420,8 @@ Members ride more frequently for shorter duration (probably commuting).
 
 Casuals ride longer (probably leisure).
 
-## Time and Ridership
+# Time and Ridership
+<span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Top](#)</span>
 
 ```{r}
 # line chart of rides per month
@@ -657,7 +665,8 @@ ggplot(casual_peak_times, aes(x = hour, y = day_of_week, fill = rides)) +
 
 Peak time is Saturday afternoon, followed by Sunday afternoon. But also a little around peak end-of-work hour. Are casual riders transiting in to work, and biking back?
 
-## Bike Type
+# Bike Type
+<span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Top](#)</span>
 
 ```{r}
 # bar chart of total count of rideable_type
@@ -771,7 +780,8 @@ What's going on with electric_scooter there? Did they only briefly demo it in Se
 
 Note that the usage of electric bikes is upticking. Did they invest in electric bikes?
 
-## Stations
+# Stations
+<span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Top](#)</span>
 
 ```{r}
 # bar chart: top start stations

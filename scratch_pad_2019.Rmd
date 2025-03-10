@@ -16,9 +16,10 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(fontawesome)
 ```
 
-## Scratch Pad for 2019 Cyclistic Exploratory Data Analysis
+# Scratch Pad for 2019 Cyclistic Exploratory Data Analysis
 
 <div class="button">
   <a href="summary_2019.html#analysis">Back to<br>Cyclistic 2019</a>
@@ -92,7 +93,8 @@ print(df[which.max(df$ride_length), ])
 ```
 Kinda pointless to plot that.
 
-## Rides by Member type (total rides, duration)
+# Rides by Member type (total rides, duration)
+<span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Top](#)</span>
 
 ```{r}
 # sum total ride length by membership type
@@ -154,7 +156,8 @@ Members ride more frequently for shorter duration (probably commuting).
 
 Casuals ride longer, enough to beat members for total minutes on a bicycle.
 
-## Time and Ridership
+# Time and Ridership
+<span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Top](#)</span>
 
 ```{r}
 # line chart of rides per month
@@ -368,7 +371,8 @@ ggplot(casual_peak_times, aes(x = hour, y = day_of_week, fill = rides)) +
 
 Peak time is Saturday afternoon, followed by Sunday afternoon. Unsurprising.
 
-## Stations
+# Stations
+<span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Top](#)</span>
 
 ```{r}
 library(sf)
@@ -720,7 +724,8 @@ ggplot() +
 ```
 
 
-## Demographics
+# Demographics
+<span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Top](#)</span>
 
 Remember, this is member rides and casual rides, so member's presumably will be over respresented.
 
