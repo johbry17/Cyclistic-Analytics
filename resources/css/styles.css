@@ -1,11 +1,39 @@
 /* styles.css */
+
+/* YAML header */
 .subtitle, .author, .date {
   text-decoration: none;
   color: #6c757d;
 }
 
+ /* toc highlight color */
+.toc .active, .toc .highlight {
+  background-color: #0085A1;
+  color: #ffffff;
+}
+
+.toc .active a, .toc .highlight a {
+  color: #ffffff;
+}
+
+/* floating header */
+.floating-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #0085A1;
+  text-align: center;
+  padding: 10px;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* body styles */
 body {
     font-size: 12pt;
+    margin-top: 60px; /* for floating header */
 }
 
 h1 {
@@ -38,11 +66,7 @@ h4 {
 }
 
 .button a {
-  /* background-color: #f8f9fa; */
-  /* background-color: #343a40; */
   background-color: #0085A1;
-  /* background-color: #198754; */
-  /* color: #212529; */
   color: #ffffff;
   padding: 10px 20px;
   text-align: center;
@@ -50,7 +74,6 @@ h4 {
   /* border-radius: 0.25rem;  */
   border-radius: 5px;
   font-weight: bold;
-  /* border: 1px solid #ced4da; */
   border: 1px solid #343a40;
   transition: background-color 0.3s ease;
   display: inline-block; /* ensure button is inline-block */
@@ -66,7 +89,6 @@ h4 {
 
 /* indented blockquote */
 blockquote {
-  /* font-size: 10pt; */
   color: #555;
   border-left: 4px solid #ccc;
   padding-left: 10px;
@@ -78,19 +100,6 @@ blockquote {
   border: 2px solid #343a40;
   padding: 20px;
   margin: 20px;
-}
-
-/* floating header */
-.floating-header {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  /* background-color: #343a40; */
-  background-color: #0085A1;
-  color: #ffffff;
-  text-align: center;
-  padding: 10px;
-  z-index: 1000;
 }
 
 /* font awesome icons */

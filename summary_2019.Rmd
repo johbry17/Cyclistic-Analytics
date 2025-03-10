@@ -14,6 +14,10 @@ output:
     css: ./resources/css/styles.css
 ---
 
+<div class="floating-header">
+  Cyclistic 2019 Final Report
+</div>
+
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)

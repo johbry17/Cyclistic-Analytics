@@ -13,6 +13,10 @@ output:
     css: ./resources/css/styles.css
 ---
 
+<div class="floating-header">
+  2024 Exploratory Data Analysis
+</div>
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
@@ -28,9 +32,6 @@ library(fontawesome)
 </div>
 
 Exploratory Data Analysis, unencumbered by the need to be **too** presentable. 
-
-# Load data
-<span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Top](#)</span>
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # load data, combine into a df
@@ -312,9 +313,6 @@ summary(df_no_outliers$ride_length)
 ```
 
 I will very conservatively drop the 0.25% of rides over four and a half hours long.
-
-# Visualizations
-<span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Top](#)</span>
 
 # Rides by Member type (total rides, duration)
 <span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Top](#)</span>

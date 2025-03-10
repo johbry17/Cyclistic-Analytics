@@ -13,6 +13,10 @@ output:
     css: ./resources/css/styles.css
 ---
 
+<div class="floating-header">
+  2019 Exploratory Data Analysis
+</div>
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
