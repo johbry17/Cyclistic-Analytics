@@ -924,7 +924,7 @@ ggplot() +
   theme_minimal()
 ```
 
-Bar chart and mapping top start and end stations, casual and member, origin and destination - skipping NA's, the largest category
+<span style="font-weight: bold;">Bar charts and mapping top start and end stations, casual and member, origin and destination - skipping NA's, the largest category</span>
 
 ```{r}
 # aggregate casual rider counts by station
@@ -1243,8 +1243,12 @@ plot_leaflet_heatmap <- function(data, title, sample_size = 50000) {
 set.seed(42) # global seed for reproducibility
 
 # sample each group separately
-electric <- df_bbox %>% filter(rideable_type == "electric_bike") %>% sample_n(50000)
-classic <- df_bbox %>% filter(rideable_type == "classic_bike") %>% sample_n(50000)
+electric <- df_bbox %>%
+  filter(rideable_type == "electric_bike") %>%
+  sample_n(50000)
+classic <- df_bbox %>%
+  filter(rideable_type == "classic_bike") %>%
+  sample_n(50000)
 member <- df_bbox %>%
   filter(member_casual == "member") %>%
   sample_n(50000)
@@ -1293,7 +1297,7 @@ plot_leaflet_heatmap(casual, "Casual Bike Trips")
 
 \
 
-The prior leafleat heatmaps are a sample of 50,000. Something went wrong, though, with the filter, as both maps are exactly the same.
+The prior leafleat heatmaps are a sample of 50,000. Mapping every data point breaks the computer.
 
 ```{r}
 # function to get top 10 stations
