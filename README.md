@@ -15,9 +15,6 @@ Data Analysis of a fictional bicycle rideshare company business task, Cyclistic,
 
 A hypothetical data analysis project, answering a business question for a fictional bikeshare company, analyzing customer behavior and concluding with recommendations to assist in converting casual customers into annual members. Analysis covered the years 2024 and 2019. The top three recommendations are provided.
 
-![AI logo](./resources/images/Logo_AI.jpeg)
-*AI generated mock logo*
-
 This mock business task was completed as the capstone project for [Data Analytics Professional Certificate](https://www.coursera.org/professional-certificates/google-data-analytics).
 
 ![Six Phases of Data Analytics](./resources/images/six_phases_of_data_analytics.png)
@@ -48,7 +45,7 @@ Steps for data cleaning can be found in the [resources](https://github.com/johbr
 
 ## Certificate
 
-
+![Google Data Analytics Certificate](./resources/images/google_data_analytics_certificate.png)
 
 ## References
 
@@ -67,3 +64,6 @@ Thanks to Coursera and the team at Google that put this together, and to Google,
 ## Author
 
 Bryan Johns, March 2025
+
+![AI logo](./resources/images/Logo_AI.jpeg)
+*AI generated mock logo*
