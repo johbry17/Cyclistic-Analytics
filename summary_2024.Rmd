@@ -18,15 +18,6 @@ output:
   Cyclistic 2024 Final Report
 </div>
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-# save plot(s)
-# final proofread
-# edit scratch pads
-# styler
-# edit scratch pad 2024 - check on sample leaflet maps (they seem exactly the same)
-```
-
-
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -122,8 +113,6 @@ average_ride_length <- df %>%
   group_by(member_casual) %>%
   summarise(average_minutes = mean(ride_length, na.rm = TRUE))
 
-# print(average_ride_length)
-
 # bar chart of average ride length
 ggplot(average_ride_length, aes(x = member_casual, y = average_minutes, fill = member_casual)) +
   geom_bar(stat = "identity") +
@@ -141,7 +130,10 @@ ggplot(average_ride_length, aes(x = member_casual, y = average_minutes, fill = m
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # bar chart of rides per hour by day of week
 df %>%
-  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  mutate(
+    day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")),
+    hour = as.numeric(hour)
+  ) %>%
   group_by(hour, member_casual, day_of_week) %>%
   summarise(rides = n()) %>%
   ggplot(aes(x = hour, y = rides, fill = member_casual)) +
@@ -152,13 +144,15 @@ df %>%
     title = "Rides per Hour of Day by Customer Type and Day of Week",
     subtitle = "Casual riders peak on weekend afternoons; members peak during rush hours.",
     x = "Hour of Day", y = "Number of Rides"
-  )
+  ) +
+  scale_x_continuous(breaks = c(0, 5, 10, 15, 20)) + 
+  theme(axis.text.x = element_text(angle = 45))
 ```
 
 ---
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-# Function to get top 10 stations for start or end locations
+# function to get top 10 stations
 get_top_stations <- function(data, station_col, member_type) {
   data %>%
     filter(!is.na(!!sym(station_col)), member_casual == member_type) %>%
@@ -167,20 +161,20 @@ get_top_stations <- function(data, station_col, member_type) {
     pull(!!sym(station_col))
 }
 
-# Get top 10 stations
+# get top 10 stations for start or end locations, member and casual
 top_start_members <- get_top_stations(df, "start_station_name", "member")
 top_start_casual <- get_top_stations(df, "start_station_name", "casual")
 
-# Function to filter trips matching the top 10 stations
+# filter trips matching the top 10 stations
 filter_trips <- function(data, station_list, station_col) {
   data %>% filter(!!sym(station_col) %in% station_list)
 }
 
-# Filter trips based on top stations
+# filter trips based on top stations
 trips_from_top_start_members <- filter_trips(df, top_start_members, "start_station_name")
 trips_from_top_start_casual <- filter_trips(df, top_start_casual, "start_station_name")
 
-# Function to plot Leaflet heatmaps
+# function to plot Leaflet heatmaps
 plot_leaflet_heatmap <- function(data, lng_col, lat_col, title, zoom_level = 13) {
   data <- data %>% filter(!is.na(!!sym(lng_col)) & !is.na(!!sym(lat_col)))
 
@@ -227,7 +221,7 @@ plot_leaflet_heatmap(trips_from_top_start_casual, "start_lng", "start_lat", "Top
 Compare the above 2024 maps with 2019's:
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="2019's Top Member and Casual Stations, with a Tourist Sightseeing Map."}
-# Add 2019 station plot, Chicago sightseeing map
+# add 2019 station plot, Chicago sightseeing map
 
 # image
 image_path <- "./resources/images/Chicago_Sightseeing_Map.jpg"
@@ -243,15 +237,7 @@ top_stations_grob <- rasterGrob(img, interpolate = TRUE)
 grid.arrange(top_stations_grob, image_grob, ncol = 2)
 ```
 
-```{r, echo=FALSE, fig.cap="2019's Top Member and Casual Stations."}
-# knitr::include_graphics("./resources/images/2019_map.png")
-```
-
 ---
-
-```{r, echo=FALSE, fig.cap="Chicago Sightseeing Map."}
-# knitr::include_graphics("./resources/images/Chicago_Sightseeing_map.jpg")
-```
 
 \
 
@@ -342,6 +328,8 @@ Data cleaning consisted of:
 ● Removed duplicate rides.
 
 ● Removed outliers, conservatively dropping the longest 0.25% of rides, over 4.5 hours long.
+
+● Switched mapping to leaflet heatmaps. Lat/lng coordinates switched from 2019's exact station location to a more granular exact bike location, refelctive of the increase in electric bike usage.
 
 \
 
@@ -464,7 +452,10 @@ df %>%
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # bar chart of rides per hour by day of week, free y-axis
 df %>%
-  mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  mutate(
+    day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")),
+    hour = as.numeric(hour)
+  ) %>%
   group_by(hour, member_casual, day_of_week) %>%
   summarise(rides = n()) %>%
   ggplot(aes(x = hour, y = rides, fill = member_casual)) +
@@ -475,7 +466,9 @@ df %>%
     title = "Rides per Hour of Day by Customer Type and Day of Week",
     subtitle = "Free y-axis highlights weekend differences",
     x = "Hour of Day", y = "Number of Rides"
-  )
+  ) +
+  scale_x_continuous(breaks = c(0, 5, 10, 15, 20)) + 
+  theme(axis.text.x = element_text(angle = 45))
 ```
 
 ---
