@@ -23,6 +23,8 @@ library(tidyverse)
 library(sf)
 library(ggspatial)
 library(fontawesome)
+library(leaflet)
+library(leaflet.extras)
 ```
 
 ## Scratch Pad for 2024 Cyclistic Exploratory Data Analysis
@@ -153,7 +155,7 @@ known_stations <- df %>%
 print(count(known_stations))
 ```
 
-Stations no longer have a specific lat/lng. No exact station location maps anymore. Have to do heatmaps.
+Stations no longer have a specific lat/lng, like in 2019. No exact station location maps anymore. Have to do heatmaps.
 
 ```{r}
 # distinct start_station_name count
@@ -241,6 +243,8 @@ ggplot(df, aes(x = ride_length)) +
 
 # Ride length outliers / IQR
 <span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Top](#)</span>
+
+Experimenting with which outliers to remove.
 
 Note that I can toggle between these and "run all" to see the impact... and the power to skew results. Mwahahahaha!
 
@@ -758,6 +762,7 @@ df %>%
 ```
 
 ```{r}
+# bar chart of usage by bike type per month, member or casual
 df %>%
   mutate(month = format(as.Date(started_at), "%Y-%m")) %>%
   group_by(month, rideable_type, member_casual) %>%
@@ -846,15 +851,17 @@ top_stations <- df %>%
 print(top_stations)
 ```
 
+\
+
+<div class="map-container">
 ```{r}
 # Leaflet: popular start stations with cleaned data
-library(leaflet)
 
 # remove rows with missing latitude or longitude values
 cleaned_data <- df %>%
   filter(!is.na(start_lng) & !is.na(start_lat))
 
-# get a sample - too many rows, it crashes my computer to plot all 4 million
+# get a sample - too many rows, it crashes my computer to plot all 4 million non-NA rides
 set.seed(123) # for reproducibility of sample
 cleaned_data <- cleaned_data %>% sample_n(1000)
 
@@ -863,9 +870,15 @@ leaflet(data = cleaned_data) %>%
   addTiles() %>%
   addMarkers(lng = ~start_lng, lat = ~start_lat, clusterOptions = markerClusterOptions())
 ```
+</div>
+
+\
 
 Remember, there are 1800 stations (per the data), not 692 (per the company - in scenario), for mysterious reasons.
 
+\
+
+<div class="map-container">
 ```{r}
 # Leaflet: popular end stations with cleaned data
 library(leaflet)
@@ -874,7 +887,7 @@ library(leaflet)
 cleaned_data <- df %>%
   filter(!is.na(end_lng) & !is.na(end_lat))
 
-# get a sample - too many rows, it crashes my computer to plot all 4 million
+# get a sample - too many rows, it crashes my computer to plot all 4 million non-NA rides
 set.seed(123) # for reproducibility of sample
 cleaned_data <- cleaned_data %>% sample_n(1000)
 
@@ -883,11 +896,11 @@ leaflet(data = cleaned_data) %>%
   addTiles() %>%
   addMarkers(lng = ~end_lng, lat = ~end_lat, clusterOptions = markerClusterOptions())
 ```
+</div>
+
+\
 
 ```{r}
-library(sf)
-library(ggspatial)
-
 # sample data
 set.seed(123) # for reproducibility
 cleaned_data <- df %>% sample_n(1000)
@@ -911,6 +924,8 @@ ggplot() +
   theme_minimal()
 ```
 
+Bar chart and mapping top start and end stations, casual and member, origin and destination - skipping NA's, the largest category
+
 ```{r}
 # aggregate casual rider counts by station
 casual_peak_stations <- df %>%
@@ -928,10 +943,6 @@ ggplot(casual_peak_stations, aes(x = reorder(start_station_name, n), y = n, fill
 ```
 
 ```{r}
-# map of top start stations for casual riders
-library(sf)
-library(ggspatial)
-
 # convert top casual start stations to sf object
 casual_start_sf <- casual_peak_stations %>%
   left_join(df, by = c("start_station_name")) %>% # Join to get lat/lng
@@ -939,7 +950,7 @@ casual_start_sf <- casual_peak_stations %>%
   drop_na(start_lat, start_lng) %>%
   st_as_sf(coords = c("start_lng", "start_lat"), crs = 4326)
 
-# plot the map
+# plot map
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = casual_start_sf, color = "blue", size = 3, alpha = 0.7) +
@@ -959,7 +970,7 @@ casual_end_from_start_sf <- df %>%
   drop_na(end_lat, end_lng) %>%
   st_as_sf(coords = c("end_lng", "end_lat"), crs = 4326)
 
-# map end stations
+# plot map
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = casual_end_from_start_sf, color = "blue", size = 3, alpha = 0.7) +
@@ -988,7 +999,7 @@ ggplot(casual_peak_stations, aes(x = reorder(end_station_name, n), y = n, fill =
 ```
 
 ```{r}
-# Convert top casual end stations to sf object
+# convert top casual end stations to sf object
 casual_end_sf <- casual_peak_stations %>%
   filter(!is.na(end_station_name)) %>%
   left_join(df, by = c("end_station_name")) %>%
@@ -996,7 +1007,7 @@ casual_end_sf <- casual_peak_stations %>%
   drop_na(end_lat, end_lng) %>%
   st_as_sf(coords = c("end_lng", "end_lat"), crs = 4326)
 
-# Plot map
+# plot map
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = casual_end_sf, color = "blue", size = 3, alpha = 0.7) +
@@ -1018,7 +1029,7 @@ casual_start_from_end_sf <- df %>%
   drop_na(start_lat, start_lng) %>%
   st_as_sf(coords = c("start_lng", "start_lat"), crs = 4326)
 
-# map: start stations
+# plot map
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = casual_start_from_end_sf, color = "blue", size = 3, alpha = 0.7) +
@@ -1102,14 +1113,14 @@ ggplot(member_peak_stations, aes(x = reorder(end_station_name, n), y = n, fill =
 ```
 
 ```{r}
-# Convert top member end stations to sf object
+# convert top member end stations to sf object
 member_end_sf <- member_peak_stations %>%
   left_join(df, by = c("end_station_name")) %>%
   distinct(end_station_name, end_lat, end_lng) %>%
   drop_na(end_lat, end_lng) %>%
   st_as_sf(coords = c("end_lng", "end_lat"), crs = 4326)
 
-# Plot map
+# plot map
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = member_end_sf, color = "red", size = 3, alpha = 0.7) +
@@ -1123,7 +1134,7 @@ ggplot() +
 Again, looks like 2019. Members go to The Loop, Chicago's business district.
 
 ```{r}
-# Extract start stations for trips ending at top member end stations
+# extract start stations for trips ending at top member end stations
 member_start_sf <- df %>%
   filter(!is.na(start_station_name)) %>%
   filter(end_station_name %in% member_peak_stations$end_station_name) %>%
@@ -1131,7 +1142,7 @@ member_start_sf <- df %>%
   drop_na(start_lat, start_lng) %>%
   st_as_sf(coords = c("start_lng", "start_lat"), crs = 4326)
 
-# Plot map
+# plot map
 ggplot() +
   annotation_map_tile(type = "osm", zoom = 12) +
   geom_sf(data = member_start_sf, color = "blue", size = 3, alpha = 0.7) +
@@ -1143,7 +1154,7 @@ ggplot() +
 ```
 
 ```{r}
-# prep heatmaps
+# prep for heatmaps
 
 # bounding box for Chicago (approximate lat/lng bounds) to exclude strange outliers
 chicago_bbox <- st_bbox(c(xmin = -88.1, xmax = -87.3, ymin = 41.5, ymax = 42.1), crs = st_crs(4326))
@@ -1169,7 +1180,7 @@ casual <- df_bbox %>% filter(member_casual == "casual")
 # heatmap function
 plot_heatmap <- function(data, title) {
   ggplot(data, aes(x = start_lng, y = start_lat)) +
-    geom_bin2d(bins = 100) + # Adjust bins for granularity
+    geom_bin2d(bins = 100) + # adjust bins for granularity
     scale_fill_gradient(low = "blue", high = "red") +
     theme_minimal() +
     labs(title = title, x = "Longitude", y = "Latitude")
@@ -1204,25 +1215,23 @@ plot_heatmap(casual, "Casual Trips Heatmap")
 ```
 
 ```{r}
-library(leaflet)
-library(leaflet.extras)
-
+# function for leaflet maps of a sample (50,000 rides), groups filtered in next block
 plot_leaflet_heatmap <- function(data, title, sample_size = 50000) {
   data_sample <- data %>% sample_n(sample_size)
 
-  # Compute density (counts per unique lat/lng combination)
+  # get density (counts per unique lat/lng combination)
   density_data <- data_sample %>%
     count(end_lng, end_lat)
 
-  # Define a continuous color palette
+  # define continuous color palette
   color_palette <- colorNumeric(palette = "viridis", domain = density_data$n)
 
   leaflet(data_sample) %>%
     addTiles() %>%
-    setView(lng = -87.63, lat = 41.88, zoom = 13) %>% # Center on downtown Chicago
+    setView(lng = -87.605, lat = 41.88, zoom = 13) %>% # Center on downtown Chicago
     addHeatmap(lng = ~end_lng, lat = ~end_lat, blur = 15, max = 1, radius = 10) %>%
     addLegend(
-      position = "bottomright",
+      position = "bottomleft",
       pal = color_palette,
       values = density_data$n,
       title = title
@@ -1231,11 +1240,11 @@ plot_leaflet_heatmap <- function(data, title, sample_size = 50000) {
 ```
 
 ```{r}
-set.seed(42) # Global seed for reproducibility
+set.seed(42) # global seed for reproducibility
 
-# Sample each group separately
-# electric <- df_bbox %>% filter(rideable_type == "electric_bike") %>% sample_n(50000)
-# classic <- df_bbox %>% filter(rideable_type == "classic_bike") %>% sample_n(50000)
+# sample each group separately
+electric <- df_bbox %>% filter(rideable_type == "electric_bike") %>% sample_n(50000)
+classic <- df_bbox %>% filter(rideable_type == "classic_bike") %>% sample_n(50000)
 member <- df_bbox %>%
   filter(member_casual == "member") %>%
   sample_n(50000)
@@ -1252,29 +1261,42 @@ casual <- df_bbox %>%
 # plot_contour_heatmap(casual, "Casual Trips Heatmap")
 ```
 
+<div class="map-container">
 ```{r}
-# Plot Leaflet Heatmaps
-# plot_leaflet_heatmap(electric, "Electric Bike Trips")
+plot_leaflet_heatmap(electric, "Electric Bike Trips")
 ```
+</div>
 
+\
+
+<div class="map-container">
 ```{r}
-# plot_leaflet_heatmap(classic, "Classic Bike Trips")
+plot_leaflet_heatmap(classic, "Classic Bike Trips")
 ```
+</div>
 
+\
+
+<div class="map-container">
 ```{r}
 plot_leaflet_heatmap(member, "Member Bike Trips")
 ```
+</div>
 
+\
+
+<div class="map-container">
 ```{r}
 plot_leaflet_heatmap(casual, "Casual Bike Trips")
 ```
+</div>
+
+\
 
 The prior leafleat heatmaps are a sample of 50,000. Something went wrong, though, with the filter, as both maps are exactly the same.
 
 ```{r}
-library(leaflet)
-
-# Function to get top 10 stations for start or end locations
+# function to get top 10 stations
 get_top_stations <- function(data, station_col, member_type) {
   data %>%
     filter(!is.na(!!sym(station_col)), member_casual == member_type) %>%
@@ -1283,26 +1305,26 @@ get_top_stations <- function(data, station_col, member_type) {
     pull(!!sym(station_col))
 }
 
-# Get top 10 stations
+# get top 10 stations for start or end locations, member and casual
 top_start_members <- get_top_stations(df, "start_station_name", "member")
 top_end_members <- get_top_stations(df, "end_station_name", "member")
 
 top_start_casual <- get_top_stations(df, "start_station_name", "casual")
 top_end_casual <- get_top_stations(df, "end_station_name", "casual")
 
-# Function to filter trips matching the top 10 stations
+# filter trips matching the top 10 stations
 filter_trips <- function(data, station_list, station_col) {
   data %>% filter(!!sym(station_col) %in% station_list)
 }
 
-# Filter trips based on top stations
+# filter trips based on top stations
 trips_from_top_start_members <- filter_trips(df, top_start_members, "start_station_name")
 trips_to_top_end_members <- filter_trips(df, top_end_members, "end_station_name")
 
 trips_from_top_start_casual <- filter_trips(df, top_start_casual, "start_station_name")
 trips_to_top_end_casual <- filter_trips(df, top_end_casual, "end_station_name")
 
-# Function to plot Leaflet heatmaps
+# function to plot Leaflet heatmaps
 plot_leaflet_heatmap <- function(data, lng_col, lat_col, title, zoom_level = 13) {
   data <- data %>% filter(!is.na(!!sym(lng_col)) & !is.na(!!sym(lat_col)))
 
@@ -1311,14 +1333,14 @@ plot_leaflet_heatmap <- function(data, lng_col, lat_col, title, zoom_level = 13)
 
   leaflet(data) %>%
     addTiles() %>%
-    setView(lng = -87.63, lat = 41.88, zoom = zoom_level) %>%
+    setView(lng = -87.605, lat = 41.88, zoom = zoom_level) %>%
     addHeatmap(
       lng = as.formula(paste0("~", lng_col)),
       lat = as.formula(paste0("~", lat_col)),
       blur = 15, max = 1, radius = 10
     ) %>%
     addLegend(
-      position = "bottomright",
+      position = "bottomleft",
       pal = color_palette,
       values = density_data$n,
       title = title
@@ -1326,38 +1348,71 @@ plot_leaflet_heatmap <- function(data, lng_col, lat_col, title, zoom_level = 13)
 }
 ```
 
+\
+
+<div class="map-container">
 ```{r}
 plot_leaflet_heatmap(trips_from_top_start_members, "start_lng", "start_lat", "Top 10 Start (Members)")
 ```
+</div>
 
+\
+
+<div class="map-container">
 ```{r}
 plot_leaflet_heatmap(trips_from_top_start_members, "end_lng", "end_lat", "Destinations from Top 10 Start (Members)")
 ```
+</div>
 
+\
+
+<div class="map-container">
 ```{r}
 plot_leaflet_heatmap(trips_to_top_end_members, "end_lng", "end_lat", "Top 10 End (Members)")
 ```
+</div>
 
+\
+
+<div class="map-container">
 ```{r}
 plot_leaflet_heatmap(trips_to_top_end_members, "start_lng", "start_lat", "Origins for Top 10 End (Members)")
 ```
+</div>
 
+\
+
+<div class="map-container">
 ```{r}
 plot_leaflet_heatmap(trips_from_top_start_casual, "start_lng", "start_lat", "Top 10 Start (Casuals)")
 ```
+</div>
 
+\
+
+<div class="map-container">
 ```{r}
 plot_leaflet_heatmap(trips_from_top_start_casual, "end_lng", "end_lat", "Destinations from Top 10 Start (Casuals)")
 ```
+</div>
 
+\
+
+<div class="map-container">
 ```{r}
 plot_leaflet_heatmap(trips_to_top_end_casual, "end_lng", "end_lat", "Top 10 End (Casuals)")
 ```
+</div>
 
+\
+
+<div class="map-container">
 ```{r}
 plot_leaflet_heatmap(trips_to_top_end_casual, "start_lng", "start_lat", "Origins for Top 10 End (Casuals)")
 ```
+</div>
 
+\
 
 <img src="./resources/images/Logo_Freepik.png" alt="Cyclistic Logo" style="width:200px; display:block; margin:auto;">
 <p style="font-size: 12px; color: #555; margin:auto; text-align: center;">Source: <a href="https://www.freepik.com">Freepik</a></p>
