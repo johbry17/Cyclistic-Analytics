@@ -39,7 +39,7 @@ library(fontawesome)
   <a href="summary_2019.html">Link to<br>Cyclistic 2019</a>
 </div>
 
-A hypothetical data analysis project, answering a business question for a fictional bikeshare company, analyzing customer behavior and concluding with recommendations to assist in converting casual customers into annual members.
+A hypothetical data analysis project, answering a business question for a fictional bikeshare company, analyzing customer behavior, and concluding with recommendations to assist in converting casual customers into annual members.
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # load data, combine into a df
@@ -99,9 +99,9 @@ This report analyzes historical data on Cyclistic users to provide insights for 
 
 - **Annual members are predominantly commuters:** Their rides are shorter (averaging under 12 minutes) and occur mainly during weekday commuting hours (8 AM and 5 PM).
 
-- **Location trends:** Members’ trips are concentrated in downtown Chicago’s central business district (The Loop), while casual riders frequent popular leisure destinations.
+- **Location trends:** Members’ trips are concentrated in downtown Chicago’s business districts, while casual riders favor popular leisure destinations.
 
-- **Increasing electric bike usage:** Both members and casual riders display a mildly growing preference for electric bikes.
+- **Increasing electric bike usage:** Both members and casual riders show a growing preference for electric bikes.
 
 \
 
@@ -145,7 +145,7 @@ df %>%
     subtitle = "Casual riders peak on weekend afternoons; members peak during rush hours.",
     x = "Hour of Day", y = "Number of Rides"
   ) +
-  scale_x_continuous(breaks = c(0, 5, 10, 15, 20)) + 
+  scale_x_continuous(breaks = c(0, 5, 10, 15, 20)) +
   theme(axis.text.x = element_text(angle = 45))
 ```
 
@@ -208,6 +208,10 @@ plot_leaflet_heatmap(trips_from_top_start_members, "start_lng", "start_lat", "To
 
 \
 
+The above hotspots correspond to The Loop and River North, neighborhoods known for a dense concentration of offices, commerical establishments, and residential buildings. They include Ogilvie Transportation Center and Union Station, serving commuters transitioning between regional trains and local destinations.
+
+\
+
 <div class="map-container">
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 plot_leaflet_heatmap(trips_from_top_start_casual, "start_lng", "start_lat", "Top Stations<br>(Casuals)")
@@ -216,11 +220,13 @@ plot_leaflet_heatmap(trips_from_top_start_casual, "start_lng", "start_lat", "Top
 
 \
 
+The above hotspots correspond to The Loop, Streeterville, Gold Coast, Lincoln Park, and the Near South Side, neighborhoods known for their proximity to Chicago’s lakefront, parks, cultural institutions, and tourist attractions. These destinations include Millennium Park, Museum Campus, and Navy Pier, drawing visitors for sightseeing, entertainment, and recreational activities along Lake Michigan. Many locations offer scenic waterfront views, beach access, and connections to Chicago’s extensive bike path network.
+
 ---
 
 Compare the above 2024 maps with 2019's:
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="2019's Top Member and Casual Stations, with a Tourist Sightseeing Map."}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="2019's top member and casual stations, with a tourist sightseeing map."}
 # add 2019 station plot, Chicago sightseeing map
 
 # image
@@ -245,7 +251,7 @@ grid.arrange(top_stations_grob, image_grob, ncol = 2)
 
 ### Top Recommendations
 
-**Leisure-Focused Marketing:** Position membership as a way to enhance casual riders' existing leisure habits by emphasizing benefits, such as unlimited rides and extended ride times.
+**Leisure-Focused Marketing:** Position membership as a way to enhance casual riders' existing leisure habits by emphasizing benefits, such as unlimited rides, extended ride times, and the convenience of electronic bikes.
 
 **Targeted Digital Advertising:** Deploy ads on platforms frequented by casual riders, particularly those related to entertainment, travel, and dining, and use geo-targeted ads near high-traffic leisure stations.
 
@@ -315,21 +321,21 @@ Google linked to [data](https://divvy-tripdata.s3.amazonaws.com/index.html) prov
 
 ---
 
-Google provided a starter template to clean the data (see [here](https://github.com/johbry17/Cyclistic-A-Google-Data-Analytics-Capstone/blob/main/resources/data_cleaning_v1.R), covering only Q1 2019 and Q1 2020. The template was substantially modified to clean all of 2024 (see [here](https://github.com/johbry17/Cyclistic-A-Google-Data-Analytics-Capstone/blob/main/resources/data_cleaning_v3.R)).
+Google provided a starter [template](https://github.com/johbry17/Cyclistic-A-Google-Data-Analytics-Capstone/blob/main/resources/data_cleaning_v1.R) to clean the data, initially covering only Q1 2019 and Q1 2020. This template was significantly modified to clean all of 2024. [See full data cleaning script](https://github.com/johbry17/Cyclistic-A-Google-Data-Analytics-Capstone/blob/main/resources/data_cleaning_v3.R).
 
 Data cleaning consisted of:
 
-● Created columns for day, month, year, season, and day of the week to support aggregation. Standardized months into two-digit format, e.g., "09" for September.
+● Created columns for day, month, year, season, and day of the week to support aggregation.
 
 ● Calculated `ride_length` in minutes.
 
-● Removed negative `ride_length` values, including company-flagged Quality Control rides.
+● Removed negative `ride_length` values, including company-flagged quality control rides.
 
 ● Removed duplicate rides.
 
-● Removed outliers, conservatively dropping the longest 0.25% of rides, over 4.5 hours long.
+● Removed outliers, conservatively dropping the longest 0.25% of rides (>4.5 hours).
 
-● Switched mapping to leaflet heatmaps. Lat/lng coordinates switched from 2019's exact station location to a more granular exact bike location, refelctive of the increase in electric bike usage.
+● Switched to Leaflet for mapping due to the transition from station-based coordinates in 2019 to more granular bike location data, making it impossible to map single stations.
 
 \
 
@@ -349,7 +355,7 @@ Data cleaning consisted of:
 
 **Trip locations differ**:
 
-- Members favor **The Loop** for commuting.
+- Members primarily ride to **The Loop, River North, and key transit hubs** for commuting.
 
 - Casual riders frequent **tourist/leisure spots** (e.g., Shedd Aquarium, Theater on the Lake).
 
@@ -467,7 +473,7 @@ df %>%
     subtitle = "Free y-axis highlights weekend differences",
     x = "Hour of Day", y = "Number of Rides"
   ) +
-  scale_x_continuous(breaks = c(0, 5, 10, 15, 20)) + 
+  scale_x_continuous(breaks = c(0, 5, 10, 15, 20)) +
   theme(axis.text.x = element_text(angle = 45))
 ```
 
@@ -569,7 +575,7 @@ grid.arrange(image_grob, top_stations_grob, ncol = 2)
 ```
 
 
-- **Members**: Cluster in The Loop, likely for commuting.
+- **Members**: Cluster around The Loop, River North, and transit centers, likely for commuting.
 
 - **Casual Riders**: Frequent tourist/leisure spots (Millennium Park, Shedd Aquarium, Theater on the Lake, etc.).
 
@@ -610,9 +616,9 @@ df %>%
 
 - Seasonal variation impacts both groups similarly, with low winter activity.
 
-- Monitor to see if electric bike usage continues to increase.
+- Monitor trends in electric bike usage for future marketing strategies.
 
-- Business Recommendation: Cyclistic should tailor promotions based on these insights (e.g., discount weekend passes for casual riders or commuter incentives for members).
+- **Recommendation:** Cyclistic should tailor promotions accordingly, such as discount weekend passes for casual riders or commuter incentives for members.
 
 </div>
 
@@ -622,49 +628,55 @@ df %>%
 
 ---
 
-### Purpose of advertising
+### Advertising Strategies
 
-- **Promote Membership as a Lifestyle Upgrade**: Position membership as an enhancement to the existing leisure experience.
+- **Position Membership as a Lifestyle Upgrade** – Frame membership as a seamless extension of leisure and commuting habits.
 
-- **Leverage Member Testimonials**: Showcase testimonials from members who use Cyclistic for recreational purposes.
+- **Showcase Member Testimonials** – Highlight real stories from recreational users to foster social proof.
 
-- **Emphasize Value**: Highlight the convenience of unlimited rides, extended trip durations, and cost savings.
+- **Emphasize Value** – Promote benefits such as unlimited rides, longer trip durations, and cost savings.
 
-### Advertising:
+### Targeted Outreach:
 
-- **Target Relevant Online Audiences**: Place ads on travel blogs, event pages, and dining/entertainment guides.
+- **Strategic Ad Placements** – Advertise on travel blogs, event pages, and entertainment guides.
 
-- **Leverage Local Events for Exposure**: Promote Cyclistic at major Chicago events such as St. Patrick’s Day, the Chicago Blues Festival, the Air & Water Show, and Pride, offering limited-time festival passes (e.g., "Skip the traffic with a special Lollapalooza festival pass!").
+- **Event-Based Promotions** – Offer festival-specific passes at major Chicago events (e.g., “Skip the traffic with a Lollapalooza festival pass!”)..
 
-- **Use Geo-Targeted Mobile Ads**: Display ads near high-traffic casual rider stations with messages like "Ride unlimited this weekend – try a membership today!"
+- **Geo-Targeted Mobile Ads** – Display dynamic ads near high-traffic casual rider stations with messages like “Ride unlimited this weekend — Try a membership today!”
 
-- **Implement Personalized Email Marketing**: Follow up with casual riders via email (e.g., "You rode three times this month. A membership would've saved you $X!").
+- **Personalized Email Marketing** – Send follow-ups to casual riders: “You rode three times this month—a membership would’ve saved you $X!”
 
-- **Engage Social Media Influencers**: Partner with travel vloggers and influencers to create content showcasing scenic rides and group bike tours (e.g., "Museum Ride" or "Scenic Chicago Ride").
+- **Influencer & Social Media Engagement** – Partner with travel vloggers and lifestyle influencers to showcase scenic and group rides (e.g., "Scenic Chicago Ride").
 
-### Promotions:
+### Promotional Incentives:
 
-- **Weekend Membership Plans:** Introduce a “Leisure Package” offering extended weekend ride times.
+- **Weekend Membership Plans** – Introduce a “Leisure Package” with extended ride times for weekend users.
 
-- **Seasonal Discounts:** Launch summer promotions when ridership peaks.
+- **Seasonal Discounts** – Launch summer promotions when ridership peaks.
 
-- **Referral Bonuses:** Encourage existing members to invite friends by offering incentives. Casual riders frequently bike in groups.
+- **Referral Rewards** – Encourage members to invite friends with exclusive perks, leveraging group riding behavior.
 
-- **Trial Memberships:** Offer discounted first-month trials to entice casual users ("First month free!").
+- **Trial Memberships** – Offer a discounted first month to new members (“First month free!”).
 
-- **Partnership Discounts:** Collaborate with local attractions (e.g., discounted admission to museums or restaurants for members).
+- **Partnership Discounts** – Collaborate with local attractions for member perks (e.g., museum or restaurant discounts).
 
-- **Gamification & Rewards:** Implement a leaderboard tracking miles ridden among friends (similar to Strava) and reward milestones with merchandise or free guest passes.
+- **Gamification & Rewards** – Implement a leaderboard tracking miles ridden among friends, rewarding engagement with merchandise or guest passes.
 
 ### Commuter crossover marketing.
 
-- **Promote Bike Commuting as a Smart Alternative**: Highlight the convenience and cost-effectiveness of commuting by bike (e.g., "Beat rush hour traffic!").
+- **Position Bike Commuting as a Smart Alternative** – Highlight time and cost savings (“Beat rush hour traffic!”).
 
-- **Offer Trial Passes During Peak Hours**: Provide free trial passes to potential commuters during weekday rush hours (8 AM and 5 PM).
+- **Rush Hour Trial Passes** – Distribute free trial passes at key commuter hours (8 AM and 5 PM).
 
-- **Develop Corporate and Student Memberships**: Establish partnerships offering discounts for employees and young professionals.
+- **Corporate & Student Memberships** – Establish employer and university partnerships for exclusive discounts.
 
-- **Integrate with Public Transit**: Develop a transit partnership with CTA (Chicago Transit Authority) for bundled bike-and-train/bus memberships.
+- **Transit Integration** – Develop bundled memberships with the Chicago Transit Authority (CTA) for seamless bike-and-train/bus commuting.
+
+### Expanding Electric Bike Adoption
+
+- **Promote E-Bike Convenience** - Emphasize the ease of longer-distance rides and reduced effort compared to traditional bikes.
+
+- **Monitor & Leverage E-Bike Trends** – Track e-bike usage patterns to refine marketing strategies and highlight their growing popularity in ads.
 
 <img src="./resources/images/Logo_Freepik.png" alt="Cyclistic Logo" style="width:200px; display:block; margin:auto;">
 
@@ -675,7 +687,7 @@ df %>%
 
 The analysis reveals clear distinctions between casual riders and annual members, providing a strategic opportunity for conversion. Casual riders tend to use Cyclistic for leisure and social activities, while members prioritize convenience and cost savings. By tailoring marketing efforts, Cyclistic can effectively shift casual users toward membership.
 
-A combination of targeted advertising, compelling promotions, and commuter-focused incentives will maximize conversion rates. Engaging casual riders through event-based marketing, geo-targeted ads, and influencer collaborations will help create stronger brand awareness. Additionally, promotions such as weekend memberships, referral bonuses, and trial offers will lower the barrier to entry.
+A combination of targeted advertising, compelling promotions, and leisure-focused incentives will maximize conversion rates. Engaging casual riders through event-based marketing, geo-targeted ads, and influencer collaborations will help create stronger brand awareness. Additionally, promotions such as weekend memberships, referral bonuses, and trial offers will lower the barrier to entry.
 
 Finally, strengthening partnerships with corporations, universities, and public transit systems will enhance Cyclistic’s appeal to commuters. By capitalizing on both the leisure and commuter benefits of membership, Cyclistic can expand its reach, encourage long-term adoption, and solidify its position as Chicago’s go-to bikeshare service. Through these strategic initiatives, Cyclistic is well-positioned to drive membership growth while enriching the overall rider experience.
 

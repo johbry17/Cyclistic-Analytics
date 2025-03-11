@@ -78,8 +78,6 @@ average_ride_length <- df %>%
   group_by(member_casual) %>%
   summarise(average_minutes = mean(ride_length, na.rm = TRUE))
 
-# print(average_ride_length)
-
 # bar chart of average ride length
 ggplot(average_ride_length, aes(x = member_casual, y = average_minutes, fill = member_casual)) +
   geom_bar(stat = "identity") +
@@ -155,7 +153,6 @@ plot_top_stations <- ggplot() +
     subtitle = "Cross-reference top casual stations with the sightseeing map.",
     color = "Rider Type"
   ) +
-  # coord_sf(xlim = c(-87.65, -87.55), ylim = c(41.86, 41.93), expand = FALSE) +
   theme_minimal() +
   theme(
     axis.text.x = element_blank(),
@@ -164,7 +161,7 @@ plot_top_stations <- ggplot() +
     plot.subtitle = element_text(hjust = 0.5),
   )
 
-# Save the plot with a different title and subtitle
+# save plot with a different title and subtitle, to use in 2024
 plot_top_stations_gsave <- plot_top_stations +
   labs(
     title = "",
@@ -265,7 +262,7 @@ Google linked to [data](https://divvy-tripdata.s3.amazonaws.com/index.html) prov
 
 ---
 
-Google provided a starter template to clean the data (see [here](https://github.com/johbry17/Cyclistic-A-Google-Data-Analytics-Capstone/blob/main/resources/data_cleaning_v1.R), covering only Q1 2019 and Q1 2020. To analyze all of 2019, I modified the script to clean individual quarters of Cyclistic data.
+Google provided a starter [template](https://github.com/johbry17/Cyclistic-A-Google-Data-Analytics-Capstone/blob/main/resources/data_cleaning_v1.R) to clean the data, initially covering only Q1 2019 and Q1 2020. This template was significantly modified to clean all of 2019. [See full data cleaning script](https://github.com/johbry17/Cyclistic-A-Google-Data-Analytics-Capstone/blob/main/resources/data_cleaning_v2.R).
 
 Google’s template removed trip duration, gender, and birth year from 2019 and omitted station latitude/longitude from 2020. I retained gender and birth year by excluding 2020 and added 2020's lat/lng to 2019.
 
@@ -441,33 +438,6 @@ df %>%
 #### Top Stations by Rider Type
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-# # aggregate member rider counts by station and add an index
-# member_peak_stations <- df %>%
-#   filter(member_casual == "member") %>%
-#   count(start_station_name, sort = TRUE) %>%
-#   top_n(10, n) %>%
-#   mutate(index = row_number())
-#
-# # aggregate casual rider counts by station and add an index
-# casual_peak_stations <- df %>%
-#   filter(member_casual == "casual") %>%
-#   count(start_station_name, sort = TRUE) %>%
-#   top_n(10, n) %>%
-#   mutate(index = row_number())
-#
-# # merge
-# merged_peak_stations <- member_peak_stations %>%
-#   rename(member_rides = n, member_station = start_station_name) %>%
-#   full_join(casual_peak_stations %>% rename(casual_rides = n, casual_station = start_station_name), by = "index")
-#
-# # drop index
-# merged_peak_stations <- merged_peak_stations %>% select(-index)
-#
-# # print
-# merged_peak_stations
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # style tables
 member_table <- member_peak_stations %>%
   rename(Station = start_station_name, "Member Rides" = n) %>%
@@ -570,7 +540,6 @@ grid.arrange(image_grob, plot_top_stations, ncol = 2)
 # age distribution
 ggplot(df, aes(x = 2020 - birthyear, fill = member_casual)) +
   geom_histogram(binwidth = 5, alpha = 0.7, position = "dodge") +
-  # stat_bin(binwidth = 5, geom = "text", aes(label = ..count..), vjust = -0.5, position = position_dodge(5)) +
   theme_minimal() +
   labs(title = "Age Distribution by Rider Type", x = "Age", y = "Count") +
   xlim(0, 100)
@@ -666,7 +635,7 @@ ggplot(df, aes(x = gender, fill = member_casual)) +
 
 The analysis reveals clear distinctions between casual riders and annual members, providing a strategic opportunity for conversion. Casual riders tend to use Cyclistic for leisure and social activities, while members prioritize convenience and cost savings. By tailoring marketing efforts, Cyclistic can effectively shift casual users toward membership.
 
-A combination of targeted advertising, compelling promotions, and commuter-focused incentives will maximize conversion rates. Engaging casual riders through event-based marketing, geo-targeted ads, and influencer collaborations will help create stronger brand awareness. Additionally, promotions such as weekend memberships, referral bonuses, and trial offers will lower the barrier to entry.
+A combination of targeted advertising, compelling promotions, and leisure-focused incentives will maximize conversion rates. Engaging casual riders through event-based marketing, geo-targeted ads, and influencer collaborations will help create stronger brand awareness. Additionally, promotions such as weekend memberships, referral bonuses, and trial offers will lower the barrier to entry.
 
 Finally, strengthening partnerships with corporations, universities, and public transit systems will enhance Cyclistic’s appeal to commuters. By capitalizing on both the leisure and commuter benefits of membership, Cyclistic can expand its reach, encourage long-term adoption, and solidify its position as Chicago’s go-to bikeshare service. Through these strategic initiatives, Cyclistic is well-positioned to drive membership growth while enriching the overall rider experience.
 
