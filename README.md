@@ -4,7 +4,7 @@ Data Analysis of a fictional bicycle rideshare company business task, Cyclistic,
 - [Description](#description)
 - [Usage](#usage)
 - [Gallery](#gallery)
-- [Certificate](#certificate)
+- [Program Certificate of Completion](#program-certificate-of-completion)
 - [References](#references)
 - [Licenses](#licenses)
 - [Acknowledgements](#acknowledgements)
@@ -43,7 +43,7 @@ Steps for data cleaning can be found in the [resources](https://github.com/johbr
 
 ![2024 Rides per Month by Bike and Member Type](./resources/images/bike_type_month_2024.png)
 
-## Certificate
+## Program Certificate of Completion
 
 ![Google Data Analytics Certificate](./resources/images/google_data_analytics_certificate.png)
 
