@@ -10,6 +10,7 @@ output:
     toc_depth: 2
     toc_float: true
     includes:
+      in_header: "favicon_header.html"
       before_body: "header.html"
     css: ./resources/css/styles.css
 ---
