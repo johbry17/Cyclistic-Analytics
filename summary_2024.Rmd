@@ -3,15 +3,17 @@ title: "<h1 style='font-size: 42px;'>Cyclistic 2024: A Google Data Analytics Cap
 subtitle: "Understanding Ridership Patterns to Drive Membership Growth"
 author: "<p style='font-style: italic;'>Bryan Johns</p>"
 # date: "`r format(Sys.Date(), '%Y-%m')`"
-date: "`r format(Sys.Date(), '%B %Y')`"
+date: "March 2025"
 output:
   html_document:
     toc: true
     toc_depth: 2
     toc_float: true
+    self_contained: false
     includes:
       in_header: "favicon_header.html"
       before_body: "header.html"
+      after_body: footer.html
     css: ./resources/css/styles.css
 ---
 

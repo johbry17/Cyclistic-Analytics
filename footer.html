@@ -1,0 +1,51 @@
+<!-- Footer -->
+<footer class="site-footer" role="contentinfo">
+  <span class="footer-owner">
+    &copy; <span id="copyright-year">2025</span>
+    <span class="footer-author">Bryan C. Johns</span>
+  </span>
+  <span class="footer-links">
+    <a
+      href="https://johbry17.github.io/portfolio/index.html"
+      target="_blank"
+      class="portfolio-link"
+      aria-label="Portfolio"
+    >
+      <i
+        class="fas fa-laptop-code footer-icon"
+        aria-hidden="true"
+        title="Portfolio"
+      ></i
+      >Portfolio
+    </a>
+    <a
+      href="https://www.linkedin.com/in/b-johns/"
+      target="_blank"
+      class="linkedin-link"
+      aria-label="LinkedIn"
+    >
+      <i
+        class="fab fa-linkedin footer-icon"
+        aria-hidden="true"
+        title="LinkedIn"
+      ></i
+      >LinkedIn
+    </a>
+    <a
+      href="https://github.com/johbry17/Cyclistic-A-Google-Data-Analytics-Capstone"
+      target="_blank"
+      class="github-link"
+      aria-label="GitHub"
+    >
+      <i class="fab fa-github footer-icon" aria-hidden="true" title="GitHub"></i
+      >GitHub
+    </a>
+  </span>
+</footer>
+<script>
+  // Auto-update year
+  const yearElement = document.getElementById("copyright-year");
+  if (yearElement) {
+    yearElement.textContent = new Date().getFullYear();
+  }
+</script>
