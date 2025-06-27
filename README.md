@@ -1,39 +1,82 @@
 # Cyclistic-A-Google-Data-Analytics-Capstone
-Data Analysis of a fictional bicycle rideshare company business task, Cyclistic, for the Google Data Analytics Capstone
 
-- [Description](#description)
+*What drives a casual rider to become a member? An R-powered look into bikeshare behavior.*
+
+📄 [Final Report (2024)](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/summary_2024.html)  
+📄 [Final Report (2019)](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/summary_2019.html)  
+📊 [EDA (2024)](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/scratch_pad_2024.html)  
+📊 [EDA (2019)](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/scratch_pad_2019.html)
+
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Tools & Technologies](#tools--technologies)
 - [Usage](#usage)
 - [Gallery](#gallery)
-- [Program Certificate of Completion](#program-certificate-of-completion)
+- [Certificate](#certificate)
 - [References](#references)
 - [Licenses](#licenses)
 - [Acknowledgements](#acknowledgements)
 - [Author](#author)
 
+## Project Overview
 
-## Description
+**Cyclistic** is a hypothetical bikeshare company in Chicago. This project investigates differences between casual riders and annual members to support a key business goal: increase member conversions.
 
-A hypothetical data analysis project, answering a business question for a fictional bikeshare company, analyzing customer behavior and concluding with recommendations to assist in converting casual customers into annual members. Analysis covered the years 2024 and 2019. The top three recommendations are provided.
+Using public data provided by Divvy (via Lyft), the analysis:
+- Cleans and preprocesses raw CSVs from 2024 and 2019
+- Explores ride patterns by time, location, and bike type
+- Visualizes data with `ggplot2`, `leaflet`, and R Markdown
+- Provides strategic recommendations based on real insights
 
-This mock business task was completed as the capstone project for [Data Analytics Professional Certificate](https://www.coursera.org/professional-certificates/google-data-analytics).
+Originally built as the final project for the [Google Data Analytics Certificate](https://www.coursera.org/professional-certificates/google-data-analytics), it follows the six-phase analytics process:
 
 ![Six Phases of Data Analytics](./resources/images/six_phases_of_data_analytics.png)
 
+## Features
+
+- 📄 R Markdown reports knitted to interactive HTML
+- 🗺️ Interactive Leaflet maps showing ride density by user type
+- 📈 Time-of-day usage patterns (hourly ride histograms)
+- 📆 Weekday vs. weekend trends by user type
+- 📊 Bike type and ride volume by month
+- 🧭 Year-over-year comparisons to spot post-pandemic trends
+- 📌 Top stations mapped for casuals vs. members
+- 💡 Strategic recommendations for converting casual riders
+
+## Tools & Technologies
+
+- **Language:** R, R Markdown
+- **Packages:** tidyverse, sf, ggspatial, leaflet, leaflet.extras, fontawesome
+- **Cleaning Scripts:** `data_cleaning_v2.R`, `data_cleaning_v3.R`
+- **Deployment:** GitHub Pages (HTML reports)
+
 ## Usage
 
-Final documentaion is posted on the web, knitted from R Markdown into HTML.
+1. View the final summary reports:
+   - [2024 Summary](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/summary_2024.html)
+   - [2019 Summary](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/summary_2019.html)
 
-The final report can be found [here](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/summary_2024.html), for 2024. Also included is analysis for 2019, located [here](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/summary_2019.html).
+2. Explore the exploratory data analysis:
+   - [2024 EDA](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/scratch_pad_2024.html)
+   - [2019 EDA](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/scratch_pad_2019.html)
 
-2024's exploratory data analysis is posted [here](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/scratch_pad_2024.html). 2019's can be found [here](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/scratch_pad_2019.html).
-
-Steps for data cleaning can be found in the [resources](https://github.com/johbry17/Cyclistic-A-Google-Data-Analytics-Capstone/tree/main/resources) folder. Google provided a template, `data_cleaning_v1.R`. `data_cleaning_v2.R` processed data for 2019, and `data_cleaning_v3.R` cleaned 2024. To clean the same data and use the above exploratory data analyses, download the data from the [source](https://divvy-tripdata.s3.amazonaws.com/index.html).
+3. Run cleaning scripts:
+   - Download trip data from [Divvy Data Portal](https://divvy-tripdata.s3.amazonaws.com/index.html)
+   - Use provided R scripts to clean and process the data locally:
+     - `data_cleaning_v2.R` for 2019
+     - `data_cleaning_v3.R` for 2024
 
 ## Gallery
+
+Time & Day Plots:
 
 ![Rides per Hour, by Member Type](./resources/images/rides_hour_2024.png)
 
 ![Rides per Hour and Day of Week, by Member Type](./resources/images/rides_per_hour_and_day_of_week_2024.png)
+
+Map Visualizations:
 
 ![2019 comparison map](./resources/images/2019_comparison_map.png)
 
@@ -41,9 +84,13 @@ Steps for data cleaning can be found in the [resources](https://github.com/johbr
 
 ![2024 member stations map](./resources/images/leaflet_member_2024.png)
 
+Bike Type by Month:
+
 ![2024 Rides per Month by Bike and Member Type](./resources/images/bike_type_month_2024.png)
 
-## Program Certificate of Completion
+## Certificate
+
+Final capstone project for [Google Data Analytics Professional Certificate](https://www.coursera.org/professional-certificates/google-data-analytics)
 
 ![Google Data Analytics Certificate](./resources/images/google_data_analytics_certificate.png)
 
@@ -53,17 +100,21 @@ Divvy and Lyft provided the [data](https://divvy-tripdata.s3.amazonaws.com/index
 
 ## Licenses
 
-MIT License, copyright 2025, Bryan Johns.
-
-The [data](https://divvy-tripdata.s3.amazonaws.com/index.html) has been made available by Motivate International Inc. under this [license](https://divvybikes.com/data-license-agreement).
+- MIT License © 2025 Bryan Johns
+- Data provided under the [Divvy Data License Agreement](https://divvybikes.com/data-license-agreement)
 
 ## Acknowledgements
 
-Thanks to Coursera and the team at Google that put this together, and to Google, Lyft, Divvy, and Motivate International Inc. for making the data available.
+Thanks to:
+- Google and Coursera for the learning platform
+- Divvy, Lyft, and Motivate International Inc. for providing the data
+- Everyone working on sustainable mobility solutions
 
 ## Author
 
-Bryan Johns, March 2025
+Bryan Johns, March 2025  
+[bryan.johns.official@gmail.com](mailto:bryan.johns.official@gmail.com) | [LinkedIn](https://www.linkedin.com/in/b-johns/) | [GitHub](https://github.com/johbry17) | [Portfolio](https://johbry17.github.io/portfolio/index.html)
+
 
 ![AI logo](./resources/images/Logo_AI.jpeg)
 *AI generated mock logo*
