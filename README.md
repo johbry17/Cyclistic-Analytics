@@ -2,8 +2,8 @@
 
 *What drives a casual rider to become a member? An R-powered look into bikeshare behavior.*
 
-📄 [Final Report (2024)](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/summary_2024.html)  
-📄 [Final Report (2019)](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/summary_2019.html)  
+🔗 [Final Report (2024)](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/summary_2024.html)  
+🔗 [Final Report (2019)](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/summary_2019.html)  
 📊 [EDA (2024)](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/scratch_pad_2024.html)  
 📊 [EDA (2019)](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/scratch_pad_2019.html)
 
