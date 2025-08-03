@@ -324,7 +324,7 @@ Google linked to [data](https://divvy-tripdata.s3.amazonaws.com/index.html) prov
 
 ---
 
-Google provided a starter [template](https://github.com/johbry17/Cyclistic-A-Google-Data-Analytics-Capstone/blob/main/resources/data_cleaning_v1.R) to clean the data, initially covering only Q1 2019 and Q1 2020. This template was significantly modified to clean all of 2024. [See full data cleaning script](https://github.com/johbry17/Cyclistic-A-Google-Data-Analytics-Capstone/blob/main/resources/data_cleaning_v3.R).
+Google provided a starter [template](https://github.com/johbry17/Cyclistic-Analytics/blob/main/resources/data_cleaning_v1.R) to clean the data, initially covering only Q1 2019 and Q1 2020. This template was significantly modified to clean all of 2024. [See full data cleaning script](https://github.com/johbry17/Cyclistic-Analytics/blob/main/resources/data_cleaning_v3.R).
 
 Data cleaning consisted of:
 
@@ -363,7 +363,7 @@ Data cleaning consisted of:
 - Casual riders frequent **tourist/leisure spots** (e.g., Shedd Aquarium, Theater on the Lake).
 
 <p>
-  <a href="scratch_pad_2019.html" class="fa-icon">`r fa("chart-line")`</a>
+  <a href="scratch_pad_2024.html" class="fa-icon">`r fa("chart-line")`</a>
   Further insights are available in the [exploratory data analysis](scratch_pad_2024.html).
 </p>
 
@@ -754,7 +754,7 @@ kable(data_dict, caption = "Cyclistic Ride Data Dictionary", format = "html") %>
 
 <span style="font-size: 10pt;">[`r fa("arrow-up")` &nbsp; Back to Ask](#ask)</span>
 
-Quoted from the Google Data Analytics Capstone (see PDF [here](https://github.com/johbry17/Cyclistic-A-Google-Data-Analytics-Capstone/blob/main/resources/Case%20Study%201_How%20does%20a%20bike-share%20navigate%20speedy%20success.pdf)):
+Quoted from the Google Data Analytics Capstone (see PDF [here](https://github.com/johbry17/Cyclistic/blob/main/resources/Case%20Study%201_How%20does%20a%20bike-share%20navigate%20speedy%20success.pdf)):
 
 <blockquote style="font-size: 10pt;">You are a junior data analyst working on the marketing analyst team at Cyclistic, a bike-share company in Chicago. The director of marketing believes the company’s future success depends on maximizing the number of annual memberships. Therefore, your team wants to understand how casual riders and annual members use Cyclistic bikes dierently. From these insights, your team will design a new marketing strategy to convert casual riders into annual members. But first, Cyclistic executives must approve your recommendations, so they must be backed up with compelling data insights and professional data visualizations.
 

@@ -1,11 +1,11 @@
-# Cyclistic-A-Google-Data-Analytics-Capstone
+# Cyclistic Analytics
 
 *What drives a casual rider to become a member? An R-powered look into bikeshare behavior.*
 
-🔗 [Final Report (2024)](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/summary_2024.html)  
-🔗 [Final Report (2019)](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/summary_2019.html)  
-📊 [EDA (2024)](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/scratch_pad_2024.html)  
-📊 [EDA (2019)](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/scratch_pad_2019.html)
+🔗 [Final Report (2024)](https://johbry17.github.io/Cyclistic-Analytics/summary_2024.html)  
+🔗 [Final Report (2019)](https://johbry17.github.io/Cyclistic-Analytics/summary_2019.html)  
+📊 [EDA (2024)](https://johbry17.github.io/Cyclistic-Analytics/scratch_pad_2024.html)  
+📊 [EDA (2019)](https://johbry17.github.io/Cyclistic-Analytics/scratch_pad_2019.html)
 
 ## Table of Contents
 
@@ -55,12 +55,12 @@ Originally built as the final project for the [Google Data Analytics Certificate
 ## Usage
 
 1. View the final summary reports:
-   - [2024 Summary](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/summary_2024.html)
-   - [2019 Summary](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/summary_2019.html)
+   - [2024 Summary](https://johbry17.github.io/Cyclistic-Analytics/summary_2024.html)
+   - [2019 Summary](https://johbry17.github.io/Cyclistic-Analytics/summary_2019.html)
 
 2. Explore the exploratory data analysis:
-   - [2024 EDA](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/scratch_pad_2024.html)
-   - [2019 EDA](https://johbry17.github.io/Cyclistic-A-Google-Data-Analytics-Capstone/scratch_pad_2019.html)
+   - [2024 EDA](https://johbry17.github.io/Cyclistic-Analytics/scratch_pad_2024.html)
+   - [2019 EDA](https://johbry17.github.io/Cyclistic-Analytics/scratch_pad_2019.html)
 
 3. Run cleaning scripts:
    - Download trip data from [Divvy Data Portal](https://divvy-tripdata.s3.amazonaws.com/index.html)

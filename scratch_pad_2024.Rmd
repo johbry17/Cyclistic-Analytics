@@ -1,5 +1,5 @@
 ---
-title: "2024 Scratch Pad"
+title: "2024 Exploratory Data Analysis"
 author: "<p style='font-style: italic;'>Bryan Johns</p>"
 # date: "`r format(Sys.Date(), '%Y-%m')`"
 date: "March 2025"
@@ -30,7 +30,7 @@ library(leaflet)
 library(leaflet.extras)
 ```
 
-## Scratch Pad for 2024 Cyclistic Exploratory Data Analysis
+## Full Analytical Workflow and Exploratory Outputs
 
 <div class="button">
   <a href="summary_2024.html#analysis">Back to<br>Cyclistic 2024</a>
