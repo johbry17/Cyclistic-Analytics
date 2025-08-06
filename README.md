@@ -1,4 +1,5 @@
-# Cyclistic Analytics
+# Cyclistic Analytics  
+<span style="font-size:1.1em; color:#555;">Google Data Analytics Capstone</span>
 
 *What drives a casual rider to become a member? An R-powered look into bikeshare behavior.*
 
