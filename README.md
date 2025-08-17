@@ -6,8 +6,8 @@
 
 🔗 [Final Report (2024)](https://johbry17.github.io/Cyclistic-Analytics/summary_2024.html)  
 🔗 [Final Report (2019)](https://johbry17.github.io/Cyclistic-Analytics/summary_2019.html)  
-📊 [EDA (2024)](https://johbry17.github.io/Cyclistic-Analytics/scratch_pad_2024.html)  
-📊 [EDA (2019)](https://johbry17.github.io/Cyclistic-Analytics/scratch_pad_2019.html)
+🔗 [EDA (2024)](https://johbry17.github.io/Cyclistic-Analytics/scratch_pad_2024.html)  
+🔗 [EDA (2019)](https://johbry17.github.io/Cyclistic-Analytics/scratch_pad_2019.html)
 
 ## Table of Contents
 
@@ -38,14 +38,14 @@ Originally built as the final project for the [Google Data Analytics Certificate
 
 ## Features
 
-- 📄 R Markdown reports knitted to interactive HTML
-- 🗺️ Interactive Leaflet maps showing ride density by user type
-- 📈 Time-of-day usage patterns (hourly ride histograms)
-- 📆 Weekday vs. weekend trends by user type
-- 📊 Bike type and ride volume by month
-- 🧭 Year-over-year comparisons to spot post-pandemic trends
-- 📌 Top stations mapped for casuals vs. members
-- 💡 Strategic recommendations for converting casual riders
+- R Markdown reports knitted to interactive HTML
+- Interactive Leaflet maps showing ride density by user type
+- Time-of-day usage patterns (hourly ride histograms)
+- Weekday vs. weekend trends by user type
+- Bike type and ride volume by month
+- Year-over-year comparisons to spot post-pandemic trends
+- Top stations mapped for casuals vs. members
+- Strategic recommendations for converting casual riders
 
 ## Tools & Technologies
 
@@ -118,5 +118,5 @@ Bryan Johns, March 2025
 [bryan.johns.official@gmail.com](mailto:bryan.johns.official@gmail.com) | [LinkedIn](https://www.linkedin.com/in/b-johns/) | [GitHub](https://github.com/johbry17) | [Portfolio](https://johbry17.github.io/portfolio/index.html)
 
 
-![AI logo](./resources/images/Logo_AI.jpeg)
-*AI generated mock logo*
+<!-- ![AI logo](./resources/images/Logo_AI.jpeg) -->
+<!-- *AI generated mock logo* -->
